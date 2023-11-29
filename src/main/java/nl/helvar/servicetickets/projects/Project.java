@@ -48,4 +48,8 @@ public class Project {
     public void setTickets(List<ServiceTicket> tickets) {
         this.tickets = tickets;
     }
+
+    public void addTicket(ServiceTicket ticket) {
+        this.tickets.add(ticket);
+    }
 }

@@ -1,5 +1,6 @@
 package nl.helvar.servicetickets.projects;
 
+import nl.helvar.servicetickets.servicetickets.ServiceTicket;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -58,15 +59,32 @@ public class ProjectController {
         return ResponseEntity.created(uri).body(project);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Project> replaceProject(@PathVariable("id") Long id, @RequestBody Project newProject) {
-        Optional<Project> Project = projectRepository.findById(id);
+    @PostMapping("/{id}/tickets")
+    public ResponseEntity<ServiceTicket> addServiceTicketToProject(@PathVariable("id") Long id, @RequestBody ServiceTicket ticket) {
+        Optional<Project> project = projectRepository.findById(id);
 
-        if (Project.isEmpty()) {
+        if (project.isEmpty()) {
             // CREATE EXCEPTION HERE
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         } else {
-            Project existingProject = Project.get();
+            Project existingProject = project.get();
+
+            existingProject.addTicket(ticket);
+            projectRepository.save(existingProject);
+
+            return new ResponseEntity<>(ticket, HttpStatus.OK);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Project> replaceProject(@PathVariable("id") Long id, @RequestBody Project newProject) {
+        Optional<Project> project = projectRepository.findById(id);
+
+        if (project.isEmpty()) {
+            // CREATE EXCEPTION HERE
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        } else {
+            Project existingProject = project.get();
 
             BeanUtils.copyProperties(newProject, existingProject, "id");
 
@@ -78,13 +96,13 @@ public class ProjectController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Project> deleteProject(@PathVariable("id") Long id) {
-        Optional<Project> Project = projectRepository.findById(id);
+        Optional<Project> project = projectRepository.findById(id);
 
-        if (Project.isEmpty()) {
+        if (project.isEmpty()) {
             // CREATE EXCEPTION HERE
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         } else {
-            Project existingProject = Project.get();
+            Project existingProject = project.get();
 
             projectRepository.delete(existingProject);
 
