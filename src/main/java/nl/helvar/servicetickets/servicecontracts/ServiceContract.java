@@ -1,6 +1,7 @@
 package nl.helvar.servicetickets.servicecontracts;
 
 import jakarta.persistence.*;
+import nl.helvar.servicetickets.projects.Project;
 
 @Entity
 @Table(name = "service_contracts")
@@ -13,6 +14,8 @@ public class ServiceContract {
     private int availableTime;
     @Column(name = "used_time")
     private int usedTime;
+    @OneToOne(mappedBy = "serviceContract")
+    private Project project;
 
     public Long getId() {
         return id;

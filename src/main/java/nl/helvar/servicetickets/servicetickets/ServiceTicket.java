@@ -1,6 +1,8 @@
 package nl.helvar.servicetickets.servicetickets;
 
 import jakarta.persistence.*;
+import nl.helvar.servicetickets.projects.Project;
+import nl.helvar.servicetickets.projects.ProjectSpecification;
 import nl.helvar.servicetickets.reports.Report;
 
 import java.util.List;
@@ -16,9 +18,12 @@ public class ServiceTicket {
     private String status; //ENUM MAKEN!!!
     // private List<Media> media;
     private String description;
-    @OneToMany
-    private List<Report> reports;
-    // private User submittedBy
+    @ManyToOne
+    @JoinColumn(name = "project_id")
+    private Project project;
+//    @OneToMany
+//    private List<Report> reports;
+//    // private User submittedBy
     @Column(name = "minutes_spent")
     private int minutesSpent;
 
@@ -56,14 +61,6 @@ public class ServiceTicket {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public List<Report> getReports() {
-        return reports;
-    }
-
-    public void setReports(List<Report> reports) {
-        this.reports = reports;
     }
 
     public int getMinutesSpent() {

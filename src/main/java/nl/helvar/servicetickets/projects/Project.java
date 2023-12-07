@@ -4,8 +4,11 @@ import jakarta.persistence.*;
 import nl.helvar.servicetickets.servicecontracts.ServiceContract;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
 
+import javax.swing.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "projects")
@@ -15,11 +18,11 @@ public class Project {
     private Long id;
     private String name;
     private String address;
-//    @OneToMany
-//    private List<ServiceTicket> tickets = new ArrayList<>();
-//    @OneToOne
-//    @Column(name = "service_contract")
-//    private ServiceContract serviceContract;
+    @OneToMany(mappedBy = "project")
+    private Set<ServiceTicket> tickets = new HashSet<>();
+    @OneToOne
+    @JoinColumn
+    private ServiceContract serviceContract;
 
 
     public Long getId() {
@@ -42,4 +45,11 @@ public class Project {
         this.address = address;
     }
 
+    public Set<ServiceTicket> getTickets() {
+        return tickets;
+    }
+
+    public ServiceContract getServiceContract() {
+        return serviceContract;
+    }
 }
