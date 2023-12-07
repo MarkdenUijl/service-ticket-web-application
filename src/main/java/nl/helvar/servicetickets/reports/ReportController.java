@@ -1,5 +1,6 @@
 package nl.helvar.servicetickets.reports;
 
+import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,8 +23,7 @@ public class ReportController {
         List<Report> reports = reportRepository.findAll();
 
         if (reports.isEmpty()) {
-            // CREATE EXCEPTION HANDLER HERE
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            throw new RecordNotFoundException("Could not find any reports in database.");
         } else {
             return new ResponseEntity<>(reports, HttpStatus.OK);
         }
@@ -34,8 +34,7 @@ public class ReportController {
         Optional<Report> Report = reportRepository.findById(id);
 
         if (Report.isEmpty()) {
-            // CREATE EXCEPTION HANDLER HERE
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            throw new RecordNotFoundException("Could not find any report with id '" + id + "' in database.");
         } else {
             return new ResponseEntity<>(Report.get(), HttpStatus.OK);
         }
@@ -60,8 +59,7 @@ public class ReportController {
         Optional<Report> Report = reportRepository.findById(id);
 
         if (Report.isEmpty()) {
-            // CREATE EXCEPTION HERE
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            throw new RecordNotFoundException("Could not find any report with id '" + id + "' in database.");
         } else {
             Report existingReport = Report.get();
 
@@ -78,8 +76,7 @@ public class ReportController {
         Optional<Report> Report = reportRepository.findById(id);
 
         if (Report.isEmpty()) {
-            // CREATE EXCEPTION HERE
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            throw new RecordNotFoundException("Could not find any report with id '" + id + "' in database.");
         } else {
             Report existingReport = Report.get();
 

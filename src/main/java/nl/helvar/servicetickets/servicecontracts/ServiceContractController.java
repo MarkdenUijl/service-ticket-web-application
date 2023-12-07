@@ -1,5 +1,6 @@
 package nl.helvar.servicetickets.servicecontracts;
 
+import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,14 +19,19 @@ public class ServiceContractController {
     private ServiceContractRepository serviceContractRepository;
 
     @GetMapping
-    public ResponseEntity<List<ServiceContract>> getAllServiceContracts() {
-        List<ServiceContract> filteredServiceContracts = serviceContractRepository.findAll();
+    public ResponseEntity<List<ServiceContract>> getAllServiceContracts(@RequestParam(required = false) String type) {
+        List<ServiceContract> serviceContracts = null;
 
-        if (filteredServiceContracts.isEmpty()) {
-            // CREATE EXCEPTION HANDLER HERE
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        if (type == null) {
+            serviceContracts= serviceContractRepository.findAll();
         } else {
-            return new ResponseEntity<>(filteredServiceContracts, HttpStatus.OK);
+            serviceContracts= serviceContractRepository.findByType(type);
+        }
+
+        if (serviceContracts.isEmpty()) {
+            throw new RecordNotFoundException("Could not find any contracts in database.");
+        } else {
+            return new ResponseEntity<>(serviceContracts, HttpStatus.OK);
         }
     }
 
@@ -34,8 +40,7 @@ public class ServiceContractController {
         Optional<ServiceContract> serviceContract = serviceContractRepository.findById(id);
 
         if (serviceContract.isEmpty()) {
-            // CREATE EXCEPTION HANDLER HERE
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            throw new RecordNotFoundException("Could not find any contract with id '" + id + "' in database.");
         } else {
             return new ResponseEntity<>(serviceContract.get(), HttpStatus.OK);
         }
@@ -60,8 +65,7 @@ public class ServiceContractController {
         Optional<ServiceContract> serviceContract = serviceContractRepository.findById(id);
 
         if (serviceContract.isEmpty()) {
-            // CREATE EXCEPTION HERE
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            throw new RecordNotFoundException("Could not find any contract with id '" + id + "' in database.");
         } else {
             ServiceContract existingServiceContract = serviceContract.get();
 
@@ -78,8 +82,7 @@ public class ServiceContractController {
         Optional<ServiceContract> serviceContract = serviceContractRepository.findById(id);
 
         if (serviceContract.isEmpty()) {
-            // CREATE EXCEPTION HERE
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            throw new RecordNotFoundException("Could not find any contract with id '" + id + "' in database.");
         } else {
             ServiceContract existingServiceContract = serviceContract.get();
 

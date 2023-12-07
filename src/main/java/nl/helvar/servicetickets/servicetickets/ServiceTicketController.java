@@ -1,5 +1,6 @@
 package nl.helvar.servicetickets.servicetickets;
 
+import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,8 +26,7 @@ public class ServiceTicketController {
         List<ServiceTicket> filteredServiceTickets = serviceTicketRepository.findAllByFilter(type, status);
 
         if (filteredServiceTickets.isEmpty()) {
-            // CREATE EXCEPTION HANDLER HERE
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            throw new RecordNotFoundException("Could not find any tickets in database.");
         } else {
             return new ResponseEntity<>(filteredServiceTickets, HttpStatus.OK);
         }
@@ -37,8 +37,7 @@ public class ServiceTicketController {
         Optional<ServiceTicket> serviceTicket = serviceTicketRepository.findById(id);
 
         if (serviceTicket.isEmpty()) {
-            // CREATE EXCEPTION HANDLER HERE
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            throw new RecordNotFoundException("Could not find any ticket with id '" + id + "' in database.");
         } else {
             return new ResponseEntity<>(serviceTicket.get(), HttpStatus.OK);
         }
@@ -63,8 +62,7 @@ public class ServiceTicketController {
         Optional<ServiceTicket> serviceTicket = serviceTicketRepository.findById(id);
 
         if (serviceTicket.isEmpty()) {
-            // CREATE EXCEPTION HERE
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            throw new RecordNotFoundException("Could not find any ticket with id '" + id + "' in database.");
         } else {
             ServiceTicket existingServiceTicket = serviceTicket.get();
 
@@ -81,8 +79,7 @@ public class ServiceTicketController {
         Optional<ServiceTicket> serviceTicket = serviceTicketRepository.findById(id);
 
         if (serviceTicket.isEmpty()) {
-            // CREATE EXCEPTION HERE
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            throw new RecordNotFoundException("Could not find any ticket with id '" + id + "' in database.");
         } else {
             ServiceTicket existingServiceTicket = serviceTicket.get();
 
