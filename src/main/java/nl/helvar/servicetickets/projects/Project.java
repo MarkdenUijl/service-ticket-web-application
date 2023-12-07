@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import nl.helvar.servicetickets.servicecontracts.ServiceContract;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -14,8 +15,8 @@ public class Project {
     private Long id;
     private String name;
     private String address;
-    @OneToMany
-    private List<ServiceTicket> tickets;
+//    @OneToMany
+//    private List<ServiceTicket> tickets = new ArrayList<>();
 //    @OneToOne
 //    @Column(name = "service_contract")
 //    private ServiceContract serviceContract;
@@ -41,15 +42,4 @@ public class Project {
         this.address = address;
     }
 
-    public List<ServiceTicket> getTickets() {
-        return tickets;
-    }
-
-    public void setTickets(List<ServiceTicket> tickets) {
-        this.tickets = tickets;
-    }
-
-    public void addTicket(ServiceTicket ticket) {
-        this.tickets.add(ticket);
-    }
 }
