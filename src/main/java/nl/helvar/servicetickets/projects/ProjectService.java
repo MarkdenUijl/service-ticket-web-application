@@ -1,10 +1,12 @@
 package nl.helvar.servicetickets.projects;
 
+import nl.helvar.servicetickets.servicecontracts.ServiceContract;
+import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
+import nl.helvar.servicetickets.servicetickets.ServiceTicketRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,31 +15,33 @@ import static nl.helvar.servicetickets.projects.ProjectSpecification.nameLike;
 
 @Service
 public class ProjectService {
-    private final ProjectRepository repository;
+    private final ProjectRepository projectRepository;
+    private final ServiceContractRepository serviceContractRepository;
 
-    public ProjectService(ProjectRepository repository) {
-        this.repository = repository;
+    public ProjectService(ProjectRepository projectRepository, ServiceContractRepository serviceContractRepository) {
+        this.projectRepository = projectRepository;
+        this.serviceContractRepository = serviceContractRepository;
     }
 
-    public ProjectDto createProject(ProjectDto projectDto) {
-        Project project = toProject(projectDto);
+    public ProjectCreationDTO createProject(ProjectCreationDTO projectCreationDto) {
+        Project project = toProject(projectCreationDto);
 
-        repository.save(project);
+        projectRepository.save(project);
 
-        projectDto.id = project.getId();
+        projectCreationDto.setId(project.getId());
 
-        return projectDto;
+        return projectCreationDto;
     }
 
-    public List<ProjectDto> getAllProjects(String name, String address) {
+    public List<ProjectDTO> getAllProjects(String name, String address) {
         Specification<Project> filters = Specification.where(StringUtils.isBlank(name) ? null : nameLike(name))
                 .and(StringUtils.isBlank(address) ? null : addressLike(address));
 
-        return repository.findAll(filters).stream().map(this::fromProject).toList();
+        return projectRepository.findAll(filters).stream().map(this::fromProject).toList();
     }
 
-    public ProjectDto findById(Long id) {
-        Optional<Project> project = repository.findById(id);
+    public ProjectDTO findById(Long id) {
+        Optional<Project> project = projectRepository.findById(id);
 
         if(project.isEmpty()) {
             return null;
@@ -47,8 +51,8 @@ public class ProjectService {
     }
 
     // MAPPERS:
-    public ProjectDto fromProject(Project project) {
-        ProjectDto projectDto = new ProjectDto();
+    public ProjectDTO fromProject(Project project) {
+        ProjectDTO projectDto = new ProjectDTO();
 
         projectDto.id = project.getId();
         projectDto.name = project.getName();
@@ -57,11 +61,17 @@ public class ProjectService {
         return projectDto;
     }
 
-    public Project toProject(ProjectDto projectDto) {
+    public Project toProject(ProjectCreationDTO projectcreationDto) {
         Project project = new Project();
 
-        project.setName(projectDto.name);
-        project.setAddress(projectDto.address);
+        project.setName(projectcreationDto.getName());
+        project.setAddress(projectcreationDto.getAddress());
+
+        if (projectcreationDto.getServiceContractId() != null) {
+            Optional<ServiceContract> serviceContract = serviceContractRepository.findById(projectcreationDto.getServiceContractId());
+
+            serviceContract.ifPresent(project::setServiceContract);
+        }
 
         return project;
     }

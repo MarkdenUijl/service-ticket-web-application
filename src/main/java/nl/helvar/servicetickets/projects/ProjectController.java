@@ -23,28 +23,28 @@ public class ProjectController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProjectDto>> getAllProjects (
+    public ResponseEntity<List<ProjectDTO>> getAllProjects (
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String address
     ) {
-        List<ProjectDto> projectDtos = service.getAllProjects(name, address);
+        List<ProjectDTO> projectDtos = service.getAllProjects(name, address);
 
         return new ResponseEntity<>(projectDtos, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProjectDto> findProjectById(@PathVariable("id") Long id) {
-        ProjectDto projectDto = service.findById(id);
-
-        if (projectDto == null) {
-            throw new RecordNotFoundException("Could not find any projects with id " + id + " in the database.");
-        } else {
-            return new ResponseEntity<>(projectDto, HttpStatus.OK);
-        }
-    }
+//    @GetMapping("/{id}")
+//    public ResponseEntity<ProjectDTO> findProjectById(@PathVariable("id") Long id) {
+//        ProjectDTO projectDto = service.findById(id);
+//
+//        if (projectDto == null) {
+//            throw new RecordNotFoundException("Could not find any projects with id " + id + " in the database.");
+//        } else {
+//            return new ResponseEntity<>(projectDto, HttpStatus.OK);
+//        }
+//    }
 
     @PostMapping
-    public ResponseEntity<Object> createProject(@Valid @RequestBody ProjectDto project, BindingResult br) {
+    public ResponseEntity<Object> createProject(@Valid @RequestBody ProjectCreationDTO project, BindingResult br) {
         if (br.hasFieldErrors()) {
             StringBuilder sb = new StringBuilder();
 
@@ -62,7 +62,7 @@ public class ProjectController {
             URI uri = URI.create(
                     ServletUriComponentsBuilder
                             .fromCurrentRequest()
-                            .path("/" + project.id)
+                            .path("/" + project.getId())
                             .toUriString()
             );
 

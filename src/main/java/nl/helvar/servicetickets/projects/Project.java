@@ -52,4 +52,8 @@ public class Project {
     public ServiceContract getServiceContract() {
         return serviceContract;
     }
+
+    public void setServiceContract(ServiceContract serviceContract) {
+        this.serviceContract = serviceContract;
+    }
 }
