@@ -1,11 +1,11 @@
 package nl.helvar.servicetickets.projects;
 
 import jakarta.validation.Valid;
-import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
+import nl.helvar.servicetickets.exceptions.BadObjectCreationException;
+import nl.helvar.servicetickets.helpers.DTOValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -17,6 +17,7 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService service;
+    private final DTOValidator dtoValidator = new DTOValidator();
 
     public ProjectController(ProjectService service) {
         this.service = service;
@@ -25,37 +26,29 @@ public class ProjectController {
     @GetMapping
     public ResponseEntity<List<ProjectDTO>> getAllProjects (
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) String address
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String zipCode,
+            @RequestParam(required = false) String street,
+            @RequestParam(required = false) Integer houseNumber,
+            @RequestParam(required = false) Boolean hasServiceContract
+
     ) {
-        List<ProjectDTO> projectDtos = service.getAllProjects(name, address);
+        List<ProjectDTO> projectDtos = service.getAllProjects(name, city, zipCode, street, houseNumber, hasServiceContract);
 
         return new ResponseEntity<>(projectDtos, HttpStatus.OK);
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<ProjectDTO> findProjectById(@PathVariable("id") Long id) {
-//        ProjectDTO projectDto = service.findById(id);
-//
-//        if (projectDto == null) {
-//            throw new RecordNotFoundException("Could not find any projects with id " + id + " in the database.");
-//        } else {
-//            return new ResponseEntity<>(projectDto, HttpStatus.OK);
-//        }
-//    }
+    @GetMapping("/{id}")
+    public ResponseEntity<ProjectDTO> findProjectById(@PathVariable("id") Long id) {
+        ProjectDTO projectDto = service.findById(id);
+
+        return new ResponseEntity<>(projectDto, HttpStatus.OK);
+    }
 
     @PostMapping
     public ResponseEntity<Object> createProject(@Valid @RequestBody ProjectCreationDTO project, BindingResult br) {
         if (br.hasFieldErrors()) {
-            StringBuilder sb = new StringBuilder();
-
-            for (FieldError fe : br.getFieldErrors()) {
-                sb.append(fe.getField());
-                sb.append(" : ");
-                sb.append(fe.getDefaultMessage());
-                sb.append("\n");
-            }
-
-            return ResponseEntity.badRequest().body(sb.toString());
+            throw new BadObjectCreationException(dtoValidator.buildErrorMessage(br));
         } else {
             project = service.createProject(project);
 
@@ -70,51 +63,21 @@ public class ProjectController {
         }
     }
 
-//    @PostMapping("/{id}/tickets")
-//    public ResponseEntity<ServiceTicket> addServiceTicketToProject(@PathVariable("id") Long id, @RequestBody ServiceTicket ticket) {
-//        Optional<Project> project = projectRepository.findById(id);
-//
-//        if (project.isEmpty()) {
-//            throw new RecordNotFoundException("Could not find any project with id '" + id + "' in database.");
-//        } else {
-//            Project existingProject = project.get();
-//
-//            existingProject.addTicket(ticket);
-//            projectRepository.save(existingProject);
-//
-//            return new ResponseEntity<>(ticket, HttpStatus.OK);
-//        }
-//    }
-//
-//    @PutMapping("/{id}")
-//    public ResponseEntity<Project> replaceProject(@PathVariable("id") Long id, @RequestBody Project newProject) {
-//        Optional<Project> project = projectRepository.findById(id);
-//
-//        if (project.isEmpty()) {
-//            throw new RecordNotFoundException("Could not find any project with id '" + id + "' in database.");
-//        } else {
-//            Project existingProject = project.get();
-//
-//            BeanUtils.copyProperties(newProject, existingProject, "id");
-//
-//            projectRepository.save(existingProject);
-//
-//            return new ResponseEntity<>(existingProject, HttpStatus.OK);
-//        }
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Project> deleteProject(@PathVariable("id") Long id) {
-//        Optional<Project> project = projectRepository.findById(id);
-//
-//        if (project.isEmpty()) {
-//            throw new RecordNotFoundException("Could not find any project with id '" + id + "' in database.");
-//        } else {
-//            Project existingProject = project.get();
-//
-//            projectRepository.delete(existingProject);
-//
-//            return new ResponseEntity<>(existingProject, HttpStatus.OK);
-//        }
-//    }
+    @PutMapping("/{id}")
+    public ResponseEntity<ProjectDTO> replaceProject(@PathVariable("id") Long id, @Valid @RequestBody ProjectCreationDTO newProject, BindingResult br) {
+        if (br.hasFieldErrors()) {
+            throw new BadObjectCreationException(dtoValidator.buildErrorMessage(br));
+        } else {
+            ProjectDTO replacedProject = service.replaceProject(id, newProject);
+
+            return new ResponseEntity<>(replacedProject, HttpStatus.OK);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ProjectDTO> deleteProject(@PathVariable("id") Long id) {
+        ProjectDTO deletedProject = service.deleteProject(id);
+
+        return new ResponseEntity<>(deletedProject, HttpStatus.OK);
+    }
 }

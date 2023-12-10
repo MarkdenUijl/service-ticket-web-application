@@ -9,9 +9,11 @@ public class ProjectCreationDTO {
     private Long id;
     @Size(min = 5, max = 128)
     private String name;
-    @Size(min = 5, max = 128)
-    @Pattern(regexp = "^\\s*\\w+(\\s+\\w+)*\\s+\\d+,\\s+\\w+(\\s+\\w+)*$", flags = Pattern.Flag.CASE_INSENSITIVE)
-    private String address;
+    private String city;
+    @Pattern(regexp = "\\b\\d{4}\\s?[A-Z]{2}\\b", flags = Pattern.Flag.CASE_INSENSITIVE)
+    private String zipCode;
+    private String street;
+    private int houseNumber;
     @Nullable
     private Long serviceContractId;
 
@@ -31,12 +33,36 @@ public class ProjectCreationDTO {
         this.name = name;
     }
 
-    public String getAddress() {
-        return address;
+    public String getCity() {
+        return city;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public int getHouseNumber() {
+        return houseNumber;
+    }
+
+    public void setHouseNumber(int houseNumber) {
+        this.houseNumber = houseNumber;
     }
 
     public Long getServiceContractId() {

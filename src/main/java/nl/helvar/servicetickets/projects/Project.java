@@ -17,7 +17,10 @@ public class Project {
     @GeneratedValue
     private Long id;
     private String name;
-    private String address;
+    private String city;
+    private String zipCode;
+    private String street;
+    private int houseNumber;
     @OneToMany(mappedBy = "project")
     private Set<ServiceTicket> tickets = new HashSet<>();
     @OneToOne
@@ -37,12 +40,36 @@ public class Project {
         this.name = name;
     }
 
-    public String getAddress() {
-        return address;
+    public String getCity() {
+        return city;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public int getHouseNumber() {
+        return houseNumber;
+    }
+
+    public void setHouseNumber(int houseNumber) {
+        this.houseNumber = houseNumber;
     }
 
     public Set<ServiceTicket> getTickets() {

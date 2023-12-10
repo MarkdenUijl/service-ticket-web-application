@@ -11,4 +11,9 @@ public class ExceptionController {
     public ResponseEntity<Object> recordNotFoundException (RecordNotFoundException recordNotFoundException) {
         return new ResponseEntity<>(recordNotFoundException.getMessage(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(value = BadObjectCreationException.class)
+    public ResponseEntity<Object> badObjectCreationException (BadObjectCreationException badObjectCreationException) {
+        return new ResponseEntity<>(badObjectCreationException.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }
