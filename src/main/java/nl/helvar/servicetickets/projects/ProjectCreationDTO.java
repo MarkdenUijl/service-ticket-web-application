@@ -1,37 +1,26 @@
 package nl.helvar.servicetickets.projects;
 
-import jakarta.persistence.*;
-import nl.helvar.servicetickets.servicecontracts.ServiceContract;
-import nl.helvar.servicetickets.servicetickets.ServiceTicket;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import org.springframework.lang.Nullable;
 
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-@Entity
-@Table(name = "projects")
-public class Project {
-    @Id
-    @GeneratedValue
+public class ProjectCreationDTO {
     private Long id;
+    @Size(min = 5, max = 128)
     private String name;
     private String city;
+    @Pattern(regexp = "\\b\\d{4}\\s?[A-Z]{2}\\b", flags = Pattern.Flag.CASE_INSENSITIVE, message = "Invalid postal code entered, enter 4 numbers followed by 2 capitalized letters")
     private String zipCode;
     private String street;
     private int houseNumber;
-
-    // Relations
-    @OneToMany(mappedBy = "project")
-    private Set<ServiceTicket> tickets = new HashSet<>();
-    @OneToOne
-    @JoinColumn
-    private ServiceContract serviceContract;
-
+    private Long serviceContractId;
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -74,15 +63,11 @@ public class Project {
         this.houseNumber = houseNumber;
     }
 
-    public Set<ServiceTicket> getTickets() {
-        return tickets;
+    public Long getServiceContractId() {
+        return serviceContractId;
     }
 
-    public ServiceContract getServiceContract() {
-        return serviceContract;
-    }
-
-    public void setServiceContract(ServiceContract serviceContract) {
-        this.serviceContract = serviceContract;
+    public void setServiceContractId(Long serviceContractId) {
+        this.serviceContractId = serviceContractId;
     }
 }

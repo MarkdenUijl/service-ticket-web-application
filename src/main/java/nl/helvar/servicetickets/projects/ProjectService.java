@@ -1,67 +1,125 @@
 package nl.helvar.servicetickets.projects;
 
+import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
+import nl.helvar.servicetickets.servicecontracts.ServiceContract;
+import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static nl.helvar.servicetickets.projects.ProjectSpecification.addressLike;
-import static nl.helvar.servicetickets.projects.ProjectSpecification.nameLike;
+import static nl.helvar.servicetickets.projects.ProjectSpecification.*;
 
 @Service
 public class ProjectService {
-    private final ProjectRepository repository;
+    private final ProjectRepository projectRepository;
+    private final ServiceContractRepository serviceContractRepository;
 
-    public ProjectService(ProjectRepository repository) {
-        this.repository = repository;
+    public ProjectService(ProjectRepository projectRepository, ServiceContractRepository serviceContractRepository) {
+        this.projectRepository = projectRepository;
+        this.serviceContractRepository = serviceContractRepository;
     }
 
-    public ProjectDto createProject(ProjectDto projectDto) {
-        Project project = projectDtoToProject(projectDto);
+    public ProjectCreationDTO createProject(ProjectCreationDTO projectCreationDto) {
+        Project project = toProject(projectCreationDto);
 
-        repository.save(project);
+        projectRepository.save(project);
 
-        projectDto.id = project.getId();
-
-        return projectDto;
+        projectCreationDto.setId(project.getId());
+        return projectCreationDto;
     }
 
-    public List<ProjectDto> getAllProjects(String name, String address) {
+    public List<ProjectDTO> getAllProjects(String name, String city, String zipCode, String street, Integer houseNumber, Boolean hasServiceContract) {
         Specification<Project> filters = Specification.where(StringUtils.isBlank(name) ? null : nameLike(name))
-                .and(StringUtils.isBlank(address) ? null : addressLike(address));
+                .and(StringUtils.isBlank(city) ? null : cityLike(city))
+                .and(StringUtils.isBlank(zipCode) ? null : zipCodeLike(zipCode))
+                .and(StringUtils.isBlank(street) ? null : streetLike(street))
+                .and(houseNumber == null ? null : houseNumberLike(houseNumber))
+                .and(hasServiceContract == null ? null : serviceContractLike(hasServiceContract));
 
-        return repository.findAll(filters).stream().map(this::projectToProjectDto).toList();
+        List<ProjectDTO> filteredProjects = projectRepository.findAll(filters)
+                .stream()
+                .map(this::fromProject)
+                .toList();
+
+        if (filteredProjects.isEmpty()) {
+            throw new RecordNotFoundException("There were no projects found with those parameters");
+        } else {
+            return filteredProjects;
+        }
     }
 
-    public ProjectDto findById(Long id) {
-        Optional<Project> project = repository.findById(id);
+    public ProjectDTO findById(Long id) {
+        Optional<Project> project = projectRepository.findById(id);
 
         if(project.isEmpty()) {
-            return null;
+            throw new RecordNotFoundException("No project found with id " + id);
         } else {
-            return projectToProjectDto(project.get());
+            return fromProject(project.get());
+        }
+    }
+
+    public ProjectDTO replaceProject(Long id, ProjectCreationDTO newProject) {
+        Optional<Project> project = projectRepository.findById(id);
+
+        if (project.isEmpty()) {
+            throw new RecordNotFoundException("Could not find any project with id '" + id + "' in database.");
+        } else {
+            Project existingProject = project.get();
+
+            BeanUtils.copyProperties(newProject, existingProject, "id");
+
+            projectRepository.save(existingProject);
+
+            return fromProject(existingProject);
+        }
+    }
+
+    public ProjectDTO deleteProject(Long id) {
+        Optional<Project> project = projectRepository.findById(id);
+
+        if (project.isEmpty()) {
+            throw new RecordNotFoundException("Could not find any project with id '" + id + "' in database.");
+        } else {
+            Project existingProject = project.get();
+
+            projectRepository.delete(existingProject);
+
+            return fromProject(existingProject);
         }
     }
 
     // MAPPERS:
-    public ProjectDto projectToProjectDto(Project project) {
-        ProjectDto projectDto = new ProjectDto();
+    public ProjectDTO fromProject(Project project) {
+        ProjectDTO projectDto = new ProjectDTO();
 
-        projectDto.id = project.getId();
-        projectDto.name = project.getName();
-        projectDto.address = project.getAddress();
+        projectDto.setId(project.getId());
+        projectDto.setName(project.getName());
+        projectDto.setCity(project.getCity());
+        projectDto.setZipCode(project.getZipCode());
+        projectDto.setStreet(project.getStreet());
+        projectDto.setHouseNumber(project.getHouseNumber());
 
         return projectDto;
     }
 
-    public Project projectDtoToProject(ProjectDto projectDto) {
+    public Project toProject(ProjectCreationDTO projectcreationDto) {
         Project project = new Project();
 
-        project.setName(projectDto.name);
-        project.setAddress(projectDto.address);
+        project.setName(projectcreationDto.getName());
+        project.setCity(projectcreationDto.getCity());
+        project.setZipCode(projectcreationDto.getZipCode());
+        project.setStreet(projectcreationDto.getStreet());
+        project.setHouseNumber(projectcreationDto.getHouseNumber());
+
+        if (projectcreationDto.getServiceContractId() != null) {
+            Optional<ServiceContract> serviceContract = serviceContractRepository.findById(projectcreationDto.getServiceContractId());
+
+            serviceContract.ifPresent(project::setServiceContract);
+        }
 
         return project;
     }
