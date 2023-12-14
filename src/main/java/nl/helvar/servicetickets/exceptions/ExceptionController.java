@@ -16,4 +16,9 @@ public class ExceptionController {
     public ResponseEntity<Object> badObjectCreationException (BadObjectCreationException badObjectCreationException) {
         return new ResponseEntity<>(badObjectCreationException.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = InvalidEnumConstantException.class)
+    public ResponseEntity<Object> invalidEnumConstantException (InvalidEnumConstantException invalidEnumConstantException) {
+        return new ResponseEntity<>(invalidEnumConstantException.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }

@@ -29,7 +29,6 @@ public class ProjectService {
         projectRepository.save(project);
 
         projectCreationDto.setId(project.getId());
-
         return projectCreationDto;
     }
 
@@ -41,7 +40,10 @@ public class ProjectService {
                 .and(houseNumber == null ? null : houseNumberLike(houseNumber))
                 .and(hasServiceContract == null ? null : serviceContractLike(hasServiceContract));
 
-        List<ProjectDTO> filteredProjects = projectRepository.findAll(filters).stream().map(this::fromProject).toList();
+        List<ProjectDTO> filteredProjects = projectRepository.findAll(filters)
+                .stream()
+                .map(this::fromProject)
+                .toList();
 
         if (filteredProjects.isEmpty()) {
             throw new RecordNotFoundException("There were no projects found with those parameters");
@@ -94,12 +96,12 @@ public class ProjectService {
     public ProjectDTO fromProject(Project project) {
         ProjectDTO projectDto = new ProjectDTO();
 
-        projectDto.id = project.getId();
-        projectDto.name = project.getName();
-        projectDto.city = project.getCity();
-        projectDto.zipCode = project.getZipCode();
-        projectDto.street = project.getStreet();
-        projectDto.houseNumber = project.getHouseNumber();
+        projectDto.setId(project.getId());
+        projectDto.setName(project.getName());
+        projectDto.setCity(project.getCity());
+        projectDto.setZipCode(project.getZipCode());
+        projectDto.setStreet(project.getStreet());
+        projectDto.setHouseNumber(project.getHouseNumber());
 
         return projectDto;
     }

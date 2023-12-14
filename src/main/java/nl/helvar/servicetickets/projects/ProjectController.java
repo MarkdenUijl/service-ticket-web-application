@@ -12,6 +12,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+import static nl.helvar.servicetickets.helpers.DTOValidator.buildErrorMessage;
+
 @RestController
 @RequestMapping("/projects")
 public class ProjectController {
@@ -33,9 +35,9 @@ public class ProjectController {
             @RequestParam(required = false) Boolean hasServiceContract
 
     ) {
-        List<ProjectDTO> projectDtos = service.getAllProjects(name, city, zipCode, street, houseNumber, hasServiceContract);
+        List<ProjectDTO> projectDTOS = service.getAllProjects(name, city, zipCode, street, houseNumber, hasServiceContract);
 
-        return new ResponseEntity<>(projectDtos, HttpStatus.OK);
+        return new ResponseEntity<>(projectDTOS, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -46,9 +48,9 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createProject(@Valid @RequestBody ProjectCreationDTO project, BindingResult br) {
+    public ResponseEntity<ProjectCreationDTO> createProject(@Valid @RequestBody ProjectCreationDTO project, BindingResult br) {
         if (br.hasFieldErrors()) {
-            throw new BadObjectCreationException(dtoValidator.buildErrorMessage(br));
+            throw new BadObjectCreationException(buildErrorMessage(br));
         } else {
             project = service.createProject(project);
 
@@ -66,7 +68,7 @@ public class ProjectController {
     @PutMapping("/{id}")
     public ResponseEntity<ProjectDTO> replaceProject(@PathVariable("id") Long id, @Valid @RequestBody ProjectCreationDTO newProject, BindingResult br) {
         if (br.hasFieldErrors()) {
-            throw new BadObjectCreationException(dtoValidator.buildErrorMessage(br));
+            throw new BadObjectCreationException(buildErrorMessage(br));
         } else {
             ProjectDTO replacedProject = service.replaceProject(id, newProject);
 

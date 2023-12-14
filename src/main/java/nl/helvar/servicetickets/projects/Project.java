@@ -21,6 +21,8 @@ public class Project {
     private String zipCode;
     private String street;
     private int houseNumber;
+
+    // Relations
     @OneToMany(mappedBy = "project")
     private Set<ServiceTicket> tickets = new HashSet<>();
     @OneToOne

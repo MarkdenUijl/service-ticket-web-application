@@ -2,6 +2,8 @@ package nl.helvar.servicetickets.servicecontracts;
 
 import jakarta.persistence.*;
 import nl.helvar.servicetickets.projects.Project;
+import nl.helvar.servicetickets.servicecontracts.enums.ContractType;
+import org.springframework.lang.Nullable;
 
 @Entity
 @Table(name = "service_contracts")
@@ -9,11 +11,14 @@ public class ServiceContract {
     @Id
     @GeneratedValue
     private Long id;
-    private String type; //ENUM MAKEN!!!
-    @Column(name = "available_time")
-    private int availableTime;
+    private ContractType type;
+    @Column(name = "contract_time")
+    private int contractTime;
     @Column(name = "used_time")
+    @Nullable
     private int usedTime;
+
+    // Relations
     @OneToOne(mappedBy = "serviceContract")
     private Project project;
 
@@ -21,20 +26,20 @@ public class ServiceContract {
         return id;
     }
 
-    public String getType() {
+    public ContractType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(ContractType type) {
         this.type = type;
     }
 
-    public int getAvailableTime() {
-        return availableTime;
+    public int getContractTime() {
+        return contractTime;
     }
 
-    public void setAvailableTime(int availableTime) {
-        this.availableTime = availableTime;
+    public void setContractTime(int contractTime) {
+        this.contractTime = contractTime;
     }
 
     public int getUsedTime() {

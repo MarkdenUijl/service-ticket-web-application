@@ -5,16 +5,14 @@ import jakarta.validation.constraints.Size;
 import org.springframework.lang.Nullable;
 
 public class ProjectCreationDTO {
-
     private Long id;
     @Size(min = 5, max = 128)
     private String name;
     private String city;
-    @Pattern(regexp = "\\b\\d{4}\\s?[A-Z]{2}\\b", flags = Pattern.Flag.CASE_INSENSITIVE)
+    @Pattern(regexp = "\\b\\d{4}\\s?[A-Z]{2}\\b", flags = Pattern.Flag.CASE_INSENSITIVE, message = "Invalid postal code entered, enter 4 numbers followed by 2 capitalized letters")
     private String zipCode;
     private String street;
     private int houseNumber;
-    @Nullable
     private Long serviceContractId;
 
     public Long getId() {
