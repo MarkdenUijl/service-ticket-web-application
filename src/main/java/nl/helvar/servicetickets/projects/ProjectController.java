@@ -2,7 +2,6 @@ package nl.helvar.servicetickets.projects;
 
 import jakarta.validation.Valid;
 import nl.helvar.servicetickets.exceptions.BadObjectCreationException;
-import nl.helvar.servicetickets.helpers.DTOValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -19,7 +18,6 @@ import static nl.helvar.servicetickets.helpers.DTOValidator.buildErrorMessage;
 public class ProjectController {
 
     private final ProjectService service;
-    private final DTOValidator dtoValidator = new DTOValidator();
 
     public ProjectController(ProjectService service) {
         this.service = service;

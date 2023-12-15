@@ -82,18 +82,8 @@ public class ServiceContractController {
 //        }
 //    }
 //
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<ServiceContract> deleteServiceContract(@PathVariable("id") Long id) {
-//        Optional<ServiceContract> serviceContract = serviceContractRepository.findById(id);
-//
-//        if (serviceContract.isEmpty()) {
-//            throw new RecordNotFoundException("Could not find any contract with id '" + id + "' in database.");
-//        } else {
-//            ServiceContract existingServiceContract = serviceContract.get();
-//
-//            serviceContractRepository.delete(existingServiceContract);
-//
-//            return new ResponseEntity<>(existingServiceContract, HttpStatus.OK);
-//        }
-//    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ServiceContractDTO> deleteServiceContract(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(service.deleteServiceContract(id), HttpStatus.OK);
+    }
 }

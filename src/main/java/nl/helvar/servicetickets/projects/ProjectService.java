@@ -1,7 +1,6 @@
 package nl.helvar.servicetickets.projects;
 
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
-import nl.helvar.servicetickets.servicecontracts.ServiceContract;
 import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -24,7 +23,7 @@ public class ProjectService {
     }
 
     public ProjectCreationDTO createProject(ProjectCreationDTO projectCreationDto) {
-        Project project = toProject(projectCreationDto);
+        Project project = projectCreationDto.fromDto(serviceContractRepository);
 
         projectRepository.save(project);
 
@@ -42,7 +41,7 @@ public class ProjectService {
 
         List<ProjectDTO> filteredProjects = projectRepository.findAll(filters)
                 .stream()
-                .map(this::fromProject)
+                .map(ProjectDTO::toDto)
                 .toList();
 
         if (filteredProjects.isEmpty()) {
@@ -58,7 +57,7 @@ public class ProjectService {
         if(project.isEmpty()) {
             throw new RecordNotFoundException("No project found with id " + id);
         } else {
-            return fromProject(project.get());
+            return ProjectDTO.toDto(project.get());
         }
     }
 
@@ -70,11 +69,11 @@ public class ProjectService {
         } else {
             Project existingProject = project.get();
 
-            BeanUtils.copyProperties(newProject, existingProject, "id");
+            BeanUtils.copyProperties(newProject.fromDto(serviceContractRepository), existingProject, "id");
 
             projectRepository.save(existingProject);
 
-            return fromProject(existingProject);
+            return ProjectDTO.toDto(existingProject);
         }
     }
 
@@ -88,39 +87,7 @@ public class ProjectService {
 
             projectRepository.delete(existingProject);
 
-            return fromProject(existingProject);
+            return ProjectDTO.toDto(existingProject);
         }
-    }
-
-    // MAPPERS:
-    public ProjectDTO fromProject(Project project) {
-        ProjectDTO projectDto = new ProjectDTO();
-
-        projectDto.setId(project.getId());
-        projectDto.setName(project.getName());
-        projectDto.setCity(project.getCity());
-        projectDto.setZipCode(project.getZipCode());
-        projectDto.setStreet(project.getStreet());
-        projectDto.setHouseNumber(project.getHouseNumber());
-
-        return projectDto;
-    }
-
-    public Project toProject(ProjectCreationDTO projectcreationDto) {
-        Project project = new Project();
-
-        project.setName(projectcreationDto.getName());
-        project.setCity(projectcreationDto.getCity());
-        project.setZipCode(projectcreationDto.getZipCode());
-        project.setStreet(projectcreationDto.getStreet());
-        project.setHouseNumber(projectcreationDto.getHouseNumber());
-
-        if (projectcreationDto.getServiceContractId() != null) {
-            Optional<ServiceContract> serviceContract = serviceContractRepository.findById(projectcreationDto.getServiceContractId());
-
-            serviceContract.ifPresent(project::setServiceContract);
-        }
-
-        return project;
     }
 }

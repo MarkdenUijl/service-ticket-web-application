@@ -1,15 +1,21 @@
 package nl.helvar.servicetickets.servicecontracts;
 
+import jakarta.validation.constraints.NotBlank;
 import nl.helvar.servicetickets.exceptions.InvalidEnumConstantException;
+import nl.helvar.servicetickets.projects.Project;
 import nl.helvar.servicetickets.servicecontracts.enums.ContractType;
 
 import static nl.helvar.servicetickets.helpers.EnumValidator.getEnumConstantFromString;
 
 public class ServiceContractCreationDTO {
     private Long id;
+    @NotBlank
     private String contractType;
+    @NotBlank
     private int contractTime;
     private int usedTime;
+    @NotBlank
+    private Long projectId;
 
     public Long getId() {
         return id;
@@ -41,6 +47,14 @@ public class ServiceContractCreationDTO {
 
     public void setUsedTime(int usedTime) {
         this.usedTime = usedTime;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
     }
 
     // MAPPERS:
