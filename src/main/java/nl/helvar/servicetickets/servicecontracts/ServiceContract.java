@@ -1,5 +1,6 @@
 package nl.helvar.servicetickets.servicecontracts;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import nl.helvar.servicetickets.projects.Project;
 import nl.helvar.servicetickets.servicecontracts.enums.ContractType;
@@ -20,6 +21,7 @@ public class ServiceContract {
 
     // Relations
     @OneToOne(mappedBy = "serviceContract")
+    @JsonIgnore
     private Project project;
 
     public Long getId() {
@@ -48,5 +50,13 @@ public class ServiceContract {
 
     public void setUsedTime(int usedTime) {
         this.usedTime = usedTime;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

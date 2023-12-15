@@ -35,17 +35,11 @@ public class ServiceContractController {
 
         return new ResponseEntity<>(serviceContractDTOS, HttpStatus.OK);
     }
-//
-//    @GetMapping("/{id}")
-//    public ResponseEntity<ServiceContract> findServiceContractById(@PathVariable("id") Long id) {
-//        Optional<ServiceContract> serviceContract = serviceContractRepository.findById(id);
-//
-//        if (serviceContract.isEmpty()) {
-//            throw new RecordNotFoundException("Could not find any contract with id '" + id + "' in database.");
-//        } else {
-//            return new ResponseEntity<>(serviceContract.get(), HttpStatus.OK);
-//        }
-//    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ServiceContractDTO> findServiceContractById(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(service.findById(id), HttpStatus.OK);
+    }
 
     @PostMapping
     public ResponseEntity<ServiceContractCreationDTO> addServiceContract(@Valid @RequestBody ServiceContractCreationDTO serviceContract, BindingResult br) {
@@ -65,25 +59,13 @@ public class ServiceContractController {
         }
     }
 
-//    @PutMapping("/{id}")
-//    public ResponseEntity<ServiceContract> replaceServiceContract(@PathVariable("id") Long id, @RequestBody ServiceContract newServiceContract) {
-//        Optional<ServiceContract> serviceContract = serviceContractRepository.findById(id);
-//
-//        if (serviceContract.isEmpty()) {
-//            throw new RecordNotFoundException("Could not find any contract with id '" + id + "' in database.");
-//        } else {
-//            ServiceContract existingServiceContract = serviceContract.get();
-//
-//            BeanUtils.copyProperties(newServiceContract, existingServiceContract, "id");
-//
-//            serviceContractRepository.save(existingServiceContract);
-//
-//            return new ResponseEntity<>(existingServiceContract, HttpStatus.OK);
-//        }
-//    }
-//
+    @PutMapping("/{id}")
+    public ResponseEntity<ServiceContractDTO> replaceServiceContract(@PathVariable("id") Long id, @RequestBody ServiceContractCreationDTO newServiceContract) {
+        return new ResponseEntity<>(service.replaceServiceContract(id, newServiceContract), HttpStatus.OK);
+    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<ServiceContractDTO> deleteServiceContract(@PathVariable("id") Long id) {
+    public ResponseEntity<String> deleteServiceContract(@PathVariable("id") Long id) {
         return new ResponseEntity<>(service.deleteServiceContract(id), HttpStatus.OK);
     }
 }

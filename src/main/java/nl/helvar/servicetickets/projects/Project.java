@@ -1,5 +1,6 @@
 package nl.helvar.servicetickets.projects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Null;
 import nl.helvar.servicetickets.servicecontracts.ServiceContract;

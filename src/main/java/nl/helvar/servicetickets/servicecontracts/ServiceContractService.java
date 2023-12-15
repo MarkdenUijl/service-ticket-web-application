@@ -4,6 +4,7 @@ import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.projects.Project;
 import nl.helvar.servicetickets.projects.ProjectRepository;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,12 @@ public class ServiceContractService {
             ServiceContract serviceContract = serviceContractCreationDTO.fromDto();
             Project project = projectOptional.get();
 
+            if (project.getServiceContract() != null) {
+                ServiceContract existingServiceContract = project.getServiceContract();
+                project.setServiceContract(null); // Remove reference from project
+                serviceContractRepository.delete(existingServiceContract); // Delete old service contract from repository
+            }
+
             project.setServiceContract(serviceContract);
 
             serviceContractRepository.save(serviceContract);
@@ -61,18 +68,47 @@ public class ServiceContractService {
         }
     }
 
-    public ServiceContractDTO deleteServiceContract(Long id) {
+    public ServiceContractDTO findById(Long id) {
+        Optional<ServiceContract> serviceContract = serviceContractRepository.findById(id);
+
+        if (serviceContract.isEmpty()) {
+            throw new RecordNotFoundException("Could not find any contract with id '" + id + "' in database.");
+        } else {
+            return ServiceContractDTO.toDto(serviceContract.get());
+        }
+    }
+
+    public ServiceContractDTO replaceServiceContract(Long id, ServiceContractCreationDTO newServiceContract) {
         Optional<ServiceContract> serviceContract = serviceContractRepository.findById(id);
 
         if (serviceContract.isEmpty()) {
             throw new RecordNotFoundException("Could not find any contract with id '" + id + "' in database.");
         } else {
             ServiceContract existingServiceContract = serviceContract.get();
-            // Project project = projectRepository.findByServiceContract(existingServiceContract);
 
-            serviceContractRepository.deleteById(id);
+            BeanUtils.copyProperties(newServiceContract, existingServiceContract, "id");
+
+            serviceContractRepository.save(existingServiceContract);
 
             return ServiceContractDTO.toDto(existingServiceContract);
+        }
+    }
+
+    public String deleteServiceContract(Long id) {
+        Optional<ServiceContract> serviceContract = serviceContractRepository.findById(id);
+
+        if (serviceContract.isEmpty()) {
+            throw new RecordNotFoundException("Could not find any contract with id '" + id + "' in database.");
+        } else {
+            ServiceContract existingServiceContract = serviceContract.get();
+            Project project = existingServiceContract.getProject();
+
+            project.setServiceContract(null);
+
+            serviceContractRepository.deleteById(id);
+            projectRepository.save(project);
+
+            return "Contract with id " + id + " was successfully deleted.";
         }
     }
 }
