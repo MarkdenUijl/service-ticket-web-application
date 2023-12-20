@@ -1,8 +1,11 @@
 package nl.helvar.servicetickets.projects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Null;
 import nl.helvar.servicetickets.servicecontracts.ServiceContract;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
+import org.springframework.lang.Nullable;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -25,10 +28,8 @@ public class Project {
     // Relations
     @OneToMany(mappedBy = "project")
     private Set<ServiceTicket> tickets = new HashSet<>();
-    @OneToOne
-    @JoinColumn
+    @OneToOne(cascade = CascadeType.ALL)
     private ServiceContract serviceContract;
-
 
     public Long getId() {
         return id;

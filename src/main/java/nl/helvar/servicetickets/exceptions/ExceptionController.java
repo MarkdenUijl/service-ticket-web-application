@@ -21,4 +21,9 @@ public class ExceptionController {
     public ResponseEntity<Object> invalidEnumConstantException (InvalidEnumConstantException invalidEnumConstantException) {
         return new ResponseEntity<>(invalidEnumConstantException.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = DuplicateInDatabaseException.class)
+    public ResponseEntity<Object> duplicateInDatabaseException (DuplicateInDatabaseException duplicateInDatabaseException) {
+        return new ResponseEntity<>(duplicateInDatabaseException.getMessage(), HttpStatus.CONFLICT);
+    }
 }

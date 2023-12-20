@@ -1,5 +1,6 @@
 package nl.helvar.servicetickets.projects;
 
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 public class ProjectSpecification {
@@ -42,6 +43,24 @@ public class ProjectSpecification {
             } else {
                 return builder.isNull(root.get("serviceContract"));
             }
+        };
+    }
+
+    // Specific search specifications:
+    public static Specification<Project> findByAddress(String city, String street, String zipCode, int houseNumber) {
+        return (root, query, builder) -> {
+            Predicate predicateByAddress = builder.and(
+                    builder.equal(root.get("city"), city),
+                    builder.equal(root.get("street"), street),
+                    builder.equal(root.get("houseNumber"), houseNumber)
+            );
+
+            Predicate predicateByZipAndHouseNumber = builder.and(
+                    builder.equal(root.get("zipCode"), zipCode),
+                    builder.equal(root.get("houseNumber"), houseNumber)
+            );
+
+            return builder.or(predicateByAddress, predicateByZipAndHouseNumber);
         };
     }
 }

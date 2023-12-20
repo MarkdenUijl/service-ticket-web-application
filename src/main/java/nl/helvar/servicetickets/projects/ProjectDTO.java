@@ -11,7 +11,9 @@ public class ProjectDTO {
     private String zipCode;
     private String street;
     private int houseNumber;
+    private ServiceContract serviceContract;
 
+    // GETTERS AND SETTERS:
     public Long getId() {
         return id;
     }
@@ -58,5 +60,41 @@ public class ProjectDTO {
 
     public void setHouseNumber(int houseNumber) {
         this.houseNumber = houseNumber;
+    }
+
+    public ServiceContract getServiceContract() {
+        return serviceContract;
+    }
+
+    public void setServiceContract(ServiceContract serviceContract) {
+        this.serviceContract = serviceContract;
+    }
+
+    // MAPPERS:
+    public Project fromDto() {
+        Project project = new Project();
+
+        project.setName(this.getName());
+        project.setCity(this.getCity());
+        project.setZipCode(this.getZipCode());
+        project.setStreet(this.getStreet());
+        project.setHouseNumber(this.getHouseNumber());
+        project.setServiceContract(this.getServiceContract());
+
+        return project;
+    }
+
+    public static ProjectDTO toDto(Project project) {
+        ProjectDTO projectDTO = new ProjectDTO();
+
+        projectDTO.setId(project.getId());
+        projectDTO.setName(project.getName());
+        projectDTO.setCity(project.getCity());
+        projectDTO.setZipCode(project.getZipCode());
+        projectDTO.setStreet(project.getStreet());
+        projectDTO.setHouseNumber(project.getHouseNumber());
+        projectDTO.setServiceContract(project.getServiceContract());
+
+        return projectDTO;
     }
 }

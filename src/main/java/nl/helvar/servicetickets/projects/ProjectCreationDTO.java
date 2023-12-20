@@ -2,9 +2,15 @@ package nl.helvar.servicetickets.projects;
 
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import org.springframework.lang.Nullable;
+import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
+import nl.helvar.servicetickets.servicecontracts.ServiceContract;
+import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Optional;
 
 public class ProjectCreationDTO {
+
     private Long id;
     @Size(min = 5, max = 128)
     private String name;
@@ -15,6 +21,7 @@ public class ProjectCreationDTO {
     private int houseNumber;
     private Long serviceContractId;
 
+    // GETTERS AND SETTERS:
     public Long getId() {
         return id;
     }
@@ -69,5 +76,41 @@ public class ProjectCreationDTO {
 
     public void setServiceContractId(Long serviceContractId) {
         this.serviceContractId = serviceContractId;
+    }
+
+    // MAPPERS:
+    public Project fromDto(ServiceContractRepository serviceContractRepository) {
+        Project project = new Project();
+
+        project.setName(this.getName());
+        project.setCity(this.getCity());
+        project.setZipCode(this.getZipCode());
+        project.setStreet(this.getStreet());
+        project.setHouseNumber(this.getHouseNumber());
+
+        if (this.getServiceContractId() != null) {
+            Optional<ServiceContract> serviceContract = serviceContractRepository.findById(this.getServiceContractId());
+
+            if (serviceContract.isPresent()) {
+                project.setServiceContract(serviceContract.get());
+            } else {
+                throw new RecordNotFoundException("Service contract with ID " + this.getServiceContractId() + " not found.");
+            }
+        }
+
+        return project;
+    }
+
+    public static ProjectCreationDTO toDto(Project project) {
+        ProjectCreationDTO projectCreationDto = new ProjectCreationDTO();
+
+        projectCreationDto.setId(project.getId());
+        projectCreationDto.setName(project.getName());
+        projectCreationDto.setCity(project.getCity());
+        projectCreationDto.setZipCode(project.getZipCode());
+        projectCreationDto.setStreet(project.getStreet());
+        projectCreationDto.setHouseNumber(project.getHouseNumber());
+
+        return projectCreationDto;
     }
 }
