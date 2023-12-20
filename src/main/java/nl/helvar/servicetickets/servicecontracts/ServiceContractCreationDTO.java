@@ -11,7 +11,7 @@ import static nl.helvar.servicetickets.helpers.EnumValidator.getEnumConstantFrom
 public class ServiceContractCreationDTO {
     private Long id;
     @NotNull
-    private String contractType;
+    private String type;
     @NotNull
     private int contractTime;
     private int usedTime;
@@ -27,11 +27,11 @@ public class ServiceContractCreationDTO {
     }
 
     public ContractType getType() {
-        return (ContractType) getEnumConstantFromString(ContractType.values(), this.contractType);
+        return (ContractType) getEnumConstantFromString(ContractType.values(), this.type);
     }
 
     public void setType(String contractType) {
-        this.contractType = contractType;
+        this.type = contractType;
     }
 
     public int getContractTime() {

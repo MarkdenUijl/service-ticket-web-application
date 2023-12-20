@@ -1,5 +1,6 @@
 package nl.helvar.servicetickets.projects;
 
+import nl.helvar.servicetickets.exceptions.DuplicateInDatabaseException;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -23,12 +24,25 @@ public class ProjectService {
     }
 
     public ProjectCreationDTO createProject(ProjectCreationDTO projectCreationDto) {
-        Project project = projectCreationDto.fromDto(serviceContractRepository);
+        Specification<Project> projectByAddressFilter = Specification.where(findByAddress(
+                projectCreationDto.getCity(),
+                projectCreationDto.getStreet(),
+                projectCreationDto.getZipCode(),
+                projectCreationDto.getHouseNumber()
+        ));
 
-        projectRepository.save(project);
+        List<Project> optionalProjects = projectRepository.findAll(projectByAddressFilter);
 
-        projectCreationDto.setId(project.getId());
-        return projectCreationDto;
+        if (optionalProjects.isEmpty()) {
+            Project project = projectCreationDto.fromDto(serviceContractRepository);
+
+            projectRepository.save(project);
+
+            projectCreationDto.setId(project.getId());
+            return projectCreationDto;
+        } else {
+            throw new DuplicateInDatabaseException("There was already a project registered at this address.");
+        }
     }
 
     public List<ProjectDTO> getAllProjects(String name, String city, String zipCode, String street, Integer houseNumber, Boolean hasServiceContract) {

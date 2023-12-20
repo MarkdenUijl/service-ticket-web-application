@@ -23,7 +23,6 @@ import static nl.helvar.servicetickets.helpers.DTOValidator.buildErrorMessage;
 @RequestMapping("/serviceContracts")
 public class ServiceContractController {
     private final ServiceContractService service;
-    private final DTOValidator dtoValidator = new DTOValidator();
 
     public ServiceContractController(ServiceContractService service) {
         this.service = service;
