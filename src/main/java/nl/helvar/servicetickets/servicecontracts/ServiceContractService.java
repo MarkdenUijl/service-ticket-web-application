@@ -36,8 +36,8 @@ public class ServiceContractService {
 
             if (project.getServiceContract() != null) {
                 ServiceContract existingServiceContract = project.getServiceContract();
-                project.setServiceContract(null); // Remove reference from project
-                serviceContractRepository.delete(existingServiceContract); // Delete old service contract from repository
+                project.setServiceContract(null);
+                serviceContractRepository.delete(existingServiceContract);
             }
 
             project.setServiceContract(serviceContract);
