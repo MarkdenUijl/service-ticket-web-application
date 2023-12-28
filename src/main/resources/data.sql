@@ -19,3 +19,9 @@ VALUES
     (nextval('projects_seq'), 'The Hague Residency', 'Den Haag', '2597 AK', 'Scheveningseweg', 89, null),
     (nextval('projects_seq'), 'Groningen Central', 'Groningen', '9711 AA', 'Grote Markt', 10, 101),
     (nextval('projects_seq'), 'Eindhoven Tower', 'Eindhoven', '5611 BB', 'Stratumseind', 34, null);
+
+/* SERVICE TICKETS DATA */
+INSERT INTO service_tickets (id, name, status, type, description, project_id, minutes_spent, creation_date)
+VALUES
+    (nextval('service_tickets_seq'), 'Issue with Server', 0, 0, 'Experiencing connectivity problems', 1, 0, '2023-12-28T09:00:00');
+

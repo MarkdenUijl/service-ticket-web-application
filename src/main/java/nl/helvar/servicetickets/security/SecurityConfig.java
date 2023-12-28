@@ -37,8 +37,8 @@ public class SecurityConfig {
         return http
                 .httpBasic(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/projects/**", "/serviceContracts/**"
-                        ).hasAnyRole("ADMIN", "ENGINEER", "USER")
+                        .requestMatchers(HttpMethod.GET, "/projects/**", "/serviceContracts/**")
+                        .hasAnyRole("ADMIN", "ENGINEER", "USER")
 
                         .requestMatchers(HttpMethod.POST, "/projects/**")
                         .hasAnyRole("ADMIN", "ENGINEER")
@@ -52,10 +52,19 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/serviceContracts/**")
                         .hasRole("ADMIN")
 
-                        .requestMatchers("/serviceTickets/**")
+                        .requestMatchers(HttpMethod.POST, "/serviceTickets/**")
+                        .hasAnyRole("ADMIN", "ENGINEER", "USER")
+
+                        .requestMatchers(HttpMethod.DELETE, "/serviceTickets/**")
+                        .hasAnyRole("ADMIN", "ENGINEER", "USER")
+
+                        .requestMatchers(HttpMethod.PUT, "/serviceTickets/**")
+                        .hasAnyRole("ADMIN", "ENGINEER")
+
+                        .requestMatchers(HttpMethod.GET, "/serviceTickets/**")
                         .permitAll()
 
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
