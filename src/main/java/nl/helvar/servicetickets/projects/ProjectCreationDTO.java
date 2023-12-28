@@ -3,14 +3,14 @@ package nl.helvar.servicetickets.projects;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
+import nl.helvar.servicetickets.interfaces.Identifyable;
 import nl.helvar.servicetickets.servicecontracts.ServiceContract;
 import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
-public class ProjectCreationDTO {
-
+public class ProjectCreationDTO implements Identifyable {
     private Long id;
     @Size(min = 5, max = 128)
     private String name;

@@ -1,14 +1,18 @@
 package nl.helvar.servicetickets.servicecontracts;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import nl.helvar.servicetickets.exceptions.InvalidEnumConstantException;
+import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
+import nl.helvar.servicetickets.interfaces.Identifyable;
 import nl.helvar.servicetickets.projects.Project;
+import nl.helvar.servicetickets.projects.ProjectRepository;
 import nl.helvar.servicetickets.servicecontracts.enums.ContractType;
+
+import java.time.LocalDate;
+import java.util.Optional;
 
 import static nl.helvar.servicetickets.helpers.EnumValidator.getEnumConstantFromString;
 
-public class ServiceContractCreationDTO {
+public class ServiceContractCreationDTO implements Identifyable {
     private Long id;
     @NotNull
     private String type;
@@ -17,6 +21,8 @@ public class ServiceContractCreationDTO {
     private int usedTime;
     @NotNull
     private Long projectId;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     public Long getId() {
         return id;
@@ -58,6 +64,22 @@ public class ServiceContractCreationDTO {
         this.projectId = projectId;
     }
 
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
     // MAPPERS:
     public ServiceContract fromDto() {
         ServiceContract serviceContract = new ServiceContract();
@@ -65,6 +87,8 @@ public class ServiceContractCreationDTO {
         serviceContract.setType(this.getType());
         serviceContract.setContractTime(this.getContractTime());
         serviceContract.setUsedTime(this.getUsedTime());
+        serviceContract.setStartDate(this.getStartDate());
+        serviceContract.setEndDate(this.getEndDate());
 
         return serviceContract;
     }
@@ -76,6 +100,8 @@ public class ServiceContractCreationDTO {
         serviceContractCreationDTO.setType(serviceContract.getType().toString());
         serviceContractCreationDTO.setContractTime(serviceContract.getContractTime());
         serviceContractCreationDTO.setUsedTime(serviceContract.getUsedTime());
+        serviceContractCreationDTO.setStartDate(serviceContract.getStartDate());
+        serviceContractCreationDTO.setEndDate(serviceContract.getEndDate());
 
         return serviceContractCreationDTO;
     }

@@ -3,6 +3,8 @@ package nl.helvar.servicetickets.projects;
 import nl.helvar.servicetickets.exceptions.DuplicateInDatabaseException;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
+import nl.helvar.servicetickets.servicetickets.ServiceTicket;
+import nl.helvar.servicetickets.servicetickets.ServiceTicketRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.jpa.domain.Specification;
@@ -17,10 +19,12 @@ import static nl.helvar.servicetickets.projects.ProjectSpecification.*;
 public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ServiceContractRepository serviceContractRepository;
+    private final ServiceTicketRepository serviceTicketRepository;
 
-    public ProjectService(ProjectRepository projectRepository, ServiceContractRepository serviceContractRepository) {
+    public ProjectService(ProjectRepository projectRepository, ServiceContractRepository serviceContractRepository, ServiceTicketRepository serviceTicketRepository) {
         this.projectRepository = projectRepository;
         this.serviceContractRepository = serviceContractRepository;
+        this.serviceTicketRepository = serviceTicketRepository;
     }
 
     public ProjectCreationDTO createProject(ProjectCreationDTO projectCreationDto) {
@@ -98,6 +102,12 @@ public class ProjectService {
             throw new RecordNotFoundException("Could not find any project with id '" + id + "' in database.");
         } else {
             Project existingProject = project.get();
+
+            for (ServiceTicket ticket : existingProject.getTickets()) {
+                ticket.setProject(null);
+
+                serviceTicketRepository.save(ticket);
+            }
 
             projectRepository.delete(existingProject);
 

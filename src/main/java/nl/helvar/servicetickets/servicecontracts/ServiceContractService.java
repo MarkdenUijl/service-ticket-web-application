@@ -6,8 +6,6 @@ import nl.helvar.servicetickets.projects.ProjectRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -62,7 +60,7 @@ public class ServiceContractService {
                 .toList();
 
         if (serviceContracts.isEmpty()) {
-            throw new RecordNotFoundException("Could not find any contracts in database.");
+            throw new RecordNotFoundException("Could not find any contracts with these parameters in the database.");
         } else {
             return serviceContracts;
         }

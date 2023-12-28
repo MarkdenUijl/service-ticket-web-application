@@ -2,11 +2,15 @@ package nl.helvar.servicetickets.servicecontracts;
 
 import nl.helvar.servicetickets.servicecontracts.enums.ContractType;
 
+import java.time.LocalDate;
+
 public class ServiceContractDTO {
     private Long id;
     private ContractType contractType;
     private int contractTime;
     private int usedTime;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     public Long getId() {
         return id;
@@ -40,6 +44,22 @@ public class ServiceContractDTO {
         this.usedTime = usedTime;
     }
 
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
     // MAPPERS:
     public static ServiceContract fromDto(ServiceContractDTO serviceContractDTO) {
         ServiceContract serviceContract = new ServiceContract();
@@ -47,6 +67,8 @@ public class ServiceContractDTO {
         serviceContract.setType(serviceContractDTO.getType());
         serviceContract.setContractTime(serviceContractDTO.getContractTime());
         serviceContract.setUsedTime(serviceContractDTO.getUsedTime());
+        serviceContract.setStartDate(serviceContractDTO.getStartDate());
+        serviceContract.setEndDate(serviceContractDTO.getEndDate());
 
         return serviceContract;
     }
@@ -58,6 +80,8 @@ public class ServiceContractDTO {
         serviceContractDTO.setType(serviceContract.getType());
         serviceContractDTO.setContractTime(serviceContract.getContractTime());
         serviceContractDTO.setUsedTime(serviceContract.getUsedTime());
+        serviceContractDTO.setStartDate(serviceContract.getStartDate());
+        serviceContractDTO.setEndDate(serviceContract.getEndDate());
 
         return serviceContractDTO;
     }
