@@ -3,6 +3,7 @@ package nl.helvar.servicetickets.servicetickets;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.projects.Project;
 import nl.helvar.servicetickets.projects.ProjectRepository;
+import nl.helvar.servicetickets.servicecontracts.ServiceContractCreationDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.jpa.domain.Specification;
@@ -32,20 +33,7 @@ public class ServiceTicketService {
 
         ServiceTicket serviceTicket = serviceTicketCreationDTO.fromDto(projectRepository);
 
-        if (serviceTicketCreationDTO.getProjectId() != null) {
-            Optional<Project> projectOptional = projectRepository.findById(serviceTicketCreationDTO.getProjectId());
-
-            if (projectOptional.isEmpty()) {
-                throw new RecordNotFoundException("Project with id " + serviceTicketCreationDTO.getProjectId() + " was not found.");
-            } else {
-                Project project = projectOptional.get();
-
-                project.addServiceTicket(serviceTicket);
-
-                projectRepository.save(project);
-            }
-        }
-
+        addServiceTicketToProject(serviceTicket);
         serviceTicketRepository.save(serviceTicket);
 
         serviceTicketCreationDTO.setId(serviceTicket.getId());
@@ -85,8 +73,11 @@ public class ServiceTicketService {
             throw new RecordNotFoundException("Could not find any ticket with id '" + id + "' in database.");
         } else {
             ServiceTicket existingServiceTicket = serviceTicket.get();
+            ServiceTicket newTicket = newServiceTicket.fromDto(projectRepository);
 
-            BeanUtils.copyProperties(newServiceTicket, existingServiceTicket, "id");
+            BeanUtils.copyProperties(newTicket, existingServiceTicket, "id", "creationDate", "responses");
+
+            addServiceTicketToProject(existingServiceTicket);
 
             serviceTicketRepository.save(existingServiceTicket);
 
@@ -105,6 +96,19 @@ public class ServiceTicketService {
             serviceTicketRepository.delete(existingServiceTicket);
 
             return ServiceTicketDTO.toDto(existingServiceTicket);
+        }
+    }
+
+    // HELPER METHODS
+    private void addServiceTicketToProject(ServiceTicket serviceTicket) {
+        if (serviceTicket.getProject() == null) {
+            throw new RecordNotFoundException("No project connected to the service ticket was found.");
+        } else {
+            Project project = serviceTicket.getProject();
+
+            project.addServiceTicket(serviceTicket);
+
+            projectRepository.save(project);
         }
     }
 }
