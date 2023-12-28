@@ -1,10 +1,13 @@
 package nl.helvar.servicetickets.servicetickets;
 
+import jakarta.validation.Valid;
+import nl.helvar.servicetickets.exceptions.BadObjectCreationException;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -12,80 +15,53 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import static nl.helvar.servicetickets.helpers.DTOValidator.buildErrorMessage;
+import static nl.helvar.servicetickets.helpers.UriCreator.createUri;
+
 @RestController
 @RequestMapping("/serviceTickets")
 public class ServiceTicketController {
-    @Autowired
-    private ServiceTicketRepository serviceTicketRepository;
+    private final ServiceTicketService service;
+
+    public ServiceTicketController(ServiceTicketService service) {
+        this.service = service;
+    }
 
     @GetMapping
-    public ResponseEntity<List<ServiceTicket>> getAllServiceTickets(
+    public ResponseEntity<List<ServiceTicketDTO>> getAllServiceTickets(
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String status
     ) {
-        List<ServiceTicket> filteredServiceTickets = serviceTicketRepository.findAllByFilter(type, status);
+        List<ServiceTicketDTO> serviceTicketDTOS = service.getAllServiceTickets(type, status);
 
-        if (filteredServiceTickets.isEmpty()) {
-            throw new RecordNotFoundException("Could not find any tickets in database.");
-        } else {
-            return new ResponseEntity<>(filteredServiceTickets, HttpStatus.OK);
-        }
+        return new ResponseEntity<>(serviceTicketDTOS, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ServiceTicket> findServiceTicketById(@PathVariable("id") Long id) {
-        Optional<ServiceTicket> serviceTicket = serviceTicketRepository.findById(id);
-
-        if (serviceTicket.isEmpty()) {
-            throw new RecordNotFoundException("Could not find any ticket with id '" + id + "' in database.");
-        } else {
-            return new ResponseEntity<>(serviceTicket.get(), HttpStatus.OK);
-        }
+    public ResponseEntity<ServiceTicketDTO> findServiceTicketById(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(service.findById(id), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<ServiceTicket> addServiceTicket(@RequestBody ServiceTicket serviceTicket) {
-        serviceTicketRepository.save(serviceTicket);
+    public ResponseEntity<ServiceTicketCreationDTO> addServiceTicket(@Valid @RequestBody ServiceTicketCreationDTO serviceTicket, BindingResult br) {
+        if (br.hasFieldErrors()) {
+            throw new BadObjectCreationException(buildErrorMessage(br));
+        } else {
+            serviceTicket = service.createServiceTicket(serviceTicket);
 
-        URI uri = URI.create(
-                ServletUriComponentsBuilder
-                        .fromCurrentRequest()
-                        .path("/" + serviceTicket.getId())
-                        .toUriString()
-        );
+            URI uri = createUri(serviceTicket);
 
-        return ResponseEntity.created(uri).body(serviceTicket);
+            return ResponseEntity.created(uri).body(serviceTicket);
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ServiceTicket> replaceServiceTicket(@PathVariable("id") Long id, @RequestBody ServiceTicket newServiceTicket) {
-        Optional<ServiceTicket> serviceTicket = serviceTicketRepository.findById(id);
-
-        if (serviceTicket.isEmpty()) {
-            throw new RecordNotFoundException("Could not find any ticket with id '" + id + "' in database.");
-        } else {
-            ServiceTicket existingServiceTicket = serviceTicket.get();
-
-            BeanUtils.copyProperties(newServiceTicket, existingServiceTicket, "id");
-
-            serviceTicketRepository.save(existingServiceTicket);
-
-            return new ResponseEntity<>(existingServiceTicket, HttpStatus.OK);
-        }
+    public ResponseEntity<ServiceTicketDTO> replaceServiceTicket(@PathVariable("id") Long id, @RequestBody ServiceTicketCreationDTO newServiceTicket) {
+        return new ResponseEntity<>(service.replaceServiceTicket(id, newServiceTicket), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ServiceTicket> deleteServiceTicket(@PathVariable("id") Long id) {
-        Optional<ServiceTicket> serviceTicket = serviceTicketRepository.findById(id);
-
-        if (serviceTicket.isEmpty()) {
-            throw new RecordNotFoundException("Could not find any ticket with id '" + id + "' in database.");
-        } else {
-            ServiceTicket existingServiceTicket = serviceTicket.get();
-
-            serviceTicketRepository.delete(existingServiceTicket);
-
-            return new ResponseEntity<>(existingServiceTicket, HttpStatus.OK);
-        }
+    public ResponseEntity<ServiceTicketDTO> deleteServiceTicket(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(service.deleteServiceTicket(id), HttpStatus.OK);
     }
 }

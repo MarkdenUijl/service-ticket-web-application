@@ -37,13 +37,25 @@ public class SecurityConfig {
         return http
                 .httpBasic(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/projects/**").hasAnyRole("ADMIN", "ENGINEER", "USER")
-                        .requestMatchers(HttpMethod.POST, "/projects/**").hasAnyRole("ADMIN", "ENGINEER")
-                        .requestMatchers(HttpMethod.PUT, "/projects/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/projects/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/serviceContracts/**").hasRole("ENGINEER")
-                        .requestMatchers("/serviceContracts/**").hasRole("ADMIN")
-                        .anyRequest().denyAll()
+                        .requestMatchers(HttpMethod.GET, "/projects/**", "/serviceContracts/**"
+                        ).hasAnyRole("ADMIN", "ENGINEER", "USER")
+
+                        .requestMatchers(HttpMethod.POST, "/projects/**")
+                        .hasAnyRole("ADMIN", "ENGINEER")
+
+                        .requestMatchers(HttpMethod.PUT, "/projects/**", "/serviceContracts/**")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.DELETE, "/projects/**", "/serviceContracts/**")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/serviceContracts/**")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers("/serviceTickets/**")
+                        .permitAll()
+
+                        .anyRequest().permitAll()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)

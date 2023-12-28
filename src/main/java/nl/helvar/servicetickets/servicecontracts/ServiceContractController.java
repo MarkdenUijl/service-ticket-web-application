@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static nl.helvar.servicetickets.helpers.DTOValidator.buildErrorMessage;
+import static nl.helvar.servicetickets.helpers.UriCreator.createUri;
 
 @RestController
 @RequestMapping("/serviceContracts")
@@ -47,12 +48,7 @@ public class ServiceContractController {
         } else {
             serviceContract = service.createServiceContract(serviceContract);
 
-            URI uri = URI.create(
-                    ServletUriComponentsBuilder
-                            .fromCurrentRequest()
-                            .path("/" + serviceContract.getId())
-                            .toUriString()
-            );
+            URI uri = createUri(serviceContract);
 
             return ResponseEntity.created(uri).body(serviceContract);
         }

@@ -2,8 +2,11 @@ package nl.helvar.servicetickets.servicecontracts;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import nl.helvar.servicetickets.interfaces.Identifyable;
 import nl.helvar.servicetickets.projects.Project;
 import nl.helvar.servicetickets.servicecontracts.enums.ContractType;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "service_contracts")
@@ -12,16 +15,18 @@ public class ServiceContract {
     @GeneratedValue
     private Long id;
     private ContractType type;
-    @Column(name = "contract_time")
     private int contractTime;
-    @Column(name = "used_time")
     private int usedTime;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     // Relations
     @OneToOne(mappedBy = "serviceContract")
     @JsonIgnore
     private Project project;
 
+
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -56,5 +61,21 @@ public class ServiceContract {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 }

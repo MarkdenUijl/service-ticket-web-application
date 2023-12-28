@@ -6,12 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
 
 import static nl.helvar.servicetickets.helpers.DTOValidator.buildErrorMessage;
+import static nl.helvar.servicetickets.helpers.UriCreator.createUri;
 
 @RestController
 @RequestMapping("/projects")
@@ -52,12 +52,7 @@ public class ProjectController {
         } else {
             project = service.createProject(project);
 
-            URI uri = URI.create(
-                    ServletUriComponentsBuilder
-                            .fromCurrentRequest()
-                            .path("/" + project.getId())
-                            .toUriString()
-            );
+            URI uri = createUri(project);
 
             return ResponseEntity.created(uri).body(project);
         }

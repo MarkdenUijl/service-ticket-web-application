@@ -1,17 +1,11 @@
 package nl.helvar.servicetickets.projects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Null;
 import nl.helvar.servicetickets.servicecontracts.ServiceContract;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
-import org.springframework.lang.Nullable;
 
-import javax.swing.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "projects")
@@ -27,7 +21,7 @@ public class Project {
 
     // Relations
     @OneToMany(mappedBy = "project")
-    private Set<ServiceTicket> tickets = new HashSet<>();
+    private List<ServiceTicket> tickets;
     @OneToOne(cascade = CascadeType.ALL)
     private ServiceContract serviceContract;
 
@@ -75,8 +69,12 @@ public class Project {
         this.houseNumber = houseNumber;
     }
 
-    public Set<ServiceTicket> getTickets() {
+    public List<ServiceTicket> getTickets() {
         return tickets;
+    }
+
+    public void addServiceTicket(ServiceTicket ticket) {
+        tickets.add(ticket);
     }
 
     public ServiceContract getServiceContract() {

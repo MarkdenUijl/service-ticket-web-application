@@ -1,7 +1,9 @@
 package nl.helvar.servicetickets.projects;
 
 import nl.helvar.servicetickets.servicecontracts.ServiceContract;
+import nl.helvar.servicetickets.servicetickets.ServiceTicket;
 
+import java.util.List;
 import java.util.Optional;
 
 public class ProjectDTO {
@@ -12,6 +14,7 @@ public class ProjectDTO {
     private String street;
     private int houseNumber;
     private ServiceContract serviceContract;
+    private List<ServiceTicket> tickets;
 
     // GETTERS AND SETTERS:
     public Long getId() {
@@ -70,6 +73,14 @@ public class ProjectDTO {
         this.serviceContract = serviceContract;
     }
 
+    public List<ServiceTicket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<ServiceTicket> tickets) {
+        this.tickets = tickets;
+    }
+
     // MAPPERS:
     public Project fromDto() {
         Project project = new Project();
@@ -94,6 +105,7 @@ public class ProjectDTO {
         projectDTO.setStreet(project.getStreet());
         projectDTO.setHouseNumber(project.getHouseNumber());
         projectDTO.setServiceContract(project.getServiceContract());
+        projectDTO.setTickets(project.getTickets());
 
         return projectDTO;
     }

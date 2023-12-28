@@ -1,43 +1,36 @@
 package nl.helvar.servicetickets.servicetickets;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import nl.helvar.servicetickets.projects.Project;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.servicetickets.enums.TicketType;
 import nl.helvar.servicetickets.ticketresponses.TicketResponse;
-import nl.helvar.servicetickets.users.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Entity
-@Table(name = "service_tickets")
-public class ServiceTicket {
-    @Id
-    @GeneratedValue
+public class ServiceTicketDTO {
     private Long id;
     private String name;
     private TicketStatus status;
     private TicketType type;
     private String description;
-    @OneToMany(mappedBy = "ticket", fetch = FetchType.EAGER)
     private List<TicketResponse> responses;
-    @ManyToOne
-    @JoinColumn(name = "project_id")
-    @JsonIgnore
-    private Project project;
     private int minutesSpent;
     private LocalDateTime creationDate;
 
-    // NOG UITZOEKEN HOE DIT GEMAAKT WORDt
+    // NOG UITZOEKEN HOE DIT GEMAAKT WORDT
     //private Media media;
-    //@OneToOne
     //private User submittedBy;
 
-    // GETTERS AND SETTERS:
+
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -80,14 +73,6 @@ public class ServiceTicket {
         this.responses = responses;
     }
 
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
     public int getMinutesSpent() {
         return minutesSpent;
     }
@@ -102,5 +87,34 @@ public class ServiceTicket {
 
     public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public static ServiceTicket fromDto(ServiceTicketDTO serviceTicketDTO) {
+        ServiceTicket serviceTicket = new ServiceTicket();
+
+        serviceTicket.setName(serviceTicketDTO.getName());
+        serviceTicket.setStatus(serviceTicketDTO.getStatus());
+        serviceTicket.setType(serviceTicketDTO.getType());
+        serviceTicket.setDescription(serviceTicketDTO.getDescription());
+        serviceTicket.setResponses(serviceTicketDTO.getResponses());
+        serviceTicket.setMinutesSpent(serviceTicketDTO.getMinutesSpent());
+        serviceTicket.setCreationDate(serviceTicketDTO.getCreationDate());
+
+        return serviceTicket;
+    }
+
+    public static ServiceTicketDTO toDto(ServiceTicket serviceTicket) {
+        ServiceTicketDTO serviceTicketDTO = new ServiceTicketDTO();
+
+        serviceTicketDTO.setId(serviceTicket.getId());
+        serviceTicketDTO.setName(serviceTicket.getName());
+        serviceTicketDTO.setStatus(serviceTicket.getStatus());
+        serviceTicketDTO.setType(serviceTicket.getType());
+        serviceTicketDTO.setDescription(serviceTicket.getDescription());
+        serviceTicketDTO.setResponses(serviceTicket.getResponses());
+        serviceTicketDTO.setMinutesSpent(serviceTicket.getMinutesSpent());
+        serviceTicketDTO.setCreationDate(serviceTicket.getCreationDate());
+
+        return serviceTicketDTO;
     }
 }
