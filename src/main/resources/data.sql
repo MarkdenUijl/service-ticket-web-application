@@ -25,3 +25,7 @@ INSERT INTO service_tickets (id, name, status, type, description, project_id, mi
 VALUES
     (nextval('service_tickets_seq'), 'Issue with Server', 0, 0, 'Experiencing connectivity problems', 1, 0, '2023-12-28T09:00:00');
 
+/* SERVICE TICKET RESPONSE DATA */
+INSERT INTO ticket_responses (id, response, creation_date, ticket_id)
+VALUES
+    (nextval('ticket_responses_seq'), 'Tried rebooting the router', '2023-12-28T09:10:00', 1)
