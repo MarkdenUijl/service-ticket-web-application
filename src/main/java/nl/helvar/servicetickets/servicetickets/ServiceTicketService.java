@@ -85,7 +85,7 @@ public class ServiceTicketService {
         }
     }
 
-    public ServiceTicketDTO deleteServiceTicket(Long id) {
+    public String deleteServiceTicket(Long id) {
         Optional<ServiceTicket> serviceTicket = serviceTicketRepository.findById(id);
 
         if (serviceTicket.isEmpty()) {
@@ -95,7 +95,7 @@ public class ServiceTicketService {
 
             serviceTicketRepository.delete(existingServiceTicket);
 
-            return ServiceTicketDTO.toDto(existingServiceTicket);
+            return "Service ticket with id '" + id + "' was successfully deleted.";
         }
     }
 

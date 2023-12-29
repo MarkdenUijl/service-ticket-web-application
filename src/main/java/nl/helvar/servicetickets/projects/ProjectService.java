@@ -95,7 +95,7 @@ public class ProjectService {
         }
     }
 
-    public ProjectDTO deleteProject(Long id) {
+    public String deleteProject(Long id) {
         Optional<Project> project = projectRepository.findById(id);
 
         if (project.isEmpty()) {
@@ -111,7 +111,7 @@ public class ProjectService {
 
             projectRepository.delete(existingProject);
 
-            return ProjectDTO.toDto(existingProject);
+            return "Project with id '" + id + "' was successfully deleted.";
         }
     }
 }

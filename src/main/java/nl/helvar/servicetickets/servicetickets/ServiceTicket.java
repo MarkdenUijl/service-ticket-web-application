@@ -21,7 +21,7 @@ public class ServiceTicket {
     private TicketStatus status;
     private TicketType type;
     private String description;
-    @OneToMany(mappedBy = "ticket", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "ticket", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<TicketResponse> responses;
     @ManyToOne
     @JoinColumn(name = "project_id")

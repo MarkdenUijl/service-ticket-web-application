@@ -146,6 +146,7 @@ public class ServiceTicketCreationDTO implements Identifyable {
         serviceTicketCreationDTO.setResponses(serviceTicket.getResponses());
         serviceTicketCreationDTO.setMinutesSpent(serviceTicket.getMinutesSpent());
         serviceTicketCreationDTO.setCreationDate(serviceTicket.getCreationDate());
+        serviceTicketCreationDTO.setProjectId(serviceTicket.getProject().getId());
 
         return serviceTicketCreationDTO;
     }

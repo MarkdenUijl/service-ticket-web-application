@@ -61,7 +61,7 @@ public class ServiceTicketController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ServiceTicketDTO> deleteServiceTicket(@PathVariable("id") Long id) {
+    public ResponseEntity<String> deleteServiceTicket(@PathVariable("id") Long id) {
         return new ResponseEntity<>(service.deleteServiceTicket(id), HttpStatus.OK);
     }
 }

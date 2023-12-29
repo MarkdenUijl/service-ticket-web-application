@@ -1,13 +1,11 @@
 package nl.helvar.servicetickets.servicetickets;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.servicetickets.enums.TicketType;
-import nl.helvar.servicetickets.ticketresponses.TicketResponse;
+import nl.helvar.servicetickets.ticketresponses.TicketResponseDTO;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 public class ServiceTicketDTO {
@@ -16,14 +14,9 @@ public class ServiceTicketDTO {
     private TicketStatus status;
     private TicketType type;
     private String description;
-    private List<TicketResponse> responses;
+    private List<TicketResponseDTO> responses;
     private int minutesSpent;
     private LocalDateTime creationDate;
-
-    // NOG UITZOEKEN HOE DIT GEMAAKT WORDT
-    //private Media media;
-    //private User submittedBy;
-
 
     public Long getId() {
         return id;
@@ -65,11 +58,11 @@ public class ServiceTicketDTO {
         this.description = description;
     }
 
-    public List<TicketResponse> getResponses() {
+    public List<TicketResponseDTO> getResponses() {
         return responses;
     }
 
-    public void setResponses(List<TicketResponse> responses) {
+    public void setResponses(List<TicketResponseDTO> responses) {
         this.responses = responses;
     }
 
@@ -96,9 +89,13 @@ public class ServiceTicketDTO {
         serviceTicket.setStatus(serviceTicketDTO.getStatus());
         serviceTicket.setType(serviceTicketDTO.getType());
         serviceTicket.setDescription(serviceTicketDTO.getDescription());
-        serviceTicket.setResponses(serviceTicketDTO.getResponses());
         serviceTicket.setMinutesSpent(serviceTicketDTO.getMinutesSpent());
         serviceTicket.setCreationDate(serviceTicketDTO.getCreationDate());
+        serviceTicket.setResponses(serviceTicketDTO.getResponses()
+                .stream()
+                .map(TicketResponseDTO::fromDto)
+                .toList()
+        );
 
         return serviceTicket;
     }
@@ -111,9 +108,14 @@ public class ServiceTicketDTO {
         serviceTicketDTO.setStatus(serviceTicket.getStatus());
         serviceTicketDTO.setType(serviceTicket.getType());
         serviceTicketDTO.setDescription(serviceTicket.getDescription());
-        serviceTicketDTO.setResponses(serviceTicket.getResponses());
         serviceTicketDTO.setMinutesSpent(serviceTicket.getMinutesSpent());
         serviceTicketDTO.setCreationDate(serviceTicket.getCreationDate());
+        serviceTicketDTO.setResponses(serviceTicket.getResponses()
+                .stream()
+                .map(TicketResponseDTO::toDto)
+                .sorted(Comparator.comparing(TicketResponseDTO::getCreationDate))
+                .toList()
+        );
 
         return serviceTicketDTO;
     }
