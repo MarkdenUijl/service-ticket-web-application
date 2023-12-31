@@ -2,12 +2,13 @@ package nl.helvar.servicetickets.ticketresponses;
 
 import jakarta.persistence.*;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "response_type", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("basic_response")
 @Table(name = "ticket_responses")
 public class TicketResponse {
     @Id

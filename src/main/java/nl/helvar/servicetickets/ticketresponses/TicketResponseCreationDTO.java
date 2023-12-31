@@ -4,8 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.interfaces.Identifyable;
+import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
 import nl.helvar.servicetickets.servicetickets.ServiceTicketRepository;
+import nl.helvar.servicetickets.ticketresponses.subclasses.EngineerResponse;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -17,6 +19,8 @@ public class TicketResponseCreationDTO implements Identifyable {
     private LocalDateTime creationDate;
     @NotNull
     private Long serviceTicketId;
+    private int minutesSpent;
+    private boolean isEngineerResponse;
 
     public Long getId() {
         return id;
@@ -50,21 +54,46 @@ public class TicketResponseCreationDTO implements Identifyable {
         this.serviceTicketId = serviceTicketId;
     }
 
+    public int getMinutesSpent() {
+        return minutesSpent;
+    }
+
+    public void setMinutesSpent(int minutesSpent) {
+        this.minutesSpent = minutesSpent;
+    }
+
+    public boolean getIsEngineerResponse() {
+        return isEngineerResponse;
+    }
+
+    public void setIsEngineerResponse(boolean engineerResponse) {
+        isEngineerResponse = engineerResponse;
+    }
+
     public TicketResponse fromDto(ServiceTicketRepository serviceTicketRepository) {
-        TicketResponse ticketResponse = new TicketResponse();
-
-        ticketResponse.setResponse(this.getResponse());
-        ticketResponse.setCreationDate(this.getCreationDate());
-
         Optional<ServiceTicket> serviceTicket = serviceTicketRepository.findById(this.getServiceTicketId());
 
-        if (serviceTicket.isPresent()) {
-            ticketResponse.setTicket(serviceTicket.get());
-        } else {
+        if(serviceTicket.isEmpty()) {
             throw new RecordNotFoundException("Could not find ticket with id '" + this.getServiceTicketId() + "' in the database.");
         }
 
-        return ticketResponse;
+        if (this.getIsEngineerResponse()) {
+            EngineerResponse engineerResponse = new EngineerResponse();
+
+            engineerResponse.setResponse(this.getResponse());
+            engineerResponse.setCreationDate(this.getCreationDate());
+            engineerResponse.setMinutesSpent(this.getMinutesSpent());
+            engineerResponse.setTicket(serviceTicket.get());
+
+            return engineerResponse;
+        } else {
+            TicketResponse ticketResponse = new TicketResponse();
+            ticketResponse.setResponse(this.getResponse());
+            ticketResponse.setCreationDate(this.getCreationDate());
+            ticketResponse.setTicket(serviceTicket.get());
+
+            return ticketResponse;
+        }
     }
 
     public static TicketResponseCreationDTO toDto(TicketResponse ticketResponse) {
@@ -74,6 +103,7 @@ public class TicketResponseCreationDTO implements Identifyable {
         ticketResponseCreationDTO.setResponse(ticketResponse.getResponse());
         ticketResponseCreationDTO.setCreationDate(ticketResponse.getCreationDate());
         ticketResponseCreationDTO.setServiceTicketId(ticketResponse.getTicket().getId());
+        ticketResponseCreationDTO.setMinutesSpent(ticketResponseCreationDTO.getMinutesSpent());
 
         return ticketResponseCreationDTO;
     }

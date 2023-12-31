@@ -55,6 +55,10 @@ public class ServiceContract {
         this.usedTime = usedTime;
     }
 
+    public void addUsedTime(int time) {
+        this.usedTime += time;
+    }
+
     public Project getProject() {
         return project;
     }

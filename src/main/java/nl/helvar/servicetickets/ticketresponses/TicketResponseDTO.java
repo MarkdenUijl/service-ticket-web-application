@@ -1,18 +1,15 @@
 package nl.helvar.servicetickets.ticketresponses;
 
-import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.interfaces.Identifyable;
-import nl.helvar.servicetickets.servicetickets.ServiceTicket;
-import nl.helvar.servicetickets.servicetickets.ServiceTicketDTO;
-import nl.helvar.servicetickets.servicetickets.ServiceTicketRepository;
+import nl.helvar.servicetickets.ticketresponses.subclasses.EngineerResponse;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 public class TicketResponseDTO implements Identifyable {
     private Long id;
     private String response;
     private LocalDateTime creationDate;
+    private int minutesSpent;
 
     public Long getId() {
         return id;
@@ -38,6 +35,14 @@ public class TicketResponseDTO implements Identifyable {
         this.creationDate = creationDate;
     }
 
+    public int getMinutesSpent() {
+        return minutesSpent;
+    }
+
+    public void setMinutesSpent(int minutesSpent) {
+        this.minutesSpent = minutesSpent;
+    }
+
     public static TicketResponse fromDto(TicketResponseDTO ticketResponseDTO) {
         TicketResponse ticketResponse = new TicketResponse();
 
@@ -53,6 +58,10 @@ public class TicketResponseDTO implements Identifyable {
         ticketResponseDTO.setId(ticketResponse.getId());
         ticketResponseDTO.setResponse(ticketResponse.getResponse());
         ticketResponseDTO.setCreationDate(ticketResponse.getCreationDate());
+
+        if (ticketResponse instanceof EngineerResponse engineerResponse) {
+            ticketResponseDTO.setMinutesSpent(engineerResponse.getMinutesSpent());
+        }
 
         return ticketResponseDTO;
     }

@@ -1,7 +1,10 @@
 package nl.helvar.servicetickets.ticketresponses;
 
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
+import nl.helvar.servicetickets.servicecontracts.ServiceContract;
+import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
+import nl.helvar.servicetickets.servicetickets.ServiceTicketDTO;
 import nl.helvar.servicetickets.servicetickets.ServiceTicketRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -14,10 +17,15 @@ import java.util.Optional;
 public class TicketResponseService {
     private final TicketResponseRepository ticketResponseRepository;
     private final ServiceTicketRepository serviceTicketRepository;
+    private final ServiceContractRepository serviceContractRepository;
 
-    public TicketResponseService(TicketResponseRepository ticketResponseRepository, ServiceTicketRepository serviceTicketRepository) {
+    public TicketResponseService(TicketResponseRepository ticketResponseRepository,
+                                 ServiceTicketRepository serviceTicketRepository,
+                                 ServiceContractRepository serviceContractRepository
+            ) {
         this.ticketResponseRepository = ticketResponseRepository;
         this.serviceTicketRepository = serviceTicketRepository;
+        this.serviceContractRepository = serviceContractRepository;
     }
 
     public TicketResponseCreationDTO createTicketResponse(TicketResponseCreationDTO ticketResponseCreationDTO) {
@@ -25,6 +33,22 @@ public class TicketResponseService {
         ticketResponseCreationDTO.setCreationDate(currentTime);
 
         TicketResponse ticketResponse = ticketResponseCreationDTO.fromDto(serviceTicketRepository);
+
+        Optional<ServiceContract> contract = serviceContractRepository.findById(ticketResponse
+                .getTicket()
+                .getProject()
+                .getServiceContract()
+                .getId()
+        );
+
+        if (contract.isPresent()) {
+            int minutesSpent = ticketResponseCreationDTO.getMinutesSpent();
+            ServiceContract existingContract = contract.get();
+
+            existingContract.addUsedTime(minutesSpent);
+            serviceContractRepository.save(existingContract);
+        }
+
         ticketResponseRepository.save(ticketResponse);
 
         ticketResponseCreationDTO.setId(ticketResponse.getId());

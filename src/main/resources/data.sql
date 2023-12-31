@@ -6,9 +6,9 @@ INSERT INTO users(username, password, enabled)VALUES('user', 'password', true) *
 /* SERVICE CONTRACT DATA */
 INSERT INTO service_contracts(id, type, contract_time, used_time, start_date, end_date)
 VALUES
-    (nextval('service_contracts_seq'), 0, 8, 2, '2023-01-01', '2023-12-31'),
-    (nextval('service_contracts_seq'), 1, 8, 2, '2023-01-01', '2023-12-31'),
-    (nextval('service_contracts_seq'), 2, 8, 2, '2023-01-01', '2023-12-31');
+    (nextval('service_contracts_seq'), 0, 480, 0, '2023-01-01', '2023-12-31'),
+    (nextval('service_contracts_seq'), 1, 240, 30, '2023-01-01', '2023-12-31'),
+    (nextval('service_contracts_seq'), 2, 480, 15, '2023-01-01', '2023-12-31');
 
 /* PROJECTS DATA */
 INSERT INTO projects(id, name, city, zip_code, street, house_number, service_contract_id)
@@ -26,6 +26,6 @@ VALUES
     (nextval('service_tickets_seq'), 'Issue with Server', 0, 0, 'Experiencing connectivity problems', 1, 0, '2023-12-28T09:00:00');
 
 /* SERVICE TICKET RESPONSE DATA */
-INSERT INTO ticket_responses (id, response, creation_date, ticket_id)
+INSERT INTO ticket_responses (id, response_type, response, creation_date, ticket_id)
 VALUES
-    (nextval('ticket_responses_seq'), 'Tried rebooting the router', '2023-12-28T09:10:00', 1)
+    (nextval('ticket_responses_seq'), 'basic_response', 'Tried rebooting the router', '2023-12-28T09:10:00', 1)

@@ -32,7 +32,7 @@ public class ServiceTicket {
 
     // NOG UITZOEKEN HOE DIT GEMAAKT WORDt
     //private Media media;
-    //@OneToOne
+    //@ManyToOne
     //private User submittedBy;
 
     // GETTERS AND SETTERS:
