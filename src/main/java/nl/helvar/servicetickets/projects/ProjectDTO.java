@@ -1,10 +1,9 @@
 package nl.helvar.servicetickets.projects;
 
-import nl.helvar.servicetickets.servicecontracts.ServiceContract;
-import nl.helvar.servicetickets.servicetickets.ServiceTicket;
+import nl.helvar.servicetickets.servicecontracts.ServiceContractDTO;
+import nl.helvar.servicetickets.servicetickets.ServiceTicketDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public class ProjectDTO {
     private Long id;
@@ -13,8 +12,8 @@ public class ProjectDTO {
     private String zipCode;
     private String street;
     private int houseNumber;
-    private ServiceContract serviceContract;
-    private List<ServiceTicket> tickets;
+    private ServiceContractDTO serviceContract;
+    private List<ServiceTicketDTO> tickets;
 
     // GETTERS AND SETTERS:
     public Long getId() {
@@ -65,19 +64,19 @@ public class ProjectDTO {
         this.houseNumber = houseNumber;
     }
 
-    public ServiceContract getServiceContract() {
+    public ServiceContractDTO getServiceContract() {
         return serviceContract;
     }
 
-    public void setServiceContract(ServiceContract serviceContract) {
+    public void setServiceContract(ServiceContractDTO serviceContract) {
         this.serviceContract = serviceContract;
     }
 
-    public List<ServiceTicket> getTickets() {
+    public List<ServiceTicketDTO> getTickets() {
         return tickets;
     }
 
-    public void setTickets(List<ServiceTicket> tickets) {
+    public void setTickets(List<ServiceTicketDTO> tickets) {
         this.tickets = tickets;
     }
 
@@ -90,7 +89,7 @@ public class ProjectDTO {
         project.setZipCode(this.getZipCode());
         project.setStreet(this.getStreet());
         project.setHouseNumber(this.getHouseNumber());
-        project.setServiceContract(this.getServiceContract());
+        project.setServiceContract(ServiceContractDTO.fromDto(this.getServiceContract()));
 
         return project;
     }
@@ -104,8 +103,16 @@ public class ProjectDTO {
         projectDTO.setZipCode(project.getZipCode());
         projectDTO.setStreet(project.getStreet());
         projectDTO.setHouseNumber(project.getHouseNumber());
-        projectDTO.setServiceContract(project.getServiceContract());
-        projectDTO.setTickets(project.getTickets());
+
+        if (project.getServiceContract() != null) {
+            projectDTO.setServiceContract(ServiceContractDTO.toDto(project.getServiceContract()));
+        }
+
+        projectDTO.setTickets(project.getTickets()
+                .stream()
+                .map(ServiceTicketDTO::toDto)
+                .toList()
+        );
 
         return projectDTO;
     }

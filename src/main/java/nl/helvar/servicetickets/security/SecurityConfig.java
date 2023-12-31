@@ -40,29 +40,32 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/projects/**", "/serviceContracts/**")
                         .hasAnyRole("ADMIN", "ENGINEER", "USER")
 
+                        .requestMatchers(HttpMethod.GET, "/serviceTickets/**")
+                        .permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/serviceTickets/**")
+                        .hasAnyRole("ADMIN", "ENGINEER", "USER")
+
                         .requestMatchers(HttpMethod.POST, "/projects/**")
+                        .hasAnyRole("ADMIN", "ENGINEER")
+
+                        .requestMatchers(HttpMethod.POST, "/serviceContracts/**")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.PUT, "/serviceTickets/**")
                         .hasAnyRole("ADMIN", "ENGINEER")
 
                         .requestMatchers(HttpMethod.PUT, "/projects/**", "/serviceContracts/**")
                         .hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.DELETE, "/projects/**", "/serviceContracts/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.POST, "/serviceContracts/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.POST, "/serviceTickets/**")
-                        .hasAnyRole("ADMIN", "ENGINEER", "USER")
-
                         .requestMatchers(HttpMethod.DELETE, "/serviceTickets/**")
                         .hasAnyRole("ADMIN", "ENGINEER", "USER")
 
-                        .requestMatchers(HttpMethod.PUT, "/serviceTickets/**")
-                        .hasAnyRole("ADMIN", "ENGINEER")
+                        .requestMatchers(HttpMethod.DELETE, "/projects/**", "/serviceContracts/**")
+                        .hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.GET, "/serviceTickets/**")
-                        .permitAll()
+                        .requestMatchers("/ticketResponses/**")
+                        .hasAnyRole("ADMIN", "ENGINEER", "USER")
 
                         .anyRequest().authenticated()
                 )

@@ -70,9 +70,7 @@ public class ProjectController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ProjectDTO> deleteProject(@PathVariable("id") Long id) {
-        ProjectDTO deletedProject = service.deleteProject(id);
-
-        return new ResponseEntity<>(deletedProject, HttpStatus.OK);
+    public ResponseEntity<String> deleteProject(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(service.deleteProject(id), HttpStatus.OK);
     }
 }
