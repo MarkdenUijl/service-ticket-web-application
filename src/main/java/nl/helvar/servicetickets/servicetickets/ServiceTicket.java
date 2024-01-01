@@ -29,6 +29,8 @@ public class ServiceTicket {
     private Project project;
     private int minutesSpent;
     private LocalDateTime creationDate;
+    @Lob
+    private byte[] file;
 
     // NOG UITZOEKEN HOE DIT GEMAAKT WORDt
     //private Media media;
@@ -102,5 +104,13 @@ public class ServiceTicket {
 
     public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public byte[] getFile() {
+        return file;
+    }
+
+    public void setFile(byte[] file) {
+        this.file = file;
     }
 }

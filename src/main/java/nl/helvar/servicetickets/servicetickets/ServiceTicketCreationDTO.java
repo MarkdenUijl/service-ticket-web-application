@@ -33,6 +33,7 @@ public class ServiceTicketCreationDTO implements Identifyable {
     private int minutesSpent;
     private LocalDateTime creationDate;
     private Long projectId;
+    private byte[] file;
 
     // NOG UITZOEKEN HOE DIT GEMAAKT WORDT
     //private Media media;
@@ -111,6 +112,14 @@ public class ServiceTicketCreationDTO implements Identifyable {
         this.projectId = projectId;
     }
 
+    public byte[] getFile() {
+        return file;
+    }
+
+    public void setFile(byte[] file) {
+        this.file = file;
+    }
+
     public ServiceTicket fromDto(ProjectRepository projectRepository) {
         ServiceTicket serviceTicket = new ServiceTicket();
 
@@ -121,6 +130,7 @@ public class ServiceTicketCreationDTO implements Identifyable {
         serviceTicket.setResponses(this.getResponses());
         serviceTicket.setMinutesSpent(this.getMinutesSpent());
         serviceTicket.setCreationDate(this.getCreationDate());
+        serviceTicket.setFile(this.getFile());
 
         if (this.getProjectId() != null) {
             Optional<Project> project = projectRepository.findById(this.getProjectId());
@@ -147,6 +157,7 @@ public class ServiceTicketCreationDTO implements Identifyable {
         serviceTicketCreationDTO.setMinutesSpent(serviceTicket.getMinutesSpent());
         serviceTicketCreationDTO.setCreationDate(serviceTicket.getCreationDate());
         serviceTicketCreationDTO.setProjectId(serviceTicket.getProject().getId());
+        serviceTicketCreationDTO.setFile(serviceTicket.getFile());
 
         return serviceTicketCreationDTO;
     }

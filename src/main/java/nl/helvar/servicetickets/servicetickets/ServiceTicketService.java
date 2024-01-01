@@ -7,8 +7,12 @@ import nl.helvar.servicetickets.servicecontracts.ServiceContractCreationDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.net.http.HttpHeaders;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -63,6 +67,16 @@ public class ServiceTicketService {
             throw new RecordNotFoundException("Could not find any ticket with id '" + id + "' in database.");
         } else {
             return ServiceTicketDTO.toDto(serviceTicket.get());
+        }
+    }
+
+    public byte[] getTicketFile(Long id) {
+        Optional<ServiceTicket> serviceTicket = serviceTicketRepository.findById(id);
+
+        if (serviceTicket.isEmpty()) {
+            throw new RecordNotFoundException("Could not find any ticket with id '" + id + "' in database.");
+        } else {
+            return serviceTicket.get().getFile();
         }
     }
 

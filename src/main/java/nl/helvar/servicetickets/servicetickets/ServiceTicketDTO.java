@@ -4,6 +4,7 @@ import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.servicetickets.enums.TicketType;
 import nl.helvar.servicetickets.ticketresponses.TicketResponseDTO;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -82,7 +83,8 @@ public class ServiceTicketDTO {
         this.creationDate = creationDate;
     }
 
-    public static ServiceTicket fromDto(ServiceTicketDTO serviceTicketDTO) {
+
+    public static ServiceTicket fromDto(ServiceTicketDTO serviceTicketDTO) throws IOException {
         ServiceTicket serviceTicket = new ServiceTicket();
 
         serviceTicket.setName(serviceTicketDTO.getName());
