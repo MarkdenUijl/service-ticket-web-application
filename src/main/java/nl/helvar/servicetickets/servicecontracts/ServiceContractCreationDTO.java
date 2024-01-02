@@ -1,14 +1,10 @@
 package nl.helvar.servicetickets.servicecontracts;
 
 import jakarta.validation.constraints.NotNull;
-import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.interfaces.Identifyable;
-import nl.helvar.servicetickets.projects.Project;
-import nl.helvar.servicetickets.projects.ProjectRepository;
 import nl.helvar.servicetickets.servicecontracts.enums.ContractType;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 import static nl.helvar.servicetickets.helpers.EnumValidator.getEnumConstantFromString;
 

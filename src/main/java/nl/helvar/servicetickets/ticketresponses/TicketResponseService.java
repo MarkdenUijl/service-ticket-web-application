@@ -3,8 +3,6 @@ package nl.helvar.servicetickets.ticketresponses;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.servicecontracts.ServiceContract;
 import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
-import nl.helvar.servicetickets.servicetickets.ServiceTicket;
-import nl.helvar.servicetickets.servicetickets.ServiceTicketDTO;
 import nl.helvar.servicetickets.servicetickets.ServiceTicketRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;

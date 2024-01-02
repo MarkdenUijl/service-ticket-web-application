@@ -51,43 +51,27 @@ public class FileController {
         }
     }
 
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> addFilesToTicket(@RequestPart("files") List<MultipartFile> files,
+                                                   @PathVariable("ticketId") Long id) throws IOException {
+        StringBuilder responseBuilder = new StringBuilder();
 
-//    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-//    public ResponseEntity<String> addFileToTicket(@RequestPart MultipartFile data,
-//                                                   @PathVariable("ticketId") Long id
-//    ) throws IOException {
-//        FileCreationDTO file = new FileCreationDTO();
-//
-//        String name = data.getOriginalFilename();
-//        byte[] compressedData = FileUtils.compressFile(data.getBytes());
-//
-//        file.setTicketId(id);
-//        file.setName(name);
-//        file.setData(compressedData);
-//
-//        return new ResponseEntity<>(fileService.storeFile(file), HttpStatus.CREATED);
-//    }
-@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-public ResponseEntity<String> addFilesToTicket(@RequestPart("files") List<MultipartFile> files,
-                                               @PathVariable("ticketId") Long id) throws IOException {
-    StringBuilder responseBuilder = new StringBuilder();
+        for (MultipartFile data : files) {
+            FileCreationDTO file = new FileCreationDTO();
 
-    for (MultipartFile data : files) {
-        FileCreationDTO file = new FileCreationDTO();
+            String name = data.getOriginalFilename();
+            byte[] compressedData = FileUtils.compressFile(data.getBytes());
 
-        String name = data.getOriginalFilename();
-        byte[] compressedData = FileUtils.compressFile(data.getBytes());
+            file.setTicketId(id);
+            file.setName(name);
+            file.setData(compressedData);
 
-        file.setTicketId(id);
-        file.setName(name);
-        file.setData(compressedData);
+            String savedFileResponse = fileService.storeFile(file);
+            responseBuilder.append(savedFileResponse).append("\n");
+        }
 
-        String savedFileResponse = fileService.storeFile(file);
-        responseBuilder.append(savedFileResponse).append("\n");
+        return new ResponseEntity<>(responseBuilder.toString(), HttpStatus.CREATED);
     }
-
-    return new ResponseEntity<>(responseBuilder.toString(), HttpStatus.CREATED);
-}
 
 
     @DeleteMapping(value = "/{fileId}")

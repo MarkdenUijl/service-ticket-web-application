@@ -1,7 +1,6 @@
 package nl.helvar.servicetickets.files;
 
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
-import nl.helvar.servicetickets.servicetickets.ServiceTicket;
 import nl.helvar.servicetickets.servicetickets.ServiceTicketRepository;
 import org.springframework.stereotype.Service;
 
