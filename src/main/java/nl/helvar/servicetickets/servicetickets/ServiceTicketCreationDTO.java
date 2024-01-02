@@ -33,6 +33,7 @@ public class ServiceTicketCreationDTO implements Identifyable {
     private int minutesSpent;
     private LocalDateTime creationDate;
     private Long projectId;
+    //private byte[] file;
 
     // NOG UITZOEKEN HOE DIT GEMAAKT WORDT
     //private Media media;
@@ -110,6 +111,7 @@ public class ServiceTicketCreationDTO implements Identifyable {
     public void setProjectId(Long projectId) {
         this.projectId = projectId;
     }
+
 
     public ServiceTicket fromDto(ProjectRepository projectRepository) {
         ServiceTicket serviceTicket = new ServiceTicket();

@@ -6,7 +6,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 public class ServiceContractSpecification {
     private ServiceContractSpecification() {}

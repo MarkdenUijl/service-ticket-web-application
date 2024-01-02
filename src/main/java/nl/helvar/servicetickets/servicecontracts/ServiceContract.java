@@ -2,7 +2,6 @@ package nl.helvar.servicetickets.servicecontracts;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import nl.helvar.servicetickets.interfaces.Identifyable;
 import nl.helvar.servicetickets.projects.Project;
 import nl.helvar.servicetickets.servicecontracts.enums.ContractType;
 
@@ -15,7 +14,7 @@ public class ServiceContract {
     @GeneratedValue
     private Long id;
     private ContractType type;
-    private int contractTime;
+    private int contractTimeInMinutes;
     private int usedTime;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -40,11 +39,11 @@ public class ServiceContract {
     }
 
     public int getContractTime() {
-        return contractTime;
+        return contractTimeInMinutes;
     }
 
-    public void setContractTime(int contractTime) {
-        this.contractTime = contractTime;
+    public void setContractTime(int contractTimeInMinutes) {
+        this.contractTimeInMinutes = contractTimeInMinutes;
     }
 
     public int getUsedTime() {
