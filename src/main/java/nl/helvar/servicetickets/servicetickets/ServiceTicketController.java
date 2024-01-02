@@ -2,7 +2,7 @@ package nl.helvar.servicetickets.servicetickets;
 
 import jakarta.validation.Valid;
 import nl.helvar.servicetickets.exceptions.BadObjectCreationException;
-import nl.helvar.servicetickets.images.FileUtils;
+import nl.helvar.servicetickets.files.FileUtils;
 import org.apache.tika.Tika;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -34,47 +34,26 @@ public class ServiceTicketController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String status
     ) {
-        List<ServiceTicketDTO> serviceTicketDTOS = service.getAllServiceTickets(type, status);
+        List<ServiceTicketDTO> serviceTicketDTOS = service.getAllServiceTickets(type, status)
+                .stream()
+                .map(ServiceTicketDTO::toDto)
+                .toList();;
 
         return new ResponseEntity<>(serviceTicketDTOS, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ServiceTicketDTO> findServiceTicketById(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(service.findById(id), HttpStatus.OK);
+        return new ResponseEntity<>(ServiceTicketDTO.toDto(service.findById(id)), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{id}/file")
-    public ResponseEntity<byte[]> getTicketFile(@PathVariable("id") Long id) throws IOException, DataFormatException {
-        byte[] file = FileUtils.decompressFile(service.getTicketFile(id));
-
-        Tika tika = new Tika();
-        String contentType = tika.detect(file);
-
-        HttpHeaders headers = new HttpHeaders();
-
-        if (contentType != null) {
-            headers.setContentType(MediaType.parseMediaType(contentType));
-        } else {
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        }
-
-        return new ResponseEntity<>(file, headers, HttpStatus.OK);
-    }
-
-    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<ServiceTicketCreationDTO> addServiceTicket(@Valid @RequestPart ServiceTicketCreationDTO serviceTicket,
-                                                                     @RequestPart(required = false) MultipartFile file,
+    @PostMapping
+    public ResponseEntity<ServiceTicketCreationDTO> addServiceTicket(@Valid @RequestBody ServiceTicketCreationDTO serviceTicket,
                                                                      BindingResult br
-    ) throws IOException {
+    ) {
         if (br.hasFieldErrors()) {
             throw new BadObjectCreationException(buildErrorMessage(br));
         } else {
-            if (file != null) {
-                byte[] fileToByte = FileUtils.compressFile(file.getBytes());
-                serviceTicket.setFile(fileToByte);
-            }
-
             serviceTicket = service.createServiceTicket(serviceTicket);
 
             URI uri = createUri(serviceTicket);
@@ -85,7 +64,7 @@ public class ServiceTicketController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ServiceTicketDTO> replaceServiceTicket(@PathVariable("id") Long id, @RequestBody ServiceTicketCreationDTO newServiceTicket) {
-        return new ResponseEntity<>(service.replaceServiceTicket(id, newServiceTicket), HttpStatus.OK);
+        return new ResponseEntity<>(ServiceTicketDTO.toDto(service.replaceServiceTicket(id, newServiceTicket)), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

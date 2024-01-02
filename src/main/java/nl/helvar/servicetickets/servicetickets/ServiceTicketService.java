@@ -44,14 +44,11 @@ public class ServiceTicketService {
         return serviceTicketCreationDTO;
     }
 
-    public List<ServiceTicketDTO> getAllServiceTickets(String type, String status) {
+    public List<ServiceTicket> getAllServiceTickets(String type, String status) {
         Specification<ServiceTicket> filters = Specification.where(StringUtils.isBlank(type) ? null : typeEquals(type))
                 .and(StringUtils.isBlank(status) ? null : statusEquals(status));
 
-        List<ServiceTicketDTO> serviceTickets = serviceTicketRepository.findAll(filters)
-                .stream()
-                .map(ServiceTicketDTO::toDto)
-                .toList();
+        List<ServiceTicket> serviceTickets = serviceTicketRepository.findAll(filters);
 
         if (serviceTickets.isEmpty()) {
             throw new RecordNotFoundException("Could not find service tickets with these parameters in the database.");
@@ -60,27 +57,17 @@ public class ServiceTicketService {
         }
     }
 
-    public ServiceTicketDTO findById(Long id) {
+    public ServiceTicket findById(Long id) {
         Optional<ServiceTicket> serviceTicket = serviceTicketRepository.findById(id);
 
         if (serviceTicket.isEmpty()) {
             throw new RecordNotFoundException("Could not find any ticket with id '" + id + "' in database.");
         } else {
-            return ServiceTicketDTO.toDto(serviceTicket.get());
+            return serviceTicket.get();
         }
     }
 
-    public byte[] getTicketFile(Long id) {
-        Optional<ServiceTicket> serviceTicket = serviceTicketRepository.findById(id);
-
-        if (serviceTicket.isEmpty()) {
-            throw new RecordNotFoundException("Could not find any ticket with id '" + id + "' in database.");
-        } else {
-            return serviceTicket.get().getFile();
-        }
-    }
-
-    public ServiceTicketDTO replaceServiceTicket(Long id, ServiceTicketCreationDTO newServiceTicket) {
+    public ServiceTicket replaceServiceTicket(Long id, ServiceTicketCreationDTO newServiceTicket) {
         Optional<ServiceTicket> serviceTicket = serviceTicketRepository.findById(id);
 
         if (serviceTicket.isEmpty()) {
@@ -95,7 +82,7 @@ public class ServiceTicketService {
 
             serviceTicketRepository.save(existingServiceTicket);
 
-            return ServiceTicketDTO.toDto(existingServiceTicket);
+            return existingServiceTicket;
         }
     }
 

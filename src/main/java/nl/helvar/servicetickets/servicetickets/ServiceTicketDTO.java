@@ -1,5 +1,6 @@
 package nl.helvar.servicetickets.servicetickets;
 
+import nl.helvar.servicetickets.files.File;
 import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.servicetickets.enums.TicketType;
 import nl.helvar.servicetickets.ticketresponses.TicketResponseDTO;
@@ -7,6 +8,7 @@ import nl.helvar.servicetickets.ticketresponses.TicketResponseDTO;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 public class ServiceTicketDTO {
@@ -18,6 +20,7 @@ public class ServiceTicketDTO {
     private List<TicketResponseDTO> responses;
     private int minutesSpent;
     private LocalDateTime creationDate;
+    private HashMap<Long, String> files;
 
     public Long getId() {
         return id;
@@ -83,6 +86,13 @@ public class ServiceTicketDTO {
         this.creationDate = creationDate;
     }
 
+    public HashMap<Long, String> getFiles() {
+        return files;
+    }
+
+    public void setFiles(HashMap<Long, String> files) {
+        this.files = files;
+    }
 
     public static ServiceTicket fromDto(ServiceTicketDTO serviceTicketDTO) throws IOException {
         ServiceTicket serviceTicket = new ServiceTicket();
@@ -118,6 +128,14 @@ public class ServiceTicketDTO {
                 .sorted(Comparator.comparing(TicketResponseDTO::getCreationDate))
                 .toList()
         );
+
+        HashMap<Long, String> fileMap = new HashMap<>();
+
+        for (File file : serviceTicket.getFiles()) {
+            fileMap.put(file.getId(), file.getName());
+        }
+
+        serviceTicketDTO.setFiles(fileMap);
 
         return serviceTicketDTO;
     }

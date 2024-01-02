@@ -2,6 +2,7 @@ package nl.helvar.servicetickets.servicetickets;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import nl.helvar.servicetickets.files.File;
 import nl.helvar.servicetickets.projects.Project;
 import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.servicetickets.enums.TicketType;
@@ -10,6 +11,7 @@ import nl.helvar.servicetickets.users.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "service_tickets")
@@ -29,11 +31,10 @@ public class ServiceTicket {
     private Project project;
     private int minutesSpent;
     private LocalDateTime creationDate;
-    @Lob
-    private byte[] file;
+    @OneToMany(mappedBy = "ticket", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
+    private List<File> files;
 
-    // NOG UITZOEKEN HOE DIT GEMAAKT WORDt
-    //private Media media;
+    // NOG UITZOEKEN HOE DIT GEMAAKT WORDT
     //@ManyToOne
     //private User submittedBy;
 
@@ -106,11 +107,21 @@ public class ServiceTicket {
         this.creationDate = creationDate;
     }
 
-    public byte[] getFile() {
-        return file;
+    public List<File> getFiles() {
+        return files;
     }
 
-    public void setFile(byte[] file) {
-        this.file = file;
+    public void setFiles(List<File> files) {
+        this.files = files;
+    }
+
+    public boolean hasFileById(Long id) {
+        for (File file : this.files) {
+            if (Objects.equals(file.getId(), id)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

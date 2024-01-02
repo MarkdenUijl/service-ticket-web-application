@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import nl.helvar.servicetickets.servicecontracts.ServiceContract;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity

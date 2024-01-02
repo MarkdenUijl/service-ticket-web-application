@@ -4,7 +4,7 @@
 INSERT INTO users(username, password, enabled)VALUES('user', 'password', true) */
 
 /* SERVICE CONTRACT DATA */
-INSERT INTO service_contracts(id, type, contract_time, used_time, start_date, end_date)
+INSERT INTO service_contracts(id, type, contract_time_in_minutes, used_time, start_date, end_date)
 VALUES
     (nextval('service_contracts_seq'), 0, 480, 0, '2023-01-01', '2023-12-31'),
     (nextval('service_contracts_seq'), 1, 240, 30, '2023-01-01', '2023-12-31'),

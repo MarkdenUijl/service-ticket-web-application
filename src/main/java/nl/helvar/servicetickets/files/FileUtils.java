@@ -1,4 +1,4 @@
-package nl.helvar.servicetickets.images;
+package nl.helvar.servicetickets.files;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
