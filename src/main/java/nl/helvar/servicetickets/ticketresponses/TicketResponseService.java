@@ -4,6 +4,7 @@ import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.servicecontracts.ServiceContract;
 import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
 import nl.helvar.servicetickets.servicetickets.ServiceTicketRepository;
+import nl.helvar.servicetickets.ticketresponses.subclasses.EngineerResponse;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -32,12 +33,7 @@ public class TicketResponseService {
 
         TicketResponse ticketResponse = ticketResponseCreationDTO.fromDto(serviceTicketRepository);
 
-        Optional<ServiceContract> contract = serviceContractRepository.findById(ticketResponse
-                .getTicket()
-                .getProject()
-                .getServiceContract()
-                .getId()
-        );
+        Optional<ServiceContract> contract = extractServiceContract(ticketResponse);
 
         if (contract.isPresent()) {
             int minutesSpent = ticketResponseCreationDTO.getMinutesSpent();
@@ -86,6 +82,23 @@ public class TicketResponseService {
             TicketResponse existingTicketResponse = ticketResponse.get();
             TicketResponse newResponse = newTicketResponse.fromDto(serviceTicketRepository);
 
+            if (existingTicketResponse instanceof EngineerResponse existingEngineerResponse &&
+                newResponse instanceof EngineerResponse newEngineerResponse
+            ) {
+                Optional<ServiceContract> contract = extractServiceContract(newResponse);
+
+                if (contract.isPresent()) {
+                    int oldMinutesSpent = existingEngineerResponse.getMinutesSpent();
+                    int newMinutesSpent = newEngineerResponse.getMinutesSpent();
+                    int valueAdjustment = newMinutesSpent - oldMinutesSpent;
+
+                    ServiceContract existingContract = contract.get();
+
+                    existingContract.addUsedTime(valueAdjustment);
+                    serviceContractRepository.save(existingContract);
+                }
+            }
+
             BeanUtils.copyProperties(newResponse, existingTicketResponse, "id", "creationDate");
 
             ticketResponseRepository.save(existingTicketResponse);
@@ -104,5 +117,14 @@ public class TicketResponseService {
 
             return "Ticket response with id '" + id + "' was successfully deleted.";
         }
+    }
+
+    public Optional<ServiceContract> extractServiceContract(TicketResponse ticketResponse) {
+        return serviceContractRepository.findById(ticketResponse
+                .getTicket()
+                .getProject()
+                .getServiceContract()
+                .getId()
+        );
     }
 }
