@@ -1,5 +1,6 @@
 package nl.helvar.servicetickets.ticketresponses;
 
+import nl.helvar.servicetickets.email.EmailService;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.servicecontracts.ServiceContract;
 import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
@@ -8,6 +9,7 @@ import nl.helvar.servicetickets.ticketresponses.subclasses.EngineerResponse;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -17,14 +19,17 @@ public class TicketResponseService {
     private final TicketResponseRepository ticketResponseRepository;
     private final ServiceTicketRepository serviceTicketRepository;
     private final ServiceContractRepository serviceContractRepository;
+    private final EmailService emailService;
 
     public TicketResponseService(TicketResponseRepository ticketResponseRepository,
                                  ServiceTicketRepository serviceTicketRepository,
-                                 ServiceContractRepository serviceContractRepository
+                                 ServiceContractRepository serviceContractRepository,
+                                 EmailService emailService
             ) {
         this.ticketResponseRepository = ticketResponseRepository;
         this.serviceTicketRepository = serviceTicketRepository;
         this.serviceContractRepository = serviceContractRepository;
+        this.emailService = emailService;
     }
 
     public TicketResponseCreationDTO createTicketResponse(TicketResponseCreationDTO ticketResponseCreationDTO) {
@@ -32,6 +37,13 @@ public class TicketResponseService {
         ticketResponseCreationDTO.setCreationDate(currentTime);
 
         TicketResponse ticketResponse = ticketResponseCreationDTO.fromDto(serviceTicketRepository);
+
+        //USER MAIL TOEVOEGEN
+        try {
+            emailService.sendTicketUpdate("markdenuyl@gmail.com", ticketResponse.getTicket().getName(), ticketResponse.getResponse());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         Optional<ServiceContract> contract = extractServiceContract(ticketResponse);
 

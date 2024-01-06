@@ -1,21 +1,16 @@
 package nl.helvar.servicetickets.servicetickets;
 
 import jakarta.validation.Valid;
+import nl.helvar.servicetickets.email.EmailService;
 import nl.helvar.servicetickets.exceptions.BadObjectCreationException;
-import nl.helvar.servicetickets.files.FileUtils;
-import org.apache.tika.Tika;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-import java.util.zip.DataFormatException;
 
 import static nl.helvar.servicetickets.helpers.DTOValidator.buildErrorMessage;
 import static nl.helvar.servicetickets.helpers.UriCreator.createUri;
@@ -24,9 +19,11 @@ import static nl.helvar.servicetickets.helpers.UriCreator.createUri;
 @RequestMapping("/serviceTickets")
 public class ServiceTicketController {
     private final ServiceTicketService service;
+    private final EmailService emailService;
 
-    public ServiceTicketController(ServiceTicketService service) {
+    public ServiceTicketController(ServiceTicketService service, EmailService emailService) {
         this.service = service;
+        this.emailService = emailService;
     }
 
     @GetMapping
@@ -57,6 +54,13 @@ public class ServiceTicketController {
             serviceTicket = service.createServiceTicket(serviceTicket);
 
             URI uri = createUri(serviceTicket);
+
+            // LATER AANPASSEN ZODAT DIT HET ADRES VAN DE GEBRUIKER GEBRUIKT
+            try {
+                emailService.sendTicketConfirmationEmail("markdenuyl@gmail.com", serviceTicket.getId(), serviceTicket.getName());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
             return ResponseEntity.created(uri).body(serviceTicket);
         }
