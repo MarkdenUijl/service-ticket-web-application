@@ -35,7 +35,7 @@ public class TicketResponseController {
     }
 
     @PostMapping
-    public ResponseEntity<TicketResponseCreationDTO> addServiceTicket(@Valid @RequestBody TicketResponseCreationDTO ticketResponse, BindingResult br) {
+    public ResponseEntity<TicketResponseCreationDTO> addServiceTicketResponse(@Valid @RequestBody TicketResponseCreationDTO ticketResponse, BindingResult br) {
         if (br.hasFieldErrors()) {
             throw new BadObjectCreationException(buildErrorMessage(br));
         } else {
@@ -48,12 +48,12 @@ public class TicketResponseController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TicketResponseDTO> replaceServiceTicket(@PathVariable("id") Long id, @RequestBody TicketResponseCreationDTO newTicketResponse) {
+    public ResponseEntity<TicketResponseDTO> replaceServiceTicketResponse(@PathVariable("id") Long id, @RequestBody TicketResponseCreationDTO newTicketResponse) {
         return new ResponseEntity<>(service.replaceTicketResponse(id, newTicketResponse), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteServiceTicket(@PathVariable("id") Long id) {
+    public ResponseEntity<String> deleteServiceTicketResponse(@PathVariable("id") Long id) {
         return new ResponseEntity<>(service.deleteTicketResponse(id), HttpStatus.OK);
     }
 }

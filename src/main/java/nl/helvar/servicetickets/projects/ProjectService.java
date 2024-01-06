@@ -42,7 +42,6 @@ public class ProjectService {
 
             projectRepository.save(project);
 
-            projectCreationDto.setId(project.getId());
             return projectCreationDto;
         } else {
             throw new DuplicateInDatabaseException("There was already a project registered at this address.");
