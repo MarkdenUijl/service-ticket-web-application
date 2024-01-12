@@ -21,7 +21,7 @@ public class FileService {
 
         fileRepository.save(file);
 
-        return "File with name '" + fileCreationDTO.getName() + "' stored to ticket with id: " + fileCreationDTO.getTicketId() +".";
+        return "File with name '" + fileCreationDTO.getName() + "' stored to ticket with id '" + fileCreationDTO.getTicketId() +"' at file id '" + file.getId() + "'.";
     }
 
     public File getFile(Long id) {

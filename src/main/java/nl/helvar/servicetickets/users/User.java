@@ -1,38 +1,59 @@
 package nl.helvar.servicetickets.users;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
-import nl.helvar.servicetickets.authorities.Authority;
+import nl.helvar.servicetickets.roles.Role;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
-@Entity
-@Table(name = "users")
+@Entity(name = "users")
 public class User {
-    @Id
-    @Column(nullable = false, unique = true)
-    private String username;
-    @Column(nullable = false)
-    private String password;
-    @Column(nullable = false)
-    private boolean enabled = true;
-//    @OneToMany(
-//            targetEntity = Authority.class,
-//            mappedBy = "username",
-//            cascade = CascadeType.ALL,
-//            orphanRemoval = true,
-//            fetch = FetchType.EAGER)
-//    private Set<Authority> authorities = new HashSet<>();
 
-    public String getUsername() {
-        return username;
+    @Id
+    @GeneratedValue
+    private Long id;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String password;
+    private String phoneNumber;
+
+    @ManyToMany
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(
+                    name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(
+                    name = "role_id", referencedColumnName = "id"))
+    private List<Role> roles;
+
+    // GETTERS AND SETTERS
+    public Long getId() {
+        return id;
     }
 
-//    public void setUsername(String username) {
-//        this.username = username;
-//    }
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public String getPassword() {
         return password;
@@ -42,19 +63,19 @@ public class User {
         this.password = password;
     }
 
-    public boolean isEnabled() {
-        return enabled;
+    public List<Role> getRoles() {
+        return roles;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 
-//    public Set<Authority> getAuthorities() {
-//        return authorities;
-//    }
-//
-//    public void setAuthorities(Set<Authority> authorities) {
-//        this.authorities = authorities;
-//    }
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 
 import static nl.helvar.servicetickets.helpers.DTOValidator.buildErrorMessage;
@@ -29,9 +30,13 @@ public class ServiceTicketController {
     @GetMapping
     public ResponseEntity<List<ServiceTicketDTO>> getAllServiceTickets(
             @RequestParam(required = false) String type,
-            @RequestParam(required = false) String status
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long projectId,
+            @RequestParam(required = false) LocalDate issuedBefore,
+            @RequestParam(required = false) LocalDate issuedAfter
+
     ) {
-        List<ServiceTicketDTO> serviceTicketDTOS = service.getAllServiceTickets(type, status)
+        List<ServiceTicketDTO> serviceTicketDTOS = service.getAllServiceTickets(type, status, projectId, issuedBefore, issuedAfter)
                 .stream()
                 .map(ServiceTicketDTO::toDto)
                 .toList();;

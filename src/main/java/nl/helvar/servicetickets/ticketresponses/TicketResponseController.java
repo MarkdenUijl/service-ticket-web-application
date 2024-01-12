@@ -24,7 +24,7 @@ public class TicketResponseController {
 
     @GetMapping
     public ResponseEntity<List<TicketResponseDTO>> getAllTicketResponses() {
-        List<TicketResponseDTO> ticketResponseDTOS = service.getAllServiceTickets();
+        List<TicketResponseDTO> ticketResponseDTOS = service.getAllServiceTicketResponses();
 
         return new ResponseEntity<>(ticketResponseDTOS, HttpStatus.OK);
     }

@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.http.HttpHeaders;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static nl.helvar.servicetickets.servicetickets.ServiceTicketSpecification.statusEquals;
-import static nl.helvar.servicetickets.servicetickets.ServiceTicketSpecification.typeEquals;
+import static nl.helvar.servicetickets.servicetickets.ServiceTicketSpecification.*;
 
 @Service
 public class ServiceTicketService {
@@ -44,9 +44,11 @@ public class ServiceTicketService {
         return serviceTicketCreationDTO;
     }
 
-    public List<ServiceTicket> getAllServiceTickets(String type, String status) {
+    public List<ServiceTicket> getAllServiceTickets(String type, String status, Long projectId, LocalDate issuedBefore, LocalDate issuedAfter) {
         Specification<ServiceTicket> filters = Specification.where(StringUtils.isBlank(type) ? null : typeEquals(type))
-                .and(StringUtils.isBlank(status) ? null : statusEquals(status));
+                .and(StringUtils.isBlank(status) ? null : statusEquals(status))
+                .and(projectId == null ? null : projectEquals(projectId))
+                .and(ServiceTicketSpecification.dateRange(issuedAfter, issuedBefore));
 
         List<ServiceTicket> serviceTickets = serviceTicketRepository.findAll(filters);
 

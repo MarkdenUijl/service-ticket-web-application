@@ -41,8 +41,8 @@ public class ExceptionController {
     }
 
     // Existing exceptions overridden.
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<Object> handleMaxSizeException(MaxUploadSizeExceededException exc) {
+    @ExceptionHandler(value = MaxUploadSizeExceededException.class)
+    public ResponseEntity<Object> maxSizeExceededException(MaxUploadSizeExceededException maxUploadSizeExceededException) {
         return new ResponseEntity<>("The file you are trying to upload is too large, it can not exceed " + maxFileSize + ".",
                 HttpStatus.PAYLOAD_TOO_LARGE);
     }

@@ -1,17 +1,14 @@
 -- noinspection SqlDialectInspectionForFile
 
-/* USER DATA
-INSERT INTO users(username, password, enabled)VALUES('user', 'password', true) */
-
 /* SERVICE CONTRACT DATA */
-INSERT INTO service_contracts(id, type, contract_time_in_minutes, used_time, start_date, end_date)
+INSERT INTO service_contracts (id, type, contract_time_in_minutes, used_time, start_date, end_date)
 VALUES
     (nextval('service_contracts_seq'), 0, 480, 0, '2023-01-01', '2023-12-31'),
     (nextval('service_contracts_seq'), 1, 240, 30, '2023-01-01', '2023-12-31'),
     (nextval('service_contracts_seq'), 2, 480, 15, '2023-01-01', '2023-12-31');
 
 /* PROJECTS DATA */
-INSERT INTO projects(id, name, city, zip_code, street, house_number, service_contract_id)
+INSERT INTO projects (id, name, city, zip_code, street, house_number, service_contract_id)
 VALUES
     (nextval('projects_seq'), 'Amsterdam Tower', 'Amsterdam', '1071 BV', 'Stadhouderskade', 123, 1),
     (nextval('projects_seq'), 'Rotterdam Plaza', 'Rotterdam', '3012 CL', 'Coolsingel', 45, null),
@@ -23,10 +20,10 @@ VALUES
 /* SERVICE TICKETS DATA */
 INSERT INTO service_tickets (id, name, status, type, description, project_id, minutes_spent, creation_date)
 VALUES
-    (nextval('service_tickets_seq'), 'Issue with Server', 0, 0, 'Experiencing connectivity problems', 1, 0, '2023-12-28T09:00:00'),
-    (nextval('service_tickets_seq'), 'Network Latency', 1, 1, 'Experiencing slow internet speeds', 51, 0, '2024-01-02T10:30:00'),
-    (nextval('service_tickets_seq'), 'Software Installation', 1, 1, 'Request for software setup on workstation', 101, 0, '2024-01-02T11:45:00'),
-    (nextval('service_tickets_seq'), 'Email Configuration Issue', 2, 0, 'Unable to send/receive emails', 151, 0, '2024-01-02T13:15:00');
+    (nextval('service_tickets_seq'), 'Issue with Server', 0, 0, 'Experiencing connectivity problems', 1, 0, '2023-06-28T09:00:00'),
+    (nextval('service_tickets_seq'), 'Network Latency', 1, 1, 'Experiencing slow internet speeds', 51, 0, '2023-09-02T10:30:00'),
+    (nextval('service_tickets_seq'), 'Software Installation', 1, 1, 'Request for software setup on workstation', 101, 0, '2024-01-01T11:45:00'),
+    (nextval('service_tickets_seq'), 'Email Configuration Issue', 2, 0, 'Unable to send/receive emails', 151, 0, '2024-01-06T13:15:00');
 
 /* SERVICE TICKET RESPONSE DATA */
 INSERT INTO ticket_responses (id, response_type, response, creation_date, ticket_id)
@@ -41,3 +38,35 @@ VALUES
     (nextval('ticket_responses_seq'), 'basic_response', 'Checking mail server settings for possible issues', '2024-01-02T13:20:00', 151),
     (nextval('ticket_responses_seq'), 'basic_response', 'Adjusted SMTP settings, testing outgoing mail', '2024-01-02T13:40:00', 151),
     (nextval('ticket_responses_seq'), 'basic_response', 'Incoming mail settings updated, testing incoming mail', '2024-01-02T14:00:00', 151);
+
+/* PRIVILEGE DATA */
+INSERT INTO privileges (id, name)
+VALUES
+    (nextval('privileges_seq'), 'READ_PRIVILEGE'),
+    (nextval('privileges_seq'), 'WRITE_PRIVILEGE');
+
+/* ROLE DATA */
+INSERT INTO roles (id, name)
+VALUES
+    (nextval('roles_seq'), 'ROLE_ADMIN'),
+    (nextval('roles_seq'), 'ROLE_ENGINEER'),
+    (nextval('roles_seq'), 'ROLE_USER');
+
+/* USER DATA */
+INSERT INTO users (id, first_name, last_name, email, password, phone_number)
+VALUES
+    (nextval('users_seq'), 'Admin', 'Tester', 'admin@tester.nl', '{bcrypt}$2a$10$1234567890123456789012345678901234567890123456789012345678901234', '+31612345678'),
+    (nextval('users_seq'), 'Engineer', 'Tester', 'engineer@tester.nl', '{bcrypt}$2a$10$1234567890123456789012345678901234567890123456789012345678901234', '+31612345678'),
+    (nextval('users_seq'), 'User', 'Tester', 'user@tester.nl', '{bcrypt}$2a$10$1234567890123456789012345678901234567890123456789012345678901234', '+31612345678');
+
+/* SUB TABLES DATA */
+INSERT INTO roles_privileges (role_id, privilege_id)
+VALUES
+     ((SELECT id FROM roles WHERE name = 'ROLE_ADMIN'), (SELECT id FROM privileges WHERE name = 'READ_PRIVILEGE')),
+     ((SELECT id FROM roles WHERE name = 'ROLE_ADMIN'), (SELECT id FROM privileges WHERE name = 'WRITE_PRIVILEGE'));
+
+INSERT INTO users_roles (user_id, role_id)
+VALUES
+    ((SELECT id FROM users WHERE email = 'admin@tester.nl'), (SELECT id FROM roles WHERE name = 'ROLE_ADMIN')),
+    ((SELECT id FROM users WHERE email = 'engineer@tester.nl'), (SELECT id FROM roles WHERE name = 'ROLE_ENGINEER')),
+    ((SELECT id FROM users WHERE email = 'user@tester.nl'), (SELECT id FROM roles WHERE name = 'ROLE_USER'));

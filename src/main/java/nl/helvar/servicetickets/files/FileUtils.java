@@ -11,6 +11,7 @@ public class FileUtils {
 
     public static byte[] compressFile(byte[] data) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
         try (GZIPOutputStream gzipOutputStream = new GZIPOutputStream(outputStream)) {
             gzipOutputStream.write(data);
             gzipOutputStream.finish();
@@ -20,6 +21,7 @@ public class FileUtils {
 
     public static byte[] decompressFile(byte[] data) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
              GZIPInputStream gzipInputStream = new GZIPInputStream(inputStream)) {
             byte[] buffer = new byte[BUFFER_SIZE];

@@ -4,15 +4,20 @@ import nl.helvar.servicetickets.email.EmailService;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.servicecontracts.ServiceContract;
 import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
+import nl.helvar.servicetickets.servicetickets.ServiceTicket;
 import nl.helvar.servicetickets.servicetickets.ServiceTicketRepository;
+import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.ticketresponses.subclasses.EngineerResponse;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import static nl.helvar.servicetickets.helpers.ListScanner.checkListForProperty;
 
 @Service
 public class TicketResponseService {
@@ -38,6 +43,22 @@ public class TicketResponseService {
 
         TicketResponse ticketResponse = ticketResponseCreationDTO.fromDto(serviceTicketRepository);
 
+        if (ticketResponse instanceof EngineerResponse engineerResponse) {
+            Optional<ServiceTicket> ticketOptional = serviceTicketRepository.findById(ticketResponseCreationDTO.getServiceTicketId());
+
+            if (ticketOptional.isPresent()) {
+                ServiceTicket ticket = ticketOptional.get();
+                List<TicketResponse> allResponses = ticket.getResponses();
+
+                boolean hasEngineerResponse = checkListForProperty(allResponses, "minutesSpent");
+
+                if(!hasEngineerResponse) {
+                    ticket.setStatus(TicketStatus.PENDING);
+                    serviceTicketRepository.save(ticket);
+                }
+            }
+        }
+
         //USER MAIL TOEVOEGEN
         try {
             emailService.sendTicketUpdate("markdenuyl@gmail.com", ticketResponse.getTicket().getName(), ticketResponse.getResponse());
@@ -62,7 +83,7 @@ public class TicketResponseService {
     }
 
     // LATER FILTER BY USER TOEPASSEN
-    public List<TicketResponseDTO> getAllServiceTickets() {
+    public List<TicketResponseDTO> getAllServiceTicketResponses() {
         List<TicketResponseDTO> ticketResponses = ticketResponseRepository.findAll()
                 .stream()
                 .map(TicketResponseDTO::toDto)
