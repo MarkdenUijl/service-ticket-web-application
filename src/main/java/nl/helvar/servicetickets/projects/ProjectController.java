@@ -40,21 +40,21 @@ public class ProjectController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProjectDTO> findProjectById(@PathVariable("id") Long id) {
-        ProjectDTO projectDto = service.findById(id);
+        ProjectDTO projectDto = service.findProjectById(id);
 
         return new ResponseEntity<>(projectDto, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<ProjectCreationDTO> createProject(@Valid @RequestBody ProjectCreationDTO project, BindingResult br) {
+    public ResponseEntity<ProjectDTO> createProject(@Valid @RequestBody ProjectCreationDTO project, BindingResult br) {
         if (br.hasFieldErrors()) {
             throw new BadObjectCreationException(buildErrorMessage(br));
         } else {
-            project = service.createProject(project);
+            ProjectDTO projectOutput = service.createProject(project);
 
-            URI uri = createUri(project);
+            URI uri = createUri(projectOutput);
 
-            return ResponseEntity.created(uri).body(project);
+            return ResponseEntity.created(uri).body(projectOutput);
         }
     }
 

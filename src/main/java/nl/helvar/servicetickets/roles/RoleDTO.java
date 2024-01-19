@@ -2,10 +2,14 @@ package nl.helvar.servicetickets.roles;
 
 import jakarta.validation.constraints.NotNull;
 import nl.helvar.servicetickets.interfaces.Identifyable;
+import nl.helvar.servicetickets.privileges.PrivilegeDTO;
 
-public class RoleDTO {
+import java.util.List;
+
+public class RoleDTO implements Identifyable {
     private Long id;
     private String name;
+    private List<PrivilegeDTO> privileges;
 
     public Long getId() {
         return id;
@@ -23,12 +27,12 @@ public class RoleDTO {
         this.name = name;
     }
 
-    public Role fromDto() {
-        Role role = new Role();
+    public List<PrivilegeDTO> getPrivileges() {
+        return privileges;
+    }
 
-        role.setName(this.getName());
-
-        return role;
+    public void setPrivileges(List<PrivilegeDTO> privileges) {
+        this.privileges = privileges;
     }
 
     public static RoleDTO toDto(Role role) {
@@ -36,6 +40,13 @@ public class RoleDTO {
 
         roleDTO.setId(role.getId());
         roleDTO.setName(role.getName());
+
+        if (role.getPrivileges() != null) {
+            roleDTO.setPrivileges(role.getPrivileges()
+                    .stream()
+                    .map(PrivilegeDTO::toDto)
+                    .toList());
+        }
 
         return roleDTO;
     }

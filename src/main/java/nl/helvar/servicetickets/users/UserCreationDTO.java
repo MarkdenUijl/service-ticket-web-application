@@ -1,23 +1,27 @@
 package nl.helvar.servicetickets.users;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import nl.helvar.servicetickets.interfaces.Identifyable;
+import nl.helvar.servicetickets.roles.Role;
+import nl.helvar.servicetickets.roles.RoleRepository;
+import org.springframework.data.jpa.domain.Specification;
 
-public class UserCreationDTO implements Identifyable {
+import java.util.*;
+
+import static nl.helvar.servicetickets.roles.RoleSpecification.roleEquals;
+
+public class UserCreationDTO {
     private Long id;
     private String firstName;
     private String lastName;
-    @Email
-    @NotNull
+    @Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}",
+            flags = Pattern.Flag.CASE_INSENSITIVE)
     private String email;
-    @NotNull
     private String password;
-    @Pattern(regexp = "^(\\+[0-9]{1,4})?[-.\\s]?\\(?[0-9]+\\)?[-.\\s]?[0-9]+[-.\\s]?[0-9]+$")
+    @Pattern(regexp = "^(?:\\+31|0|\\+0031|\\0031)?\\s?[1-9](?:\\s?\\d){8}$")
     private String phoneNumber;
+    private String[] roles;
 
-    @Override
     public Long getId() {
         return id;
     }
@@ -66,7 +70,24 @@ public class UserCreationDTO implements Identifyable {
         this.phoneNumber = phoneNumber;
     }
 
-    public User fromDto() {
+    public String[] getRoles() {
+        return roles;
+    }
+
+    public void setRoles(String[] roles) {
+        this.roles = roles;
+    }
+
+    public boolean hasAdminRole() {
+        if (roles != null) {
+            List<String> rolesList = Arrays.asList(roles);
+            return rolesList.contains("ROLE_ADMIN");
+        } else {
+            return false;
+        }
+    }
+
+    public User fromDto(RoleRepository roleRepository) {
         User user = new User();
 
         user.setFirstName(this.getFirstName());
@@ -74,6 +95,19 @@ public class UserCreationDTO implements Identifyable {
         user.setEmail(this.getEmail());
         user.setPhoneNumber(this.getPhoneNumber());
         user.setPassword(this.getPassword());
+
+        if (roles != null && roles.length != 0) {
+            Set<Role> userRoles = new HashSet<>();
+
+            for (String roleName : this.roles) {
+                Specification<Role> filters = Specification.where(roleEquals(roleName));
+                Optional<Role> optionalRole = roleRepository.findOne(filters);
+
+                optionalRole.ifPresent(userRoles::add);
+            }
+
+            user.setRoles(userRoles);
+        }
 
         return user;
     }

@@ -1,10 +1,11 @@
 package nl.helvar.servicetickets.servicecontracts;
 
+import nl.helvar.servicetickets.interfaces.Identifyable;
 import nl.helvar.servicetickets.servicecontracts.enums.ContractType;
 
 import java.time.LocalDate;
 
-public class ServiceContractDTO {
+public class ServiceContractDTO implements Identifyable {
     private Long id;
     private ContractType contractType;
     private int contractTime;

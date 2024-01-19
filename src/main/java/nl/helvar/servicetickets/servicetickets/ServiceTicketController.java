@@ -50,15 +50,15 @@ public class ServiceTicketController {
     }
 
     @PostMapping
-    public ResponseEntity<ServiceTicketCreationDTO> addServiceTicket(@Valid @RequestBody ServiceTicketCreationDTO serviceTicket,
+    public ResponseEntity<ServiceTicketDTO> addServiceTicket(@Valid @RequestBody ServiceTicketCreationDTO serviceTicket,
                                                                      BindingResult br
     ) {
         if (br.hasFieldErrors()) {
             throw new BadObjectCreationException(buildErrorMessage(br));
         } else {
-            serviceTicket = service.createServiceTicket(serviceTicket);
+            ServiceTicketDTO serviceTicketOutput = service.createServiceTicket(serviceTicket);
 
-            URI uri = createUri(serviceTicket);
+            URI uri = createUri(serviceTicketOutput);
 
             // LATER AANPASSEN ZODAT DIT HET ADRES VAN DE GEBRUIKER GEBRUIKT
             try {
@@ -67,7 +67,7 @@ public class ServiceTicketController {
                 throw new RuntimeException(e);
             }
 
-            return ResponseEntity.created(uri).body(serviceTicket);
+            return ResponseEntity.created(uri).body(serviceTicketOutput);
         }
     }
 

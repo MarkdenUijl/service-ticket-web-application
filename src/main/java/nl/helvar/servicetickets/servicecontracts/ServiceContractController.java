@@ -35,15 +35,15 @@ public class ServiceContractController {
     }
 
     @PostMapping
-    public ResponseEntity<ServiceContractCreationDTO> addServiceContract(@Valid @RequestBody ServiceContractCreationDTO serviceContract, BindingResult br) {
+    public ResponseEntity<ServiceContractDTO> addServiceContract(@Valid @RequestBody ServiceContractCreationDTO serviceContract, BindingResult br) {
         if (br.hasFieldErrors()) {
             throw new BadObjectCreationException(buildErrorMessage(br));
         } else {
-            serviceContract = service.createServiceContract(serviceContract);
+            ServiceContractDTO serviceContractOutput = service.createServiceContract(serviceContract);
 
-            URI uri = createUri(serviceContract);
+            URI uri = createUri(serviceContractOutput);
 
-            return ResponseEntity.created(uri).body(serviceContract);
+            return ResponseEntity.created(uri).body(serviceContractOutput);
         }
     }
 

@@ -1,6 +1,7 @@
 package nl.helvar.servicetickets.servicecontracts;
 
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
+import nl.helvar.servicetickets.helpers.ObjectCopyUtils;
 import nl.helvar.servicetickets.projects.Project;
 import nl.helvar.servicetickets.projects.ProjectRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +24,7 @@ public class ServiceContractService {
         this.projectRepository = projectRepository;
     }
 
-    public ServiceContractCreationDTO createServiceContract(ServiceContractCreationDTO serviceContractCreationDTO) {
+    public ServiceContractDTO createServiceContract(ServiceContractCreationDTO serviceContractCreationDTO) {
         Optional<Project> projectOptional = projectRepository.findById(serviceContractCreationDTO.getProjectId());
 
         if (projectOptional.isEmpty()) {
@@ -43,8 +44,7 @@ public class ServiceContractService {
             serviceContractRepository.save(serviceContract);
             projectRepository.save(project);
 
-            serviceContractCreationDTO.setId(serviceContract.getId());
-            return serviceContractCreationDTO;
+            return ServiceContractDTO.toDto(serviceContract);
         }
     }
 
@@ -84,7 +84,7 @@ public class ServiceContractService {
         } else {
             ServiceContract existingServiceContract = serviceContract.get();
 
-            BeanUtils.copyProperties(newServiceContract, existingServiceContract, "id");
+            ObjectCopyUtils.copyNonNullProperties(newServiceContract.fromDto(), existingServiceContract);
 
             serviceContractRepository.save(existingServiceContract);
 

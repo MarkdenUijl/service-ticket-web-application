@@ -2,11 +2,11 @@ package nl.helvar.servicetickets.projects;
 
 import nl.helvar.servicetickets.exceptions.DuplicateInDatabaseException;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
+import nl.helvar.servicetickets.helpers.ObjectCopyUtils;
 import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
 import nl.helvar.servicetickets.servicetickets.ServiceTicketRepository;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,7 @@ public class ProjectService {
         this.serviceTicketRepository = serviceTicketRepository;
     }
 
-    public ProjectCreationDTO createProject(ProjectCreationDTO projectCreationDto) {
+    public ProjectDTO createProject(ProjectCreationDTO projectCreationDto) {
         Specification<Project> projectByAddressFilter = Specification.where(findByAddress(
                 projectCreationDto.getCity(),
                 projectCreationDto.getStreet(),
@@ -42,7 +42,7 @@ public class ProjectService {
 
             projectRepository.save(project);
 
-            return projectCreationDto;
+            return ProjectDTO.toDto(project);
         } else {
             throw new DuplicateInDatabaseException("There was already a project registered at this address.");
         }
@@ -68,7 +68,7 @@ public class ProjectService {
         }
     }
 
-    public ProjectDTO findById(Long id) {
+    public ProjectDTO findProjectById(Long id) {
         Optional<Project> project = projectRepository.findById(id);
 
         if(project.isEmpty()) {
@@ -78,6 +78,7 @@ public class ProjectService {
         }
     }
 
+
     public ProjectDTO replaceProject(Long id, ProjectCreationDTO newProject) {
         Optional<Project> project = projectRepository.findById(id);
 
@@ -86,7 +87,7 @@ public class ProjectService {
         } else {
             Project existingProject = project.get();
 
-            BeanUtils.copyProperties(newProject.fromDto(serviceContractRepository), existingProject, "id");
+            ObjectCopyUtils.copyNonNullProperties(newProject.fromDto(serviceContractRepository), existingProject);
 
             projectRepository.save(existingProject);
 

@@ -40,6 +40,16 @@ public class ExceptionController {
         return new ResponseEntity<>(duplicateInDatabaseException.getMessage(), HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(value = InvalidRequestException.class)
+    public ResponseEntity<Object> invalidRequestException (InvalidRequestException invalidRequestException) {
+        return new ResponseEntity<>(invalidRequestException.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @ExceptionHandler(value = EmailExistsException.class)
+    public ResponseEntity<Object> emailExistsException (EmailExistsException emailExistsException) {
+        return new ResponseEntity<>(emailExistsException.getMessage(), HttpStatus.CONFLICT);
+    }
+
     // Existing exceptions overridden.
     @ExceptionHandler(value = MaxUploadSizeExceededException.class)
     public ResponseEntity<Object> maxSizeExceededException(MaxUploadSizeExceededException maxUploadSizeExceededException) {

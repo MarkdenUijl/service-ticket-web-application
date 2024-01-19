@@ -26,24 +26,24 @@ VALUES
     (nextval('service_tickets_seq'), 'Email Configuration Issue', 2, 0, 'Unable to send/receive emails', 151, 0, '2024-01-06T13:15:00');
 
 /* SERVICE TICKET RESPONSE DATA */
-INSERT INTO ticket_responses (id, response_type, response, creation_date, ticket_id)
+INSERT INTO ticket_responses (id, response_type, response, creation_date, ticket_id, minutes_spent)
 VALUES
-    (nextval('ticket_responses_seq'), 'basic_response', 'Tried rebooting the router', '2023-12-28T09:10:00', 1),
-    (nextval('ticket_responses_seq'), 'basic_response', 'Performed speed test, investigating the issue', '2024-01-02T10:35:00', 51),
-    (nextval('ticket_responses_seq'), 'basic_response', 'Identified high latency due to ISP issue, contacting ISP support', '2024-01-02T11:00:00', 51),
-    (nextval('ticket_responses_seq'), 'basic_response', 'ISP confirmed issue in the area, estimated resolution time provided', '2024-01-02T11:30:00', 51),
-    (nextval('ticket_responses_seq'), 'basic_response', 'Contacting user to gather software requirements', '2024-01-02T11:50:00', 101),
-    (nextval('ticket_responses_seq'), 'basic_response', 'Received software specifications, initiating installation', '2024-01-02T12:15:00', 101),
-    (nextval('ticket_responses_seq'), 'basic_response', 'Software installation completed successfully', '2024-01-02T13:00:00', 101),
-    (nextval('ticket_responses_seq'), 'basic_response', 'Checking mail server settings for possible issues', '2024-01-02T13:20:00', 151),
-    (nextval('ticket_responses_seq'), 'basic_response', 'Adjusted SMTP settings, testing outgoing mail', '2024-01-02T13:40:00', 151),
-    (nextval('ticket_responses_seq'), 'basic_response', 'Incoming mail settings updated, testing incoming mail', '2024-01-02T14:00:00', 151);
+    (nextval('ticket_responses_seq'), 'engineer_response', 'Tried rebooting the router', '2023-12-28T09:10:00', 1, 2),
+    (nextval('ticket_responses_seq'), 'basic_response', 'Performed speed test, investigating the issue', '2024-01-02T10:35:00', 51, null),
+    (nextval('ticket_responses_seq'), 'engineer_response', 'Identified high latency due to ISP issue, contacting ISP support', '2024-01-02T11:00:00', 51, 4),
+    (nextval('ticket_responses_seq'), 'basic_response', 'ISP confirmed issue in the area, estimated resolution time provided', '2024-01-02T11:30:00', 51, null),
+    (nextval('ticket_responses_seq'), 'engineer_response', 'Contacting user to gather software requirements', '2024-01-02T11:50:00', 101, 3),
+    (nextval('ticket_responses_seq'), 'basic_response', 'Received software specifications, initiating installation', '2024-01-02T12:15:00', 101, null),
+    (nextval('ticket_responses_seq'), 'engineer_response', 'Software installation completed successfully', '2024-01-02T13:00:00', 101, 6),
+    (nextval('ticket_responses_seq'), 'basic_response', 'Checking mail server settings for possible issues', '2024-01-02T13:20:00', 151, null),
+    (nextval('ticket_responses_seq'), 'engineer_response', 'Adjusted SMTP settings, testing outgoing mail', '2024-01-02T13:40:00', 151, 7),
+    (nextval('ticket_responses_seq'), 'basic_response', 'Incoming mail settings updated, testing incoming mail', '2024-01-02T14:00:00', 151, null);
 
 /* PRIVILEGE DATA */
 INSERT INTO privileges (id, name)
 VALUES
-    (nextval('privileges_seq'), 'READ_PRIVILEGE'),
-    (nextval('privileges_seq'), 'WRITE_PRIVILEGE');
+    (nextval('privileges_seq'), 'SEE_ALL_USERS_PRIVILEGE'),
+    (nextval('privileges_seq'), 'CAN_MODIFY_USERS_PRIVILEGE');
 
 /* ROLE DATA */
 INSERT INTO roles (id, name)
@@ -55,15 +55,15 @@ VALUES
 /* USER DATA */
 INSERT INTO users (id, first_name, last_name, email, password, phone_number)
 VALUES
-    (nextval('users_seq'), 'Admin', 'Tester', 'admin@tester.nl', '{bcrypt}$2a$10$1234567890123456789012345678901234567890123456789012345678901234', '+31612345678'),
-    (nextval('users_seq'), 'Engineer', 'Tester', 'engineer@tester.nl', '{bcrypt}$2a$10$1234567890123456789012345678901234567890123456789012345678901234', '+31612345678'),
-    (nextval('users_seq'), 'User', 'Tester', 'user@tester.nl', '{bcrypt}$2a$10$1234567890123456789012345678901234567890123456789012345678901234', '+31612345678');
+    (nextval('users_seq'), 'Admin', 'Tester', 'admin@tester.nl', '$2a$10$EFG1ijoIuHicy2zpiqXvZ.qF.1kcxttcYz.znrI67el1rgmMkMj3W', '+31612345678'),
+    (nextval('users_seq'), 'Engineer', 'Tester', 'engineer@tester.nl', '$2a$10$EFG1ijoIuHicy2zpiqXvZ.qF.1kcxttcYz.znrI67el1rgmMkMj3W', '+31612345678'),
+    (nextval('users_seq'), 'User', 'Tester', 'user@tester.nl', '$2a$10$EFG1ijoIuHicy2zpiqXvZ.qF.1kcxttcYz.znrI67el1rgmMkMj3W', '+31612345678');
 
 /* SUB TABLES DATA */
 INSERT INTO roles_privileges (role_id, privilege_id)
 VALUES
-     ((SELECT id FROM roles WHERE name = 'ROLE_ADMIN'), (SELECT id FROM privileges WHERE name = 'READ_PRIVILEGE')),
-     ((SELECT id FROM roles WHERE name = 'ROLE_ADMIN'), (SELECT id FROM privileges WHERE name = 'WRITE_PRIVILEGE'));
+     ((SELECT id FROM roles WHERE name = 'ROLE_ADMIN'), (SELECT id FROM privileges WHERE name = 'SEE_ALL_USERS_PRIVILEGE')),
+     ((SELECT id FROM roles WHERE name = 'ROLE_ADMIN'), (SELECT id FROM privileges WHERE name = 'CAN_MODIFY_USERS_PRIVILEGE'));
 
 INSERT INTO users_roles (user_id, role_id)
 VALUES

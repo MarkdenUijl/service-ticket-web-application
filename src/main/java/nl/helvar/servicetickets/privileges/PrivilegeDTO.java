@@ -1,10 +1,8 @@
 package nl.helvar.servicetickets.privileges;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import nl.helvar.servicetickets.interfaces.Identifyable;
 
-public class PrivilegeDTO {
+public class PrivilegeDTO implements Identifyable {
     private Long id;
     private String name;
 
@@ -24,13 +22,6 @@ public class PrivilegeDTO {
         this.name = name;
     }
 
-    public Privilege fromDto() {
-        Privilege privilege = new Privilege();
-
-        privilege.setName(this.getName());
-
-        return privilege;
-    }
 
     public static PrivilegeDTO toDto(Privilege privilege) {
         PrivilegeDTO privilegeDTO = new PrivilegeDTO();

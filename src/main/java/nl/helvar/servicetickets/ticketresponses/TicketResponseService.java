@@ -2,6 +2,7 @@ package nl.helvar.servicetickets.ticketresponses;
 
 import nl.helvar.servicetickets.email.EmailService;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
+import nl.helvar.servicetickets.helpers.ObjectCopyUtils;
 import nl.helvar.servicetickets.servicecontracts.ServiceContract;
 import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,13 +37,13 @@ public class TicketResponseService {
         this.emailService = emailService;
     }
 
-    public TicketResponseCreationDTO createTicketResponse(TicketResponseCreationDTO ticketResponseCreationDTO) {
+    public TicketResponseDTO createTicketResponse(TicketResponseCreationDTO ticketResponseCreationDTO) {
         LocalDateTime currentTime = LocalDateTime.now();
         ticketResponseCreationDTO.setCreationDate(currentTime);
 
         TicketResponse ticketResponse = ticketResponseCreationDTO.fromDto(serviceTicketRepository);
 
-        if (ticketResponse instanceof EngineerResponse engineerResponse) {
+        if (ticketResponse instanceof EngineerResponse) {
             Optional<ServiceTicket> ticketOptional = serviceTicketRepository.findById(ticketResponseCreationDTO.getServiceTicketId());
 
             if (ticketOptional.isPresent()) {
@@ -78,8 +78,7 @@ public class TicketResponseService {
 
         ticketResponseRepository.save(ticketResponse);
 
-        ticketResponseCreationDTO.setId(ticketResponse.getId());
-        return ticketResponseCreationDTO;
+        return TicketResponseDTO.toDto(ticketResponse);
     }
 
     // LATER FILTER BY USER TOEPASSEN
@@ -106,19 +105,25 @@ public class TicketResponseService {
         }
     }
 
-    public TicketResponseDTO replaceTicketResponse(Long id, TicketResponseCreationDTO newTicketResponse) {
+    public TicketResponseDTO replaceTicketResponse(Long id, TicketResponseCreationDTO newTicketResponseDTO) {
         Optional<TicketResponse> ticketResponse = ticketResponseRepository.findById(id);
 
         if (ticketResponse.isEmpty()) {
             throw new RecordNotFoundException("Ticket response with id '" + id + "' was not found in the database.");
         } else {
             TicketResponse existingTicketResponse = ticketResponse.get();
-            TicketResponse newResponse = newTicketResponse.fromDto(serviceTicketRepository);
+            TicketResponse newTicketResponse = newTicketResponseDTO.fromPutDto(serviceTicketRepository);
 
             if (existingTicketResponse instanceof EngineerResponse existingEngineerResponse &&
-                newResponse instanceof EngineerResponse newEngineerResponse
+                    newTicketResponse instanceof EngineerResponse newEngineerResponse
             ) {
-                Optional<ServiceContract> contract = extractServiceContract(newResponse);
+                Optional<ServiceContract> contract;
+
+                if(newTicketResponse.getTicket() != null) {
+                    contract = extractServiceContract(newEngineerResponse);
+                } else {
+                    contract = extractServiceContract(existingEngineerResponse);
+                }
 
                 if (contract.isPresent()) {
                     int oldMinutesSpent = existingEngineerResponse.getMinutesSpent();
@@ -132,7 +137,7 @@ public class TicketResponseService {
                 }
             }
 
-            BeanUtils.copyProperties(newResponse, existingTicketResponse, "id", "creationDate");
+            ObjectCopyUtils.copyNonNullProperties(newTicketResponse, existingTicketResponse);
 
             ticketResponseRepository.save(existingTicketResponse);
 

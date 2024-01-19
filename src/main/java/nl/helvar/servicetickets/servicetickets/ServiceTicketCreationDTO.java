@@ -19,7 +19,7 @@ import java.util.Optional;
 
 import static nl.helvar.servicetickets.helpers.EnumValidator.getEnumConstantFromString;
 
-public class ServiceTicketCreationDTO implements Identifyable {
+public class ServiceTicketCreationDTO {
     private Long id;
     @Size(min = 10)
     private String name;

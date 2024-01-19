@@ -5,6 +5,7 @@ import nl.helvar.servicetickets.privileges.Privilege;
 import nl.helvar.servicetickets.users.User;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity(name = "roles")
 public class Role {
@@ -16,14 +17,14 @@ public class Role {
     @ManyToMany(mappedBy = "roles")
     private List<User> users;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "roles_privileges",
             joinColumns = @JoinColumn(
                     name = "role_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(
                     name = "privilege_id", referencedColumnName = "id"))
-    private List<Privilege> privileges;
+    private Set<Privilege> privileges;
 
     public Long getId() {
         return id;
@@ -45,11 +46,11 @@ public class Role {
         this.users = users;
     }
 
-    public List<Privilege> getPrivileges() {
+    public Set<Privilege> getPrivileges() {
         return privileges;
     }
 
-    public void setPrivileges(List<Privilege> privileges) {
+    public void setPrivileges(Set<Privilege> privileges) {
         this.privileges = privileges;
     }
 }

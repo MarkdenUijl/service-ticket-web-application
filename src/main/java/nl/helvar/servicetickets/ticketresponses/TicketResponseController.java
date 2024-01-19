@@ -35,15 +35,15 @@ public class TicketResponseController {
     }
 
     @PostMapping
-    public ResponseEntity<TicketResponseCreationDTO> addServiceTicketResponse(@Valid @RequestBody TicketResponseCreationDTO ticketResponse, BindingResult br) {
+    public ResponseEntity<TicketResponseDTO> addServiceTicketResponse(@Valid @RequestBody TicketResponseCreationDTO ticketResponse, BindingResult br) {
         if (br.hasFieldErrors()) {
             throw new BadObjectCreationException(buildErrorMessage(br));
         } else {
-            ticketResponse = service.createTicketResponse(ticketResponse);
+            TicketResponseDTO ticketResponseOutput = service.createTicketResponse(ticketResponse);
 
-            URI uri = createUri(ticketResponse);
+            URI uri = createUri(ticketResponseOutput);
 
-            return ResponseEntity.created(uri).body(ticketResponse);
+            return ResponseEntity.created(uri).body(ticketResponseOutput);
         }
     }
 

@@ -1,11 +1,12 @@
 package nl.helvar.servicetickets.projects;
 
+import nl.helvar.servicetickets.interfaces.Identifyable;
 import nl.helvar.servicetickets.servicecontracts.ServiceContractDTO;
 import nl.helvar.servicetickets.servicetickets.ServiceTicketDTO;
 
 import java.util.List;
 
-public class ProjectDTO {
+public class ProjectDTO implements Identifyable {
     private Long id;
     private String name;
     private String city;

@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class ServiceTicketSpecification {
-    private ServiceTicketSpecification() {};
+    private ServiceTicketSpecification() {}
 
     // First request parameter filter: Service ticket type
     public static Specification<ServiceTicket> typeEquals(String ticketType) {

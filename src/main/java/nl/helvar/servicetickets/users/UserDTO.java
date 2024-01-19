@@ -4,14 +4,19 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import nl.helvar.servicetickets.interfaces.Identifyable;
+import nl.helvar.servicetickets.roles.RoleDTO;
 
-public class UserDTO {
+import java.util.List;
+
+public class UserDTO implements Identifyable {
     private Long id;
     private String firstName;
     private String lastName;
     private String email;
     private String phoneNumber;
+    private List<RoleDTO> roles;
 
+    @Override
     public Long getId() {
         return id;
     }
@@ -52,6 +57,14 @@ public class UserDTO {
         this.phoneNumber = phoneNumber;
     }
 
+    public List<RoleDTO> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<RoleDTO> roles) {
+        this.roles = roles;
+    }
+
     public User fromDto() {
         User user = new User();
 
@@ -71,6 +84,10 @@ public class UserDTO {
         userDTO.setLastName(user.getLastName());
         userDTO.setEmail(user.getEmail());
         userDTO.setPhoneNumber(user.getPhoneNumber());
+        userDTO.setRoles(user.getRoles()
+                .stream()
+                .map(RoleDTO::toDto)
+                .toList());
 
         return userDTO;
     }

@@ -1,6 +1,7 @@
 package nl.helvar.servicetickets.servicetickets;
 
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
+import nl.helvar.servicetickets.helpers.ObjectCopyUtils;
 import nl.helvar.servicetickets.projects.Project;
 import nl.helvar.servicetickets.projects.ProjectRepository;
 import nl.helvar.servicetickets.servicecontracts.ServiceContractCreationDTO;
@@ -30,7 +31,7 @@ public class ServiceTicketService {
         this.projectRepository = projectRepository;
     }
 
-    public ServiceTicketCreationDTO createServiceTicket(ServiceTicketCreationDTO serviceTicketCreationDTO) {
+    public ServiceTicketDTO createServiceTicket(ServiceTicketCreationDTO serviceTicketCreationDTO) {
         // LATER UITBREIDEN MET RELATIONS, KOPPELEN AAN USER
         LocalDateTime currentTime = LocalDateTime.now();
         serviceTicketCreationDTO.setCreationDate(currentTime);
@@ -40,8 +41,7 @@ public class ServiceTicketService {
         addServiceTicketToProject(serviceTicket);
         serviceTicketRepository.save(serviceTicket);
 
-        serviceTicketCreationDTO.setId(serviceTicket.getId());
-        return serviceTicketCreationDTO;
+        return ServiceTicketDTO.toDto(serviceTicket);
     }
 
     public List<ServiceTicket> getAllServiceTickets(String type, String status, Long projectId, LocalDate issuedBefore, LocalDate issuedAfter) {
@@ -78,7 +78,7 @@ public class ServiceTicketService {
             ServiceTicket existingServiceTicket = serviceTicket.get();
             ServiceTicket newTicket = newServiceTicket.fromDto(projectRepository);
 
-            BeanUtils.copyProperties(newTicket, existingServiceTicket, "id", "creationDate", "responses");
+            ObjectCopyUtils.copyNonNullProperties(newTicket, existingServiceTicket);
 
             addServiceTicketToProject(existingServiceTicket);
 

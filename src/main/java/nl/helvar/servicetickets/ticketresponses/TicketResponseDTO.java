@@ -10,6 +10,7 @@ public class TicketResponseDTO implements Identifyable {
     private String response;
     private LocalDateTime creationDate;
     private int minutesSpent;
+    private boolean isEngineerResponse;
 
     public Long getId() {
         return id;
@@ -43,6 +44,14 @@ public class TicketResponseDTO implements Identifyable {
         this.minutesSpent = minutesSpent;
     }
 
+    public boolean isEngineerResponse() {
+        return isEngineerResponse;
+    }
+
+    public void setEngineerResponse(boolean engineerResponse) {
+        isEngineerResponse = engineerResponse;
+    }
+
     public static TicketResponse fromDto(TicketResponseDTO ticketResponseDTO) {
         TicketResponse ticketResponse = new TicketResponse();
 
@@ -61,6 +70,9 @@ public class TicketResponseDTO implements Identifyable {
 
         if (ticketResponse instanceof EngineerResponse engineerResponse) {
             ticketResponseDTO.setMinutesSpent(engineerResponse.getMinutesSpent());
+            ticketResponseDTO.setEngineerResponse(true);
+        } else {
+            ticketResponseDTO.setEngineerResponse(false);
         }
 
         return ticketResponseDTO;
