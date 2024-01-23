@@ -10,7 +10,6 @@ import org.springframework.data.jpa.domain.Specification;
 public class UserSpecification {
     private UserSpecification() {}
 
-    // First request parameter filter: User by role match
     public static Specification<User> roleEquals(String roleName) {
         return (Root<User> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) -> {
             Join<User, Role> roleJoin = root.join("roles");
@@ -19,7 +18,6 @@ public class UserSpecification {
         };
     }
 
-    // Second request parameter filter: User by role match part
     public static Specification<User> roleLike(String roleName) {
         return (Root<User> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) -> {
             Join<User, Role> roleJoin = root.join("roles");
@@ -30,7 +28,6 @@ public class UserSpecification {
         };
     }
 
-    // Second request parameter filter: User by email
     public static Specification<User> emailEquals(String email) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("email"), email);
     }

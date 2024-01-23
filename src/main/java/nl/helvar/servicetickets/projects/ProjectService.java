@@ -8,11 +8,13 @@ import nl.helvar.servicetickets.servicetickets.ServiceTicket;
 import nl.helvar.servicetickets.servicetickets.ServiceTicketRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+import static nl.helvar.servicetickets.helpers.UserDetailsValidator.hasPrivilege;
 import static nl.helvar.servicetickets.projects.ProjectSpecification.*;
 
 @Service
@@ -48,7 +50,8 @@ public class ProjectService {
         }
     }
 
-    public List<ProjectDTO> getAllProjects(String name, String city, String zipCode, String street, Integer houseNumber, Boolean hasServiceContract) {
+    public List<ProjectDTO> getAllProjects(UserDetails userDetails,
+            String name, String city, String zipCode, String street, Integer houseNumber, Boolean hasServiceContract) {
         Specification<Project> filters = Specification.where(StringUtils.isBlank(name) ? null : nameLike(name))
                 .and(StringUtils.isBlank(city) ? null : cityLike(city))
                 .and(StringUtils.isBlank(zipCode) ? null : zipCodeLike(zipCode))
@@ -68,13 +71,17 @@ public class ProjectService {
         }
     }
 
-    public ProjectDTO findProjectById(Long id) {
+    public ProjectDTO findProjectById(UserDetails userDetails, Long id) {
         Optional<Project> project = projectRepository.findById(id);
 
         if(project.isEmpty()) {
             throw new RecordNotFoundException("No project found with id " + id);
         } else {
-            return ProjectDTO.toDto(project.get());
+            if (hasPrivilege("CAN_SEE_PROJECTS_PRIVILEGE", userDetails)) {
+                return ProjectDTO.toDto(project.get());
+            } else {
+                return ProjectDTO.toSimpleDto(project.get());
+            }
         }
     }
 

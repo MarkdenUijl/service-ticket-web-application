@@ -3,7 +3,6 @@ package nl.helvar.servicetickets.security;
 import jakarta.transaction.Transactional;
 import nl.helvar.servicetickets.privileges.Privilege;
 import nl.helvar.servicetickets.roles.Role;
-import nl.helvar.servicetickets.roles.RoleRepository;
 import nl.helvar.servicetickets.users.User;
 import nl.helvar.servicetickets.users.UserRepository;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,11 +22,9 @@ import static nl.helvar.servicetickets.users.UserSpecification.emailEquals;
 public class MyUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
 
-    public MyUserDetailsService(UserRepository userRepository, RoleRepository roleRepository) {
+    public MyUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
     }
 
     @Override
@@ -42,7 +39,6 @@ public class MyUserDetailsService implements UserDetailsService {
             User user = optionalUser.get();
 
             return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), true, true, true, true, getAuthorities(user.getRoles()));
-            //return new MyUserDetails(user);
         }
     }
 

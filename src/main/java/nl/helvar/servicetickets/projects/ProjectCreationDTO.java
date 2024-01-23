@@ -72,10 +72,6 @@ public class ProjectCreationDTO {
         return serviceContractId;
     }
 
-    public void setServiceContractId(Long serviceContractId) {
-        this.serviceContractId = serviceContractId;
-    }
-
     // MAPPERS:
     public Project fromDto(ServiceContractRepository serviceContractRepository) {
         Project project = new Project();
@@ -97,18 +93,5 @@ public class ProjectCreationDTO {
         }
 
         return project;
-    }
-
-    public static ProjectCreationDTO toDto(Project project) {
-        ProjectCreationDTO projectCreationDto = new ProjectCreationDTO();
-
-        projectCreationDto.setId(project.getId());
-        projectCreationDto.setName(project.getName());
-        projectCreationDto.setCity(project.getCity());
-        projectCreationDto.setZipCode(project.getZipCode());
-        projectCreationDto.setStreet(project.getStreet());
-        projectCreationDto.setHouseNumber(project.getHouseNumber());
-
-        return projectCreationDto;
     }
 }

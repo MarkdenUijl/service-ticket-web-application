@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import nl.helvar.servicetickets.privileges.Privilege;
 import nl.helvar.servicetickets.users.User;
 
-import java.util.List;
 import java.util.Set;
 
 @Entity(name = "roles")
@@ -15,7 +14,7 @@ public class Role {
     private Long id;
     private String name;
     @ManyToMany(mappedBy = "roles")
-    private List<User> users;
+    private Set<User> users;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -38,11 +37,11 @@ public class Role {
         this.name = name;
     }
 
-    public List<User> getUsers() {
+    public Set<User> getUsers() {
         return users;
     }
 
-    public void setUsers(List<User> users) {
+    public void setUsers(Set<User> users) {
         this.users = users;
     }
 

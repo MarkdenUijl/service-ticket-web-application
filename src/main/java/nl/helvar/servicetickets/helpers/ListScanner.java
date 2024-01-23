@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 public class ListScanner {
-    public static boolean checkListForProperty(List<?> list, String propertyName) {
+    public static boolean checkListForPropertyValue(List<?> list, String propertyName) {
         for (Object obj : list) {
             Field[] fields = obj.getClass().getDeclaredFields();
             for (Field field : fields) {

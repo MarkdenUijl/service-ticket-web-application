@@ -5,31 +5,21 @@ import nl.helvar.servicetickets.users.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-
-import javax.sql.DataSource;
 
 @Configuration
 @EnableWebSecurity
@@ -57,58 +47,59 @@ public class SecurityConfig {
 
 
     public UserDetailsService userDetailsService() {
-        return new MyUserDetailsService(this.userRepository, this.roleRepository);
+        return new MyUserDetailsService(this.userRepository);
     }
 
 
     @Bean
     protected SecurityFilterChain filter (HttpSecurity http) throws Exception {
         return http
-                //.securityContext((securityContext) -> securityContext.requireExplicitSave(true))
-                .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(auth ->
+                        auth
                                 .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/privileges/**").hasAuthority("CAN_MODIFY_USERS_PRIVILEGE")
-                                .requestMatchers("/roles/**").hasAuthority("CAN_MODIFY_USERS_PRIVILEGE")
-                                //.requestMatchers(HttpMethod.POST, "/users/**").permitAll()
-//                                .requestMatchers(HttpMethod.GET, "/users/**").hasAuthority("READ_PRIVILEGE")
-//                                .requestMatchers(HttpMethod.PUT, "/roles/**").permitAll()
-//                                .requestMatchers(HttpMethod.GET, "/roles/**").permitAll()
-//                                .requestMatchers(HttpMethod.POST, "/roles/**").permitAll()
 
-//                        .requestMatchers(HttpMethod.GET, "/projects/**", "/serviceContracts/**")
-//                        .hasRole("USER")
-//
-//                        .requestMatchers(HttpMethod.GET, "/serviceTickets/**")
-//                        .hasRole("USER")
-//
-//                        .requestMatchers(HttpMethod.POST, "/serviceTickets/**")
-//                        .hasRole("USER")
-//
-//                        .requestMatchers(HttpMethod.POST, "/projects/**")
-//                        .hasRole("ENGINEER")
-//
-//                        .requestMatchers(HttpMethod.POST, "/serviceContracts/**")
-//                        .hasRole("ADMIN")
-//
-//                        .requestMatchers(HttpMethod.PUT, "/serviceTickets/**")
-//                        .hasRole("ENGINEER")
-//
-//                        .requestMatchers(HttpMethod.PUT, "/projects/**", "/serviceContracts/**")
-//                        .hasRole("ADMIN")
-//
-//                        .requestMatchers(HttpMethod.DELETE, "/serviceTickets/**")
-//                        .hasRole("USER")
-//
-//                        .requestMatchers(HttpMethod.DELETE, "/projects/**", "/serviceContracts/**")
-//                        .hasRole("ADMIN")
-//
-//                        .requestMatchers("/ticketResponses/**")
-//                        .hasRole("USER")
-//
-//                        .requestMatchers("/users/**")
-//                        .permitAll()
+                                .requestMatchers("/privileges/**")
+                                .hasAuthority("CAN_MODIFY_USERS_PRIVILEGE")
 
-                        .anyRequest().denyAll()
+                                .requestMatchers("/roles/**")
+                                .hasAuthority("CAN_MODIFY_USERS_PRIVILEGE")
+
+                                .requestMatchers(HttpMethod.POST, "/users/**")
+                                .permitAll()
+                                .requestMatchers(HttpMethod.DELETE, "/users/**")
+                                .hasAuthority("CAN_MODIFY_USERS_PRIVILEGE")
+                                .requestMatchers(HttpMethod.GET, "/users")
+                                .hasAuthority("CAN_ACCESS_USERS_PRIVILEGE")
+                                .requestMatchers(HttpMethod.GET, "/users/**")
+                                .hasAuthority("CAN_SEE_USERS_PRIVILEGE")
+                                .requestMatchers(HttpMethod.PUT, "/users/**")
+                                .authenticated()
+
+                                .requestMatchers(HttpMethod.GET, "/serviceContracts/**")
+                                .hasAuthority("CAN_SEE_CONTRACTS_PRIVILEGE")
+                                .requestMatchers("/serviceContracts/**")
+                                .hasAuthority("CAN_MODIFY_CONTRACTS_PRIVILEGE")
+
+                                .requestMatchers(HttpMethod.GET, "/projects/**")
+                                .authenticated()
+                                .requestMatchers("/projects/**")
+                                .hasAuthority("CAN_MODIFY_PROJECTS_PRIVILEGE")
+
+                                .requestMatchers(HttpMethod.GET, "/serviceTickets")
+                                .hasAuthority("CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE")
+                                .requestMatchers(HttpMethod.DELETE, "/serviceTickets/*/files/**")
+                                .hasAuthority("CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE")
+                                .requestMatchers("/serviceTickets/**")
+                                .authenticated()
+                                .requestMatchers("/serviceTickets/*/files/**")
+                                .authenticated()
+
+                                .requestMatchers(HttpMethod.GET, "/ticketResponses")
+                                .hasAuthority("CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE")
+                                .requestMatchers("/ticketResponses/**")
+                                .authenticated()
+
+                                .anyRequest().denyAll()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)

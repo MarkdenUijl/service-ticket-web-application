@@ -1,19 +1,21 @@
 package nl.helvar.servicetickets.servicetickets;
 
-import nl.helvar.servicetickets.files.File;
 import nl.helvar.servicetickets.interfaces.Identifyable;
 import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.servicetickets.enums.TicketType;
 import nl.helvar.servicetickets.ticketresponses.TicketResponseDTO;
+import nl.helvar.servicetickets.users.UserDTO;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import static nl.helvar.servicetickets.users.UserDTO.toSimpleDto;
+
 public class ServiceTicketDTO implements Identifyable {
     private Long id;
+    private UserDTO submittedBy;
     private String name;
     private TicketStatus status;
     private TicketType type;
@@ -29,6 +31,14 @@ public class ServiceTicketDTO implements Identifyable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public UserDTO getSubmittedBy() {
+        return submittedBy;
+    }
+
+    public void setSubmittedBy(UserDTO submittedBy) {
+        this.submittedBy = submittedBy;
     }
 
     public String getName() {
@@ -95,48 +105,34 @@ public class ServiceTicketDTO implements Identifyable {
         this.files = files;
     }
 
-    public static ServiceTicket fromDto(ServiceTicketDTO serviceTicketDTO) throws IOException {
-        ServiceTicket serviceTicket = new ServiceTicket();
-
-        serviceTicket.setName(serviceTicketDTO.getName());
-        serviceTicket.setStatus(serviceTicketDTO.getStatus());
-        serviceTicket.setType(serviceTicketDTO.getType());
-        serviceTicket.setDescription(serviceTicketDTO.getDescription());
-        serviceTicket.setMinutesSpent(serviceTicketDTO.getMinutesSpent());
-        serviceTicket.setCreationDate(serviceTicketDTO.getCreationDate());
-        serviceTicket.setResponses(serviceTicketDTO.getResponses()
-                .stream()
-                .map(TicketResponseDTO::fromDto)
-                .toList()
-        );
-
-        return serviceTicket;
-    }
-
     public static ServiceTicketDTO toDto(ServiceTicket serviceTicket) {
         ServiceTicketDTO serviceTicketDTO = new ServiceTicketDTO();
 
+
         serviceTicketDTO.setId(serviceTicket.getId());
+        serviceTicketDTO.setSubmittedBy(toSimpleDto(serviceTicket.getSubmittedBy()));
         serviceTicketDTO.setName(serviceTicket.getName());
         serviceTicketDTO.setStatus(serviceTicket.getStatus());
         serviceTicketDTO.setType(serviceTicket.getType());
         serviceTicketDTO.setDescription(serviceTicket.getDescription());
         serviceTicketDTO.setMinutesSpent(serviceTicket.getMinutesSpent());
         serviceTicketDTO.setCreationDate(serviceTicket.getCreationDate());
-        serviceTicketDTO.setResponses(serviceTicket.getResponses()
-                .stream()
-                .map(TicketResponseDTO::toDto)
-                .sorted(Comparator.comparing(TicketResponseDTO::getCreationDate))
-                .toList()
-        );
 
-        HashMap<Long, String> fileMap = new HashMap<>();
-
-        for (File file : serviceTicket.getFiles()) {
-            fileMap.put(file.getId(), file.getName());
+        if (serviceTicket.getResponses() != null) {
+            serviceTicketDTO.setResponses(serviceTicket.getResponses()
+                    .stream()
+                    .map(TicketResponseDTO::toDto)
+                    .sorted(Comparator.comparing(TicketResponseDTO::getCreationDate))
+                    .toList()
+            );
         }
 
-        serviceTicketDTO.setFiles(fileMap);
+        if (serviceTicket.getFiles() != null) {
+            serviceTicketDTO.setFiles(serviceTicket.getFiles()
+                    .stream()
+                    .collect(HashMap::new, (key, value) -> key.put(value.getId(), value.getName()), HashMap::putAll)
+            );
+        }
 
         return serviceTicketDTO;
     }

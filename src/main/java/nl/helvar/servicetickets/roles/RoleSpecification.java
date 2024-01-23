@@ -6,7 +6,7 @@ public class RoleSpecification {
     private RoleSpecification() {}
 
     // First request parameter filter: Find Role by name
-    public static Specification<Role> roleEquals(String roleName) {
+    public static Specification<Role> roleNameEquals(String roleName) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("name"), roleName);
     }
 }

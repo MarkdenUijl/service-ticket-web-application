@@ -6,6 +6,7 @@ import nl.helvar.servicetickets.exceptions.InvalidEnumConstantException;
 import nl.helvar.servicetickets.projects.Project;
 import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.servicetickets.enums.TicketType;
+import nl.helvar.servicetickets.ticketresponses.TicketResponse;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
@@ -14,7 +15,6 @@ import java.time.LocalDateTime;
 public class ServiceTicketSpecification {
     private ServiceTicketSpecification() {}
 
-    // First request parameter filter: Service ticket type
     public static Specification<ServiceTicket> typeEquals(String ticketType) {
         try {
             TicketType type = TicketType.valueOf(ticketType.toUpperCase());
@@ -24,7 +24,6 @@ public class ServiceTicketSpecification {
         }
     }
 
-    // Second request parameter filter: Service ticket status
     public static Specification<ServiceTicket> statusEquals(String ticketStatus) {
         try {
             TicketStatus status = TicketStatus.valueOf(ticketStatus.toUpperCase());
@@ -34,8 +33,7 @@ public class ServiceTicketSpecification {
         }
     }
 
-    // Third request parameter filter: Service ticket project id
-    public static Specification<ServiceTicket> projectEquals(Long projectId) {
+    public static Specification<ServiceTicket> projectIdEquals(Long projectId) {
         return ((root, query, builder) -> {
             Join<ServiceTicket, Project> projectJoin = root.join("project");
             Predicate predicate = builder.equal(projectJoin.get("id"), projectId);
@@ -44,7 +42,15 @@ public class ServiceTicketSpecification {
         });
     }
 
-    // Fourth request parameter filter: issued after date
+    public static Specification<ServiceTicket> projectNameLike(String projectName) {
+        String formattedNameLike = "%" + projectName.toLowerCase() + "%";
+        return ((root, query, builder) -> {
+            Join<ServiceTicket, Project> projectJoin = root.join("project");
+
+            return builder.like(builder.lower(projectJoin.get("name")), formattedNameLike);
+        });
+    }
+
     public static Specification<ServiceTicket> issuedAfterDate(LocalDate issuedAfter) {
         return (root, query, builder) -> {
             if (issuedAfter != null) {
@@ -55,7 +61,6 @@ public class ServiceTicketSpecification {
         };
     }
 
-    // Fifth request parameter filter: issued before date
     public static Specification<ServiceTicket> issuedBeforeDate(LocalDate issuedBefore) {
         return (root, query, builder) -> {
             if (issuedBefore != null) {
@@ -66,8 +71,23 @@ public class ServiceTicketSpecification {
         };
     }
 
-    // Combined request parameters fourth and fifth
     public static Specification<ServiceTicket> dateRange(LocalDate issuedAfter, LocalDate issuedBefore) {
         return Specification.where(issuedAfterDate(issuedAfter)).and(issuedBeforeDate(issuedBefore));
+    }
+
+    public static Specification<ServiceTicket> userIdEquals(Long userId) {
+        return (root, query, builder) -> builder.equal(root.get("submittedBy").get("id"), userId);
+    }
+
+    public static Specification<ServiceTicket> userEmailEquals(String email) {
+        return (root, query, builder) -> builder.equal(root.get("submittedBy").get("email"), email);
+    }
+
+    public static Specification<ServiceTicket> userFirstNameEquals(String firstName) {
+        return (root, query, builder) -> builder.equal(builder.lower(root.get("submittedBy").get("firstName")), firstName.toLowerCase());
+    }
+
+    public static Specification<ServiceTicket> userLastNameEquals(String lastName) {
+        return (root, query, builder) -> builder.equal(builder.lower(root.get("submittedBy").get("lastName")), lastName.toLowerCase());
     }
 }

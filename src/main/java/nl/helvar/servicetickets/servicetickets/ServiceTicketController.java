@@ -5,6 +5,8 @@ import nl.helvar.servicetickets.email.EmailService;
 import nl.helvar.servicetickets.exceptions.BadObjectCreationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,11 +34,26 @@ public class ServiceTicketController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Long projectId,
+            @RequestParam(required = false) String projectName,
             @RequestParam(required = false) LocalDate issuedBefore,
-            @RequestParam(required = false) LocalDate issuedAfter
-
+            @RequestParam(required = false) LocalDate issuedAfter,
+            @RequestParam(required = false) String submitterFirstName,
+            @RequestParam(required = false) String submitterLastName,
+            @RequestParam(required = false) String submitterEmail,
+            @RequestParam(required = false) Long submitterId
     ) {
-        List<ServiceTicketDTO> serviceTicketDTOS = service.getAllServiceTickets(type, status, projectId, issuedBefore, issuedAfter)
+        List<ServiceTicketDTO> serviceTicketDTOS = service.getAllServiceTickets(
+                        type,
+                        status,
+                        projectId,
+                        projectName,
+                        issuedBefore,
+                        issuedAfter,
+                        submitterFirstName,
+                        submitterLastName,
+                        submitterEmail,
+                        submitterId
+                )
                 .stream()
                 .map(ServiceTicketDTO::toDto)
                 .toList();;
@@ -45,24 +62,27 @@ public class ServiceTicketController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ServiceTicketDTO> findServiceTicketById(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(ServiceTicketDTO.toDto(service.findById(id)), HttpStatus.OK);
+    public ResponseEntity<ServiceTicketDTO> findServiceTicketById(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("id") Long id
+    ) {
+        return new ResponseEntity<>(ServiceTicketDTO.toDto(service.findById(userDetails, id)), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<ServiceTicketDTO> addServiceTicket(@Valid @RequestBody ServiceTicketCreationDTO serviceTicket,
-                                                                     BindingResult br
+    public ResponseEntity<ServiceTicketDTO> addServiceTicket(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody ServiceTicketCreationDTO serviceTicket, BindingResult br
     ) {
         if (br.hasFieldErrors()) {
             throw new BadObjectCreationException(buildErrorMessage(br));
         } else {
-            ServiceTicketDTO serviceTicketOutput = service.createServiceTicket(serviceTicket);
+            ServiceTicketDTO serviceTicketOutput = service.createServiceTicket(userDetails, serviceTicket);
 
             URI uri = createUri(serviceTicketOutput);
 
-            // LATER AANPASSEN ZODAT DIT HET ADRES VAN DE GEBRUIKER GEBRUIKT
             try {
-                emailService.sendTicketConfirmationEmail("markdenuyl@gmail.com", serviceTicket.getId(), serviceTicket.getName());
+                emailService.sendTicketConfirmationEmail(userDetails.getUsername(), serviceTicket.getId(), serviceTicket.getName());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -72,12 +92,19 @@ public class ServiceTicketController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ServiceTicketDTO> replaceServiceTicket(@PathVariable("id") Long id, @RequestBody ServiceTicketCreationDTO newServiceTicket) {
-        return new ResponseEntity<>(ServiceTicketDTO.toDto(service.replaceServiceTicket(id, newServiceTicket)), HttpStatus.OK);
+    public ResponseEntity<ServiceTicketDTO> replaceServiceTicket(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("id") Long id,
+            @RequestBody ServiceTicketCreationDTO newServiceTicket
+    ) {
+        return new ResponseEntity<>(ServiceTicketDTO.toDto(service.replaceServiceTicket(userDetails, id, newServiceTicket)), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteServiceTicket(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(service.deleteServiceTicket(id), HttpStatus.OK);
+    public ResponseEntity<String> deleteServiceTicket(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("id") Long id
+    ) {
+        return new ResponseEntity<>(service.deleteServiceTicket(userDetails, id), HttpStatus.OK);
     }
 }

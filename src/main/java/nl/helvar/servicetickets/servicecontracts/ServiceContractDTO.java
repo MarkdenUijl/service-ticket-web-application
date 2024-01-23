@@ -62,18 +62,6 @@ public class ServiceContractDTO implements Identifyable {
     }
 
     // MAPPERS:
-    public static ServiceContract fromDto(ServiceContractDTO serviceContractDTO) {
-        ServiceContract serviceContract = new ServiceContract();
-
-        serviceContract.setType(serviceContractDTO.getType());
-        serviceContract.setContractTime(serviceContractDTO.getContractTime());
-        serviceContract.setUsedTime(serviceContractDTO.getUsedTime());
-        serviceContract.setStartDate(serviceContractDTO.getStartDate());
-        serviceContract.setEndDate(serviceContractDTO.getEndDate());
-
-        return serviceContract;
-    }
-
     public static ServiceContractDTO toDto(ServiceContract serviceContract) {
         ServiceContractDTO serviceContractDTO = new ServiceContractDTO();
 

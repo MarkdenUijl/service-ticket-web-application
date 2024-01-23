@@ -5,6 +5,8 @@ import nl.helvar.servicetickets.email.EmailService;
 import nl.helvar.servicetickets.exceptions.BadObjectCreationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -35,8 +37,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> findUserById(@PathVariable("id") Long id) {
-        UserDTO userDTO = userService.findUserById(id);
+    public ResponseEntity<UserDTO> findUserById(@AuthenticationPrincipal UserDetails userDetails, @PathVariable("id") Long id) {
+        UserDTO userDTO = userService.findUserById(userDetails, id);
 
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
@@ -59,7 +61,7 @@ public class UserController {
                     recipient = user.getEmail();
                 }
 
-                emailService.sendUserCreationConfirmation("markdenuyl@gmail.com", recipient);
+                emailService.sendUserCreationConfirmation(user.getEmail(), recipient);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -71,11 +73,13 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> adjustUser(@PathVariable("id")Long id, @Valid @RequestBody UserCreationDTO user, BindingResult br) {
+    public ResponseEntity<UserDTO> adjustUser(@AuthenticationPrincipal UserDetails userDetails,
+                                              @PathVariable("id")Long id,
+                                              @Valid @RequestBody UserCreationDTO user, BindingResult br) {
         if (br.hasFieldErrors()) {
             throw new BadObjectCreationException(buildErrorMessage(br));
         } else {
-            UserDTO userOutput = userService.adjustUser(id, user);
+            UserDTO userOutput = userService.adjustUser(userDetails, id, user);
 
             return new ResponseEntity<>(userOutput, HttpStatus.OK);
         }

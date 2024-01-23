@@ -1,11 +1,11 @@
 package nl.helvar.servicetickets.servicecontracts;
 
+import nl.helvar.servicetickets.exceptions.InvalidRequestException;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.helpers.ObjectCopyUtils;
 import nl.helvar.servicetickets.projects.Project;
 import nl.helvar.servicetickets.projects.ProjectRepository;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -34,9 +34,7 @@ public class ServiceContractService {
             Project project = projectOptional.get();
 
             if (project.getServiceContract() != null) {
-                ServiceContract existingServiceContract = project.getServiceContract();
-                project.setServiceContract(null);
-                serviceContractRepository.delete(existingServiceContract);
+                throw new InvalidRequestException("Project with id " + serviceContractCreationDTO.getProjectId() + " already has a contract.");
             }
 
             project.setServiceContract(serviceContract);

@@ -114,15 +114,15 @@ public class TicketResponseCreationDTO {
         }
     }
 
-    public static TicketResponseCreationDTO toDto(TicketResponse ticketResponse) {
-        TicketResponseCreationDTO ticketResponseCreationDTO = new TicketResponseCreationDTO();
-
-        ticketResponseCreationDTO.setId(ticketResponse.getId());
-        ticketResponseCreationDTO.setResponse(ticketResponse.getResponse());
-        ticketResponseCreationDTO.setCreationDate(ticketResponse.getCreationDate());
-        ticketResponseCreationDTO.setServiceTicketId(ticketResponse.getTicket().getId());
-        ticketResponseCreationDTO.setMinutesSpent(ticketResponseCreationDTO.getMinutesSpent());
-
-        return ticketResponseCreationDTO;
-    }
+//    public static TicketResponseCreationDTO toDto(TicketResponse ticketResponse) {
+//        TicketResponseCreationDTO ticketResponseCreationDTO = new TicketResponseCreationDTO();
+//
+//        ticketResponseCreationDTO.setId(ticketResponse.getId());
+//        ticketResponseCreationDTO.setResponse(ticketResponse.getResponse());
+//        ticketResponseCreationDTO.setCreationDate(ticketResponse.getCreationDate());
+//        ticketResponseCreationDTO.setServiceTicketId(ticketResponse.getTicket().getId());
+//        ticketResponseCreationDTO.setMinutesSpent(ticketResponseCreationDTO.getMinutesSpent());
+//
+//        return ticketResponseCreationDTO;
+//    }
 }

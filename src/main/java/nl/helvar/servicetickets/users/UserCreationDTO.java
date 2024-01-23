@@ -2,13 +2,14 @@ package nl.helvar.servicetickets.users;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
+import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.roles.Role;
 import nl.helvar.servicetickets.roles.RoleRepository;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.*;
 
-import static nl.helvar.servicetickets.roles.RoleSpecification.roleEquals;
+import static nl.helvar.servicetickets.roles.RoleSpecification.roleNameEquals;
 
 public class UserCreationDTO {
     private Long id;
@@ -100,28 +101,19 @@ public class UserCreationDTO {
             Set<Role> userRoles = new HashSet<>();
 
             for (String roleName : this.roles) {
-                Specification<Role> filters = Specification.where(roleEquals(roleName));
+                Specification<Role> filters = Specification.where(roleNameEquals(roleName));
                 Optional<Role> optionalRole = roleRepository.findOne(filters);
 
-                optionalRole.ifPresent(userRoles::add);
+                if (optionalRole.isEmpty()) {
+                    throw new RecordNotFoundException("Could not find any role with name '" + roleName + "' in the database.");
+                } else {
+                    userRoles.add(optionalRole.get());
+                }
             }
 
             user.setRoles(userRoles);
         }
 
         return user;
-    }
-
-    public static UserCreationDTO toDto(User user) {
-        UserCreationDTO userCreationDTO = new UserCreationDTO();
-
-        userCreationDTO.setId(user.getId());
-        userCreationDTO.setFirstName(user.getFirstName());
-        userCreationDTO.setLastName(user.getLastName());
-        userCreationDTO.setEmail(user.getEmail());
-        userCreationDTO.setPhoneNumber(user.getPhoneNumber());
-        userCreationDTO.setPassword(user.getPassword());
-
-        return userCreationDTO;
     }
 }

@@ -4,14 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
-import nl.helvar.servicetickets.interfaces.Identifyable;
 import nl.helvar.servicetickets.projects.Project;
 import nl.helvar.servicetickets.projects.ProjectRepository;
-import nl.helvar.servicetickets.servicecontracts.enums.ContractType;
 import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.servicetickets.enums.TicketType;
 import nl.helvar.servicetickets.ticketresponses.TicketResponse;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -129,21 +126,5 @@ public class ServiceTicketCreationDTO {
         }
 
         return serviceTicket;
-    }
-
-    public static ServiceTicketCreationDTO toDto(ServiceTicket serviceTicket) {
-        ServiceTicketCreationDTO serviceTicketCreationDTO = new ServiceTicketCreationDTO();
-
-        serviceTicketCreationDTO.setId(serviceTicket.getId());
-        serviceTicketCreationDTO.setName(serviceTicket.getName());
-        serviceTicketCreationDTO.setStatus(serviceTicket.getStatus().toString());
-        serviceTicketCreationDTO.setType(serviceTicket.getType().toString());
-        serviceTicketCreationDTO.setDescription(serviceTicket.getDescription());
-        serviceTicketCreationDTO.setResponses(serviceTicket.getResponses());
-        serviceTicketCreationDTO.setMinutesSpent(serviceTicket.getMinutesSpent());
-        serviceTicketCreationDTO.setCreationDate(serviceTicket.getCreationDate());
-        serviceTicketCreationDTO.setProjectId(serviceTicket.getProject().getId());
-
-        return serviceTicketCreationDTO;
     }
 }

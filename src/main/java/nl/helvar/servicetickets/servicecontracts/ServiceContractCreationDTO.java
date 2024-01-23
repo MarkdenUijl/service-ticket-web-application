@@ -87,17 +87,4 @@ public class ServiceContractCreationDTO {
 
         return serviceContract;
     }
-
-    public ServiceContractCreationDTO toDto(ServiceContract serviceContract) {
-        ServiceContractCreationDTO serviceContractCreationDTO = new ServiceContractCreationDTO();
-
-        serviceContractCreationDTO.setId(serviceContract.getId());
-        serviceContractCreationDTO.setType(serviceContract.getType().toString());
-        serviceContractCreationDTO.setContractTime(serviceContract.getContractTime());
-        serviceContractCreationDTO.setUsedTime(serviceContract.getUsedTime());
-        serviceContractCreationDTO.setStartDate(serviceContract.getStartDate());
-        serviceContractCreationDTO.setEndDate(serviceContract.getEndDate());
-
-        return serviceContractCreationDTO;
-    }
 }

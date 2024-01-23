@@ -2,6 +2,8 @@ package nl.helvar.servicetickets.users;
 
 import jakarta.persistence.*;
 import nl.helvar.servicetickets.roles.Role;
+import nl.helvar.servicetickets.servicetickets.ServiceTicket;
+import nl.helvar.servicetickets.ticketresponses.TicketResponse;
 
 import java.util.Set;
 
@@ -13,6 +15,7 @@ public class User {
     private Long id;
     private String firstName;
     private String lastName;
+    @Column(updatable = false, unique = true)
     private String email;
     private String password;
     private String phoneNumber;
@@ -25,6 +28,12 @@ public class User {
             inverseJoinColumns = @JoinColumn(
                     name = "role_id", referencedColumnName = "id"))
     private Set<Role> roles;
+
+    @OneToMany(mappedBy = "submittedBy", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
+    private Set<ServiceTicket> serviceTickets;
+
+    @OneToMany(mappedBy = "submittedBy", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
+    private Set<TicketResponse> ticketResponses;
 
     // GETTERS AND SETTERS
     public Long getId() {
@@ -87,7 +96,27 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
+    public Set<ServiceTicket> getServiceTickets() {
+        return serviceTickets;
+    }
+
+    public void setServiceTickets(Set<ServiceTicket> serviceTickets) {
+        this.serviceTickets = serviceTickets;
+    }
+
+    public Set<TicketResponse> getTicketResponses() {
+        return ticketResponses;
+    }
+
+    public void setTicketResponses(Set<TicketResponse> ticketResponses) {
+        this.ticketResponses = ticketResponses;
+    }
+
     public boolean hasAdminRole() {
         return roles.stream().anyMatch(role -> "ROLE_ADMIN".equals(role.getName()));
+    }
+
+    public boolean hasPrivilege(String privilegeName) {
+        return roles.stream().anyMatch(role -> role.getPrivileges().stream().anyMatch(privilege -> privilege.getName().equals(privilegeName)));
     }
 }

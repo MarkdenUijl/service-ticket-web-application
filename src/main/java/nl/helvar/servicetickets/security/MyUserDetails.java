@@ -27,6 +27,10 @@ public class MyUserDetails implements UserDetails {
         return authorities;
     }
 
+    public boolean hasPrivilege(String privilege) {
+        return getAuthorities().stream().anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(privilege));
+    }
+
     @Override
     public String getPassword() {
         return user.getPassword();
