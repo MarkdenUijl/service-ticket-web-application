@@ -2,17 +2,19 @@ package nl.helvar.servicetickets.projects;
 
 import nl.helvar.servicetickets.exceptions.DuplicateInDatabaseException;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
+import nl.helvar.servicetickets.helpers.ObjectCopyUtils;
 import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
 import nl.helvar.servicetickets.servicetickets.ServiceTicketRepository;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+import static nl.helvar.servicetickets.helpers.UserDetailsValidator.hasPrivilege;
 import static nl.helvar.servicetickets.projects.ProjectSpecification.*;
 
 @Service
@@ -27,7 +29,7 @@ public class ProjectService {
         this.serviceTicketRepository = serviceTicketRepository;
     }
 
-    public ProjectCreationDTO createProject(ProjectCreationDTO projectCreationDto) {
+    public ProjectDTO createProject(ProjectCreationDTO projectCreationDto) {
         Specification<Project> projectByAddressFilter = Specification.where(findByAddress(
                 projectCreationDto.getCity(),
                 projectCreationDto.getStreet(),
@@ -42,13 +44,14 @@ public class ProjectService {
 
             projectRepository.save(project);
 
-            return projectCreationDto;
+            return ProjectDTO.toDto(project);
         } else {
             throw new DuplicateInDatabaseException("There was already a project registered at this address.");
         }
     }
 
-    public List<ProjectDTO> getAllProjects(String name, String city, String zipCode, String street, Integer houseNumber, Boolean hasServiceContract) {
+    public List<ProjectDTO> getAllProjects(UserDetails userDetails,
+            String name, String city, String zipCode, String street, Integer houseNumber, Boolean hasServiceContract) {
         Specification<Project> filters = Specification.where(StringUtils.isBlank(name) ? null : nameLike(name))
                 .and(StringUtils.isBlank(city) ? null : cityLike(city))
                 .and(StringUtils.isBlank(zipCode) ? null : zipCodeLike(zipCode))
@@ -68,15 +71,20 @@ public class ProjectService {
         }
     }
 
-    public ProjectDTO findById(Long id) {
+    public ProjectDTO findProjectById(UserDetails userDetails, Long id) {
         Optional<Project> project = projectRepository.findById(id);
 
         if(project.isEmpty()) {
             throw new RecordNotFoundException("No project found with id " + id);
         } else {
-            return ProjectDTO.toDto(project.get());
+            if (hasPrivilege("CAN_SEE_PROJECTS_PRIVILEGE", userDetails)) {
+                return ProjectDTO.toDto(project.get());
+            } else {
+                return ProjectDTO.toSimpleDto(project.get());
+            }
         }
     }
+
 
     public ProjectDTO replaceProject(Long id, ProjectCreationDTO newProject) {
         Optional<Project> project = projectRepository.findById(id);
@@ -86,7 +94,7 @@ public class ProjectService {
         } else {
             Project existingProject = project.get();
 
-            BeanUtils.copyProperties(newProject.fromDto(serviceContractRepository), existingProject, "id");
+            ObjectCopyUtils.copyNonNullProperties(newProject.fromDto(serviceContractRepository), existingProject);
 
             projectRepository.save(existingProject);
 

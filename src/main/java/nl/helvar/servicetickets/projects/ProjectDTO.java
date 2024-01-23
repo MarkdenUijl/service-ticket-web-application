@@ -1,11 +1,12 @@
 package nl.helvar.servicetickets.projects;
 
+import nl.helvar.servicetickets.interfaces.Identifyable;
 import nl.helvar.servicetickets.servicecontracts.ServiceContractDTO;
 import nl.helvar.servicetickets.servicetickets.ServiceTicketDTO;
 
 import java.util.List;
 
-public class ProjectDTO {
+public class ProjectDTO implements Identifyable {
     private Long id;
     private String name;
     private String city;
@@ -81,18 +82,6 @@ public class ProjectDTO {
     }
 
     // MAPPERS:
-    public Project fromDto() {
-        Project project = new Project();
-
-        project.setName(this.getName());
-        project.setCity(this.getCity());
-        project.setZipCode(this.getZipCode());
-        project.setStreet(this.getStreet());
-        project.setHouseNumber(this.getHouseNumber());
-        project.setServiceContract(ServiceContractDTO.fromDto(this.getServiceContract()));
-
-        return project;
-    }
 
     public static ProjectDTO toDto(Project project) {
         ProjectDTO projectDTO = new ProjectDTO();
@@ -108,12 +97,27 @@ public class ProjectDTO {
             projectDTO.setServiceContract(ServiceContractDTO.toDto(project.getServiceContract()));
         }
 
-        projectDTO.setTickets(project.getTickets()
-                .stream()
-                .map(ServiceTicketDTO::toDto)
-                .toList()
-        );
+        if (project.getTickets() != null) {
+            projectDTO.setTickets(project.getTickets()
+                    .stream()
+                    .map(ServiceTicketDTO::toDto)
+                    .toList()
+            );
+        }
 
         return projectDTO;
+    }
+
+    public static ProjectDTO toSimpleDto(Project project) {
+        ProjectDTO projectSimpleDTO = new ProjectDTO();
+
+        projectSimpleDTO.setId(project.getId());
+        projectSimpleDTO.setName(project.getName());
+        projectSimpleDTO.setCity(project.getCity());
+        projectSimpleDTO.setZipCode(project.getZipCode());
+        projectSimpleDTO.setStreet(project.getStreet());
+        projectSimpleDTO.setHouseNumber(project.getHouseNumber());
+
+        return projectSimpleDTO;
     }
 }

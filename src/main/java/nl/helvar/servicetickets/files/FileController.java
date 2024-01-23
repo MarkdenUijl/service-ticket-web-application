@@ -8,12 +8,17 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Base64;
 import java.util.List;
+
+import static nl.helvar.servicetickets.helpers.UriCreator.createUri;
 
 @RestController
 @RequestMapping("/serviceTickets/{ticketId}/files")
@@ -27,10 +32,12 @@ public class FileController {
     }
 
     @GetMapping(value = "/{fileId}")
-    public ResponseEntity<byte[]> getTicketFile(@PathVariable("ticketId") Long ticketId,
-                                                @PathVariable("fileId") Long fileId
+    public ResponseEntity<byte[]> getTicketFile(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("ticketId") Long ticketId,
+            @PathVariable("fileId") Long fileId
     ) throws IOException {
-        ServiceTicket serviceTicket = serviceTicketService.findById(ticketId);
+        ServiceTicket serviceTicket = serviceTicketService.findById(userDetails, ticketId);
 
         if (serviceTicket.hasFileById(fileId)) {
             byte[] file = FileUtils.decompressFile(fileService.getFile(fileId).getData());

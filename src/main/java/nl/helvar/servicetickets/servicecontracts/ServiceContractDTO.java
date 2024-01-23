@@ -1,10 +1,11 @@
 package nl.helvar.servicetickets.servicecontracts;
 
+import nl.helvar.servicetickets.interfaces.Identifyable;
 import nl.helvar.servicetickets.servicecontracts.enums.ContractType;
 
 import java.time.LocalDate;
 
-public class ServiceContractDTO {
+public class ServiceContractDTO implements Identifyable {
     private Long id;
     private ContractType contractType;
     private int contractTime;
@@ -61,18 +62,6 @@ public class ServiceContractDTO {
     }
 
     // MAPPERS:
-    public static ServiceContract fromDto(ServiceContractDTO serviceContractDTO) {
-        ServiceContract serviceContract = new ServiceContract();
-
-        serviceContract.setType(serviceContractDTO.getType());
-        serviceContract.setContractTime(serviceContractDTO.getContractTime());
-        serviceContract.setUsedTime(serviceContractDTO.getUsedTime());
-        serviceContract.setStartDate(serviceContractDTO.getStartDate());
-        serviceContract.setEndDate(serviceContractDTO.getEndDate());
-
-        return serviceContract;
-    }
-
     public static ServiceContractDTO toDto(ServiceContract serviceContract) {
         ServiceContractDTO serviceContractDTO = new ServiceContractDTO();
 

@@ -1,7 +1,9 @@
 package nl.helvar.servicetickets.ticketresponses;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
+import nl.helvar.servicetickets.users.User;
 
 import java.time.LocalDateTime;
 
@@ -15,8 +17,10 @@ public class TicketResponse {
     @GeneratedValue
     private Long id;
     private String response;
-    //@OneToOne
-    //private User createdBy; UITWERKEN!!!
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private User submittedBy;
     private LocalDateTime creationDate;
     @ManyToOne
     @JoinColumn(name = "ticket_id")
@@ -32,6 +36,14 @@ public class TicketResponse {
 
     public void setResponse(String response) {
         this.response = response;
+    }
+
+    public User getSubmittedBy() {
+        return submittedBy;
+    }
+
+    public void setSubmittedBy(User submittedBy) {
+        this.submittedBy = submittedBy;
     }
 
     public LocalDateTime getCreationDate() {

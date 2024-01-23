@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import nl.helvar.servicetickets.exceptions.BadObjectCreationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,36 +27,40 @@ public class ProjectController {
 
     @GetMapping
     public ResponseEntity<List<ProjectDTO>> getAllProjects (
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String zipCode,
             @RequestParam(required = false) String street,
             @RequestParam(required = false) Integer houseNumber,
             @RequestParam(required = false) Boolean hasServiceContract
-
     ) {
-        List<ProjectDTO> projectDTOS = service.getAllProjects(name, city, zipCode, street, houseNumber, hasServiceContract);
+        List<ProjectDTO> projectDTOS = service.getAllProjects(userDetails,
+                name, city, zipCode, street, houseNumber, hasServiceContract);
 
         return new ResponseEntity<>(projectDTOS, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectDTO> findProjectById(@PathVariable("id") Long id) {
-        ProjectDTO projectDto = service.findById(id);
+    public ResponseEntity<ProjectDTO> findProjectById(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("id") Long id
+    ) {
+        ProjectDTO projectDto = service.findProjectById(userDetails, id);
 
         return new ResponseEntity<>(projectDto, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<ProjectCreationDTO> createProject(@Valid @RequestBody ProjectCreationDTO project, BindingResult br) {
+    public ResponseEntity<ProjectDTO> createProject(@Valid @RequestBody ProjectCreationDTO project, BindingResult br) {
         if (br.hasFieldErrors()) {
             throw new BadObjectCreationException(buildErrorMessage(br));
         } else {
-            project = service.createProject(project);
+            ProjectDTO projectOutput = service.createProject(project);
 
-            URI uri = createUri(project);
+            URI uri = createUri(projectOutput);
 
-            return ResponseEntity.created(uri).body(project);
+            return ResponseEntity.created(uri).body(projectOutput);
         }
     }
 

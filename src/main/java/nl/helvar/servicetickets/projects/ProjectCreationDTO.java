@@ -3,14 +3,12 @@ package nl.helvar.servicetickets.projects;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
-import nl.helvar.servicetickets.interfaces.Identifyable;
 import nl.helvar.servicetickets.servicecontracts.ServiceContract;
 import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
-public class ProjectCreationDTO implements Identifyable {
+public class ProjectCreationDTO {
     private Long id;
     @Size(min = 5, max = 128)
     private String name;
@@ -74,10 +72,6 @@ public class ProjectCreationDTO implements Identifyable {
         return serviceContractId;
     }
 
-    public void setServiceContractId(Long serviceContractId) {
-        this.serviceContractId = serviceContractId;
-    }
-
     // MAPPERS:
     public Project fromDto(ServiceContractRepository serviceContractRepository) {
         Project project = new Project();
@@ -99,18 +93,5 @@ public class ProjectCreationDTO implements Identifyable {
         }
 
         return project;
-    }
-
-    public static ProjectCreationDTO toDto(Project project) {
-        ProjectCreationDTO projectCreationDto = new ProjectCreationDTO();
-
-        projectCreationDto.setId(project.getId());
-        projectCreationDto.setName(project.getName());
-        projectCreationDto.setCity(project.getCity());
-        projectCreationDto.setZipCode(project.getZipCode());
-        projectCreationDto.setStreet(project.getStreet());
-        projectCreationDto.setHouseNumber(project.getHouseNumber());
-
-        return projectCreationDto;
     }
 }

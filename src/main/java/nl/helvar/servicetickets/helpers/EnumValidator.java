@@ -4,14 +4,18 @@ import nl.helvar.servicetickets.exceptions.InvalidEnumConstantException;
 
 public class EnumValidator {
     public static Enum<?> getEnumConstantFromString(Enum<?>[] enumerationValues, String value) {
-        value = value.toUpperCase();
+        if (value != null) {
+            value = value.toUpperCase();
 
-        for (Enum<?> constant : enumerationValues) {
-            if (constant.name().equals(value)) {
-                return constant;
+            for (Enum<?> constant : enumerationValues) {
+                if (constant.name().equals(value)) {
+                    return constant;
+                }
             }
-        }
 
-        throw new InvalidEnumConstantException(enumerationValues);
+            throw new InvalidEnumConstantException(enumerationValues);
+        } else {
+            return null;
+        }
     }
 }

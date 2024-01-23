@@ -12,7 +12,7 @@ import nl.helvar.servicetickets.ticketresponses.subclasses.EngineerResponse;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-public class TicketResponseCreationDTO implements Identifyable {
+public class TicketResponseCreationDTO {
     private Long id;
     @NotBlank
     private String response;
@@ -75,36 +75,54 @@ public class TicketResponseCreationDTO implements Identifyable {
 
         if(serviceTicket.isEmpty()) {
             throw new RecordNotFoundException("Could not find ticket with id '" + this.getServiceTicketId() + "' in the database.");
-        }
+        } else {
+            if (this.getIsEngineerResponse()) {
+                EngineerResponse engineerResponse = new EngineerResponse();
 
-        if (this.getIsEngineerResponse()) {
+                engineerResponse.setResponse(this.getResponse());
+                engineerResponse.setCreationDate(this.getCreationDate());
+                engineerResponse.setMinutesSpent(this.getMinutesSpent());
+                engineerResponse.setTicket(serviceTicket.get());
+
+                return engineerResponse;
+            } else {
+                TicketResponse ticketResponse = new TicketResponse();
+                ticketResponse.setResponse(this.getResponse());
+                ticketResponse.setCreationDate(this.getCreationDate());
+                ticketResponse.setTicket(serviceTicket.get());
+
+                return ticketResponse;
+            }
+        }
+    }
+
+    public TicketResponse fromPutDto(ServiceTicketRepository serviceTicketRepository) {
+        if (this.getIsEngineerResponse() || this.getMinutesSpent() != 0) {
             EngineerResponse engineerResponse = new EngineerResponse();
 
             engineerResponse.setResponse(this.getResponse());
             engineerResponse.setCreationDate(this.getCreationDate());
             engineerResponse.setMinutesSpent(this.getMinutesSpent());
-            engineerResponse.setTicket(serviceTicket.get());
 
             return engineerResponse;
         } else {
             TicketResponse ticketResponse = new TicketResponse();
             ticketResponse.setResponse(this.getResponse());
             ticketResponse.setCreationDate(this.getCreationDate());
-            ticketResponse.setTicket(serviceTicket.get());
 
             return ticketResponse;
         }
     }
 
-    public static TicketResponseCreationDTO toDto(TicketResponse ticketResponse) {
-        TicketResponseCreationDTO ticketResponseCreationDTO = new TicketResponseCreationDTO();
-
-        ticketResponseCreationDTO.setId(ticketResponse.getId());
-        ticketResponseCreationDTO.setResponse(ticketResponse.getResponse());
-        ticketResponseCreationDTO.setCreationDate(ticketResponse.getCreationDate());
-        ticketResponseCreationDTO.setServiceTicketId(ticketResponse.getTicket().getId());
-        ticketResponseCreationDTO.setMinutesSpent(ticketResponseCreationDTO.getMinutesSpent());
-
-        return ticketResponseCreationDTO;
-    }
+//    public static TicketResponseCreationDTO toDto(TicketResponse ticketResponse) {
+//        TicketResponseCreationDTO ticketResponseCreationDTO = new TicketResponseCreationDTO();
+//
+//        ticketResponseCreationDTO.setId(ticketResponse.getId());
+//        ticketResponseCreationDTO.setResponse(ticketResponse.getResponse());
+//        ticketResponseCreationDTO.setCreationDate(ticketResponse.getCreationDate());
+//        ticketResponseCreationDTO.setServiceTicketId(ticketResponse.getTicket().getId());
+//        ticketResponseCreationDTO.setMinutesSpent(ticketResponseCreationDTO.getMinutesSpent());
+//
+//        return ticketResponseCreationDTO;
+//    }
 }

@@ -33,10 +33,10 @@ public class ServiceTicket {
     private LocalDateTime creationDate;
     @OneToMany(mappedBy = "ticket", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<File> files;
-
-    // NOG UITZOEKEN HOE DIT GEMAAKT WORDT
-    //@ManyToOne
-    //private User submittedBy;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private User submittedBy;
 
     // GETTERS AND SETTERS:
     public Long getId() {
@@ -113,6 +113,14 @@ public class ServiceTicket {
 
     public void setFiles(List<File> files) {
         this.files = files;
+    }
+
+    public User getSubmittedBy() {
+        return submittedBy;
+    }
+
+    public void setSubmittedBy(User submittedBy) {
+        this.submittedBy = submittedBy;
     }
 
     public boolean hasFileById(Long id) {

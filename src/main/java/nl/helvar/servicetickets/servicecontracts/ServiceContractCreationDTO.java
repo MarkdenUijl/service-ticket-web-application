@@ -1,14 +1,13 @@
 package nl.helvar.servicetickets.servicecontracts;
 
 import jakarta.validation.constraints.NotNull;
-import nl.helvar.servicetickets.interfaces.Identifyable;
 import nl.helvar.servicetickets.servicecontracts.enums.ContractType;
 
 import java.time.LocalDate;
 
 import static nl.helvar.servicetickets.helpers.EnumValidator.getEnumConstantFromString;
 
-public class ServiceContractCreationDTO implements Identifyable {
+public class ServiceContractCreationDTO {
     private Long id;
     @NotNull
     private String type;
@@ -87,18 +86,5 @@ public class ServiceContractCreationDTO implements Identifyable {
         serviceContract.setEndDate(this.getEndDate());
 
         return serviceContract;
-    }
-
-    public ServiceContractCreationDTO toDto(ServiceContract serviceContract) {
-        ServiceContractCreationDTO serviceContractCreationDTO = new ServiceContractCreationDTO();
-
-        serviceContractCreationDTO.setId(serviceContract.getId());
-        serviceContractCreationDTO.setType(serviceContract.getType().toString());
-        serviceContractCreationDTO.setContractTime(serviceContract.getContractTime());
-        serviceContractCreationDTO.setUsedTime(serviceContract.getUsedTime());
-        serviceContractCreationDTO.setStartDate(serviceContract.getStartDate());
-        serviceContractCreationDTO.setEndDate(serviceContract.getEndDate());
-
-        return serviceContractCreationDTO;
     }
 }
