@@ -4,8 +4,6 @@ import nl.helvar.servicetickets.exceptions.DuplicateInDatabaseException;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.helpers.ObjectCopyUtils;
 import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
-import nl.helvar.servicetickets.servicetickets.ServiceTicket;
-import nl.helvar.servicetickets.servicetickets.ServiceTicketRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,12 +19,10 @@ import static nl.helvar.servicetickets.projects.ProjectSpecification.*;
 public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ServiceContractRepository serviceContractRepository;
-    private final ServiceTicketRepository serviceTicketRepository;
 
-    public ProjectService(ProjectRepository projectRepository, ServiceContractRepository serviceContractRepository, ServiceTicketRepository serviceTicketRepository) {
+    public ProjectService(ProjectRepository projectRepository, ServiceContractRepository serviceContractRepository) {
         this.projectRepository = projectRepository;
         this.serviceContractRepository = serviceContractRepository;
-        this.serviceTicketRepository = serviceTicketRepository;
     }
 
     public ProjectDTO createProject(ProjectCreationDTO projectCreationDto) {
@@ -37,9 +33,9 @@ public class ProjectService {
                 projectCreationDto.getHouseNumber()
         ));
 
-        List<Project> optionalProjects = projectRepository.findAll(projectByAddressFilter);
+        Optional<Project> optionalProject = projectRepository.findOne(projectByAddressFilter);
 
-        if (optionalProjects.isEmpty()) {
+        if (optionalProject.isEmpty()) {
             Project project = projectCreationDto.fromDto(serviceContractRepository);
 
             projectRepository.save(project);
@@ -51,7 +47,13 @@ public class ProjectService {
     }
 
     public List<ProjectDTO> getAllProjects(UserDetails userDetails,
-            String name, String city, String zipCode, String street, Integer houseNumber, Boolean hasServiceContract) {
+                                           String name,
+                                           String city,
+                                           String zipCode,
+                                           String street,
+                                           Integer houseNumber,
+                                           Boolean hasServiceContract
+    ) {
         Specification<Project> filters = Specification.where(StringUtils.isBlank(name) ? null : nameLike(name))
                 .and(StringUtils.isBlank(city) ? null : cityLike(city))
                 .and(StringUtils.isBlank(zipCode) ? null : zipCodeLike(zipCode))
@@ -108,15 +110,7 @@ public class ProjectService {
         if (project.isEmpty()) {
             throw new RecordNotFoundException("Could not find any project with id '" + id + "' in database.");
         } else {
-            Project existingProject = project.get();
-
-            for (ServiceTicket ticket : existingProject.getTickets()) {
-                ticket.setProject(null);
-
-                serviceTicketRepository.save(ticket);
-            }
-
-            projectRepository.delete(existingProject);
+            projectRepository.delete(project.get());
 
             return "Project with id '" + id + "' was successfully deleted.";
         }

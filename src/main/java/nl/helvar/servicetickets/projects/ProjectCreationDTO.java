@@ -68,6 +68,10 @@ public class ProjectCreationDTO {
         this.houseNumber = houseNumber;
     }
 
+    public void setServiceContractId(Long serviceContractId) {
+        this.serviceContractId = serviceContractId;
+    }
+
     public Long getServiceContractId() {
         return serviceContractId;
     }

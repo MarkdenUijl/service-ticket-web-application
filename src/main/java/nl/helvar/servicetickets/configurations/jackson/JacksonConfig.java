@@ -1,10 +1,11 @@
-package nl.helvar.servicetickets.configurations;
+package nl.helvar.servicetickets.configurations.jackson;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import nl.helvar.servicetickets.configurations.jackson.CustomLocalDateSerializer;
+import nl.helvar.servicetickets.configurations.jackson.CustomLocalDateTimeSerializer;
 import org.springframework.context.annotation.*;
 
 import java.time.LocalDate;

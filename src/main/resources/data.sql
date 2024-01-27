@@ -90,7 +90,6 @@ VALUES
     ((SELECT id FROM roles WHERE name = 'ROLE_ADMIN'), (SELECT id FROM privileges WHERE name = 'CAN_MAKE_ENGINEER_RESPONSE_PRIVILEGE')),
     ((SELECT id FROM roles WHERE name = 'ROLE_ADMIN'), (SELECT id FROM privileges WHERE name = 'CAN_MODERATE_TICKET_RESPONSES_PRIVILEGE'));
 
-
 INSERT INTO users_roles (user_id, role_id)
 VALUES
     ((SELECT id FROM users WHERE email = 'admin@tester.nl'), (SELECT id FROM roles WHERE name = 'ROLE_ADMIN')),
