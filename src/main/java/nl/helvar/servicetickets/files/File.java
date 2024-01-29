@@ -2,6 +2,8 @@ package nl.helvar.servicetickets.files;
 
 import jakarta.persistence.*;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
+import org.hibernate.annotations.Type;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 @Entity
 @Table(name = "files")
@@ -10,7 +12,7 @@ public class File {
     @GeneratedValue
     private Long id;
     private String name;
-    @Column(columnDefinition = "BLOB")
+
     @Lob
     private byte[] data;
 

@@ -46,8 +46,7 @@ public class ProjectService {
         }
     }
 
-    public List<ProjectDTO> getAllProjects(UserDetails userDetails,
-                                           String name,
+    public List<ProjectDTO> getAllProjects(String name,
                                            String city,
                                            String zipCode,
                                            String street,

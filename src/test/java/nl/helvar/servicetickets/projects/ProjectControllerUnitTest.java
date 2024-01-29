@@ -21,7 +21,7 @@ import java.util.List;
 
 
 @WebMvcTest(ProjectController.class)
-@AutoConfigureMockMvc(addFilters = true)
+@AutoConfigureMockMvc(addFilters = false)
 class ProjectControllerUnitTest {
 
     @Autowired
@@ -84,7 +84,7 @@ class ProjectControllerUnitTest {
     @WithMockUser(username="testuser", roles="ADMIN")
     void shouldGetAllProjects() throws Exception {
         // Arrange
-        Mockito.when(projectService.getAllProjects(Mockito.any(), Mockito.isNull(), Mockito.isNull(), Mockito.isNull(), Mockito.isNull(), Mockito.isNull(), Mockito.isNull()))
+        Mockito.when(projectService.getAllProjects(Mockito.isNull(), Mockito.isNull(), Mockito.isNull(), Mockito.isNull(), Mockito.isNull(), Mockito.isNull()))
                 .thenReturn(projectDTOS);
 
         // Act & Assert

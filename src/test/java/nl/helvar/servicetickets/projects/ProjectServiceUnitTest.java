@@ -10,13 +10,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
 
+import static nl.helvar.servicetickets.helpers.CreateMockClasses.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -73,7 +71,6 @@ class ProjectServiceUnitTest {
     @Test
     public void shouldGetAllProjects_Success() {
         // Arrange
-        UserDetails userDetails = createMockUserDetails(null);
         String name = "Test Project";
         String city = "Test City";
         String zipCode = "12345";
@@ -86,7 +83,7 @@ class ProjectServiceUnitTest {
         doReturn(mockProjects).when(projectRepository).findAll(Mockito.any(Specification.class));
 
         // Act
-        List<ProjectDTO> result = service.getAllProjects(userDetails, name, city, zipCode, street, houseNumber, hasServiceContract);
+        List<ProjectDTO> result = service.getAllProjects(name, city, zipCode, street, houseNumber, hasServiceContract);
 
         // Assert
         assertNotNull(result, "Result should not be null");
@@ -98,7 +95,6 @@ class ProjectServiceUnitTest {
     @Test
     public void shouldNotGetAllProjects_RecordNotFoundException() {
         // Arrange
-        UserDetails userDetails = createMockUserDetails(null);
         String name = "Nonexistent Project";
         String city = "Nonexistent City";
         String zipCode = "54321";
@@ -110,7 +106,7 @@ class ProjectServiceUnitTest {
 
         // Act and Assert
         RecordNotFoundException exception = assertThrows(RecordNotFoundException.class, () -> {
-            service.getAllProjects(userDetails, name, city, zipCode, street, houseNumber, hasServiceContract);
+            service.getAllProjects(name, city, zipCode, street, houseNumber, hasServiceContract);
         });
 
         assertEquals("There were no projects found with those parameters", exception.getMessage(),
@@ -252,40 +248,5 @@ class ProjectServiceUnitTest {
 
         Mockito.verify(projectRepository, times(1)).findById(anyLong());
         Mockito.verify(projectRepository, never()).delete((Project) any());
-    }
-
-
-    private ProjectCreationDTO createProjectCreationDTO() {
-        // You can create a utility method to generate a ProjectCreationDTO for test data
-        // For simplicity, you can return a fixed DTO or use a mocking library for DTO creation
-        ProjectCreationDTO dto = new ProjectCreationDTO();
-        dto.setName("TestProject");
-        dto.setCity("TestCity");
-        dto.setZipCode("1234 AB");
-        dto.setStreet("TestStreet");
-        dto.setHouseNumber(123);
-        return dto;
-    }
-
-    private Project createMockProject() {
-        Project project = new Project();
-        project.setName("TestProject");
-        project.setCity("TestCity");
-        project.setZipCode("1234 AB");
-        project.setStreet("TestStreet");
-        project.setHouseNumber(123);
-        return project;
-    }
-
-    private UserDetails createMockUserDetails(String[] extraAuthorities) {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-
-        if (extraAuthorities != null) {
-            for (String authority : extraAuthorities) {
-                authorities.add(new SimpleGrantedAuthority(authority));
-            }
-        }
-
-        return new User("testuser", "password", authorities);
     }
 }

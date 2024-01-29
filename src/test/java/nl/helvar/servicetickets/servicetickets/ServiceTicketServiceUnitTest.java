@@ -2,8 +2,6 @@ package nl.helvar.servicetickets.servicetickets;
 
 import nl.helvar.servicetickets.exceptions.InvalidRequestException;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
-import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
-import nl.helvar.servicetickets.servicetickets.enums.TicketType;
 import nl.helvar.servicetickets.users.User;
 import nl.helvar.servicetickets.users.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -13,17 +11,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static nl.helvar.servicetickets.helpers.CreateMockClasses.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -317,63 +313,5 @@ class ServiceTicketServiceUnitTest {
                 "Exception message should be equal");
 
         Mockito.verify(serviceTicketRepository, Mockito.times(1)).findById(id);
-    }
-
-
-
-    // MOCK DATA METHODS
-    private User createMockUser() {
-        User user = new User();
-        user.setFirstName("TestFirstName");
-        user.setLastName("TestLastName");
-        user.setEmail("testmail@mail.com");
-        user.setPassword("TestPassword");
-        user.setPhoneNumber("0612345678");
-        user.setRoles(null);
-        user.setServiceTickets(null);
-        user.setTicketResponses(null);
-
-        return user;
-    }
-
-    private UserDetails createMockUserDetails(String[] extraAuthorities) {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-
-        if (extraAuthorities != null) {
-            for (String authority : extraAuthorities) {
-                authorities.add(new SimpleGrantedAuthority(authority));
-            }
-        }
-
-        return new org.springframework.security.core.userdetails.User("testuser", "password", authorities);
-    }
-
-    private ServiceTicketCreationDTO createMockServiceTicketCreationDTO() {
-        ServiceTicketCreationDTO dto = new ServiceTicketCreationDTO();
-        dto.setCreationDate(null);
-        dto.setName("TestName");
-        dto.setStatus("OPEN");
-        dto.setType("SUPPORT");
-        dto.setDescription("TestDescription");
-        dto.setResponses(null);
-        dto.setMinutesSpent(0);
-        dto.setCreationDate(LocalDateTime.now());
-
-        return dto;
-    }
-
-    private ServiceTicket createMockServiceTicket() {
-        ServiceTicket serviceTicket = new ServiceTicket();
-        serviceTicket.setCreationDate(LocalDateTime.now());
-        serviceTicket.setName("TestName");
-        serviceTicket.setDescription("TestDescription");
-        serviceTicket.setType(TicketType.valueOf("SUPPORT"));
-        serviceTicket.setStatus(TicketStatus.valueOf("OPEN"));
-        serviceTicket.setMinutesSpent(0);
-        serviceTicket.setResponses(null);
-        serviceTicket.setSubmittedBy(createMockUser());
-        serviceTicket.setProject(null);
-
-        return serviceTicket;
     }
 }
