@@ -54,7 +54,6 @@ public class ServiceTicketControllerIntegrationTest {
 
         String createdId = result.getResponse().getContentAsString();
 
-        // check location field in response header (using Hamcrest regex matcher)
         assertThat(result.getResponse().getHeader("Location"), matchesPattern("^.*/serviceTickets/" + createdId));
     }
 
