@@ -29,7 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
-class ServiceTicketServiceTest {
+class ServiceTicketServiceUnitTest {
     @Mock
     ServiceTicketRepository serviceTicketRepository;
 

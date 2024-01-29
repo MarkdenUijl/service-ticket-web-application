@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 @ExtendWith(MockitoExtension.class)
-class ProjectServiceTest {
+class ProjectServiceUnitTest {
 
     @Mock
     ProjectRepository projectRepository;

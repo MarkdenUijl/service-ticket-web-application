@@ -10,6 +10,7 @@ public class File {
     @GeneratedValue
     private Long id;
     private String name;
+    @Column(columnDefinition = "BLOB")
     @Lob
     private byte[] data;
 

@@ -22,7 +22,7 @@ import java.util.List;
 
 @WebMvcTest(ProjectController.class)
 @AutoConfigureMockMvc(addFilters = true)
-class ProjectControllerTest {
+class ProjectControllerUnitTest {
 
     @Autowired
     MockMvc mockMvc;
