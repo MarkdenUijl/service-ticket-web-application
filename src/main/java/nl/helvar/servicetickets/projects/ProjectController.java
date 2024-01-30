@@ -27,7 +27,6 @@ public class ProjectController {
 
     @GetMapping
     public ResponseEntity<List<ProjectDTO>> getAllProjects (
-            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String zipCode,
@@ -35,8 +34,7 @@ public class ProjectController {
             @RequestParam(required = false) Integer houseNumber,
             @RequestParam(required = false) Boolean hasServiceContract
     ) {
-        List<ProjectDTO> projectDTOS = service.getAllProjects(userDetails,
-                name, city, zipCode, street, houseNumber, hasServiceContract);
+        List<ProjectDTO> projectDTOS = service.getAllProjects(name, city, zipCode, street, houseNumber, hasServiceContract);
 
         return new ResponseEntity<>(projectDTOS, HttpStatus.OK);
     }

@@ -53,8 +53,6 @@ public class ServiceTicketService {
 
             return ServiceTicketDTO.toDto(serviceTicket);
         }
-
-
     }
 
     public List<ServiceTicket> getAllServiceTickets(

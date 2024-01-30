@@ -1,4 +1,4 @@
-package nl.helvar.servicetickets.configurations;
+package nl.helvar.servicetickets.configurations.jackson;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;

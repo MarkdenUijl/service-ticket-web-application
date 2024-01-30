@@ -19,13 +19,17 @@ public class Project {
     private int houseNumber;
 
     // Relations
-    @OneToMany(mappedBy = "project")
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private List<ServiceTicket> tickets;
     @OneToOne(cascade = CascadeType.ALL)
     private ServiceContract serviceContract;
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
