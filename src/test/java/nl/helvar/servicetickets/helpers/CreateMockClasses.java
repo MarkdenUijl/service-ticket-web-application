@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CreateMockClasses {
-    public static UserDetails createMockUserDetails(String[] extraAuthorities) {
+    public static UserDetails createMockUserDetails(String userName, String[] extraAuthorities) {
         List<GrantedAuthority> authorities = new ArrayList<>();
 
         if (extraAuthorities != null) {
@@ -25,7 +25,7 @@ public class CreateMockClasses {
             }
         }
 
-        return new org.springframework.security.core.userdetails.User("testuser", "password", authorities);
+        return new org.springframework.security.core.userdetails.User(userName, "password", authorities);
     }
 
     public static ProjectCreationDTO createProjectCreationDTO() {
@@ -89,5 +89,36 @@ public class CreateMockClasses {
         serviceTicket.setProject(null);
 
         return serviceTicket;
+    }
+
+    public static String createMockProjectJson(String name, String city, String zipCode, String street, int houseNumber) {
+        return String.format("""
+                {
+                    "name" : "%s",
+                    "city" : "%s",
+                    "zipCode" : "%s",
+                    "street" : "%s",
+                    "houseNumber" : %d
+                }
+                """, name, city, zipCode, street, houseNumber);
+    }
+
+    public static String createMockTicketResponseJson(String response, int serviceTicketId) {
+        return String.format("""
+                {
+                    "response" : "%s",
+                    "serviceTicketId" : %d
+                }
+                """, response, serviceTicketId);
+    }
+
+    public static String createMockEngineerTicketResponseJson(String response, int serviceTicketId, int minutesSpent) {
+        return String.format("""
+                {
+                    "response" : "%s",
+                    "serviceTicketId" : %d,
+                    "minutesSpent" : %d
+                }
+                """, response, serviceTicketId, minutesSpent);
     }
 }

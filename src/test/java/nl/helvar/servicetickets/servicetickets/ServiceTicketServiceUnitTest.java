@@ -43,7 +43,7 @@ class ServiceTicketServiceUnitTest {
         doReturn(Optional.of(createMockUser())).when(userRepository).findOne((Specification<User>) any());
 
         // Act
-        ServiceTicketDTO result = service.createServiceTicket(createMockUserDetails(null), dto);
+        ServiceTicketDTO result = service.createServiceTicket(createMockUserDetails("test", null), dto);
 
         // Assert
         assertNotNull(result, "ServiceTicketDTO should not be null");
@@ -66,7 +66,7 @@ class ServiceTicketServiceUnitTest {
 
         // Act
         Exception exception = assertThrows(RecordNotFoundException.class, () -> {
-            service.createServiceTicket(createMockUserDetails(null), dto);
+            service.createServiceTicket(createMockUserDetails("test", null), dto);
         });
 
         // Assert
@@ -79,7 +79,7 @@ class ServiceTicketServiceUnitTest {
     @Test
     public void shouldGetAllServiceTickets_Success() {
         // Arrange
-        UserDetails userDetails = createMockUserDetails(null);
+        UserDetails userDetails = createMockUserDetails("test", null);
         String type = "SUPPORT";
         String status = "OPEN";
         Long projectId = 1L;
@@ -118,7 +118,7 @@ class ServiceTicketServiceUnitTest {
     @Test
     public void shouldGetAllServiceTickets_NoServiceTicketsFound() {
         // Arrange
-        UserDetails userDetails = createMockUserDetails(null);
+        UserDetails userDetails = createMockUserDetails("test", null);
         String type = "SUPPORT";
         String status = "OPEN";
         Long projectId = 1L;
@@ -157,7 +157,7 @@ class ServiceTicketServiceUnitTest {
     @Test
     public void shouldFindServiceTicketById_Success() {
         // Arrange
-        UserDetails userDetails = createMockUserDetails(new String[]{"CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE"});
+        UserDetails userDetails = createMockUserDetails("test", new String[]{"CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE"});
         Long id = 1L;
         doReturn(Optional.of(createMockServiceTicket())).when(serviceTicketRepository).findById(id);
 
@@ -173,7 +173,7 @@ class ServiceTicketServiceUnitTest {
     @Test
     public void shouldFindServiceTicketById_NoServiceTicketFound() {
         // Arrange
-        UserDetails userDetails = createMockUserDetails(new String[]{"CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE"});
+        UserDetails userDetails = createMockUserDetails("test", new String[]{"CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE"});
         Long id = 1L;
         doReturn(Optional.empty()).when(serviceTicketRepository).findById(id);
 
@@ -191,7 +191,7 @@ class ServiceTicketServiceUnitTest {
     @Test
     public void shouldFindServiceTicketById_NoPrivileges() {
         // Arrange
-        UserDetails userDetails = createMockUserDetails(null);
+        UserDetails userDetails = createMockUserDetails("test", null);
         Long id = 1L;
         doReturn(Optional.of(createMockServiceTicket())).when(serviceTicketRepository).findById(id);
 
@@ -209,7 +209,7 @@ class ServiceTicketServiceUnitTest {
     @Test
     public void shouldReplaceServiceTicket_Success() {
         // Arrange
-        UserDetails userDetails = createMockUserDetails(new String[]{"CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE"});
+        UserDetails userDetails = createMockUserDetails("test", new String[]{"CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE"});
         Long id = 1L;
         ServiceTicketCreationDTO dto = createMockServiceTicketCreationDTO();
         doReturn(Optional.of(createMockServiceTicket())).when(serviceTicketRepository).findById(id);
@@ -227,7 +227,7 @@ class ServiceTicketServiceUnitTest {
     @Test
     public void shouldReplaceServiceTicket_NoServiceTicketFound() {
         // Arrange
-        UserDetails userDetails = createMockUserDetails(new String[]{"CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE"});
+        UserDetails userDetails = createMockUserDetails("test", new String[]{"CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE"});
         Long id = 1L;
         ServiceTicketCreationDTO dto = createMockServiceTicketCreationDTO();
         doReturn(Optional.empty()).when(serviceTicketRepository).findById(id);
@@ -246,7 +246,7 @@ class ServiceTicketServiceUnitTest {
     @Test
     public void shouldReplaceServiceTicket_NoPrivileges() {
         // Arrange
-        UserDetails userDetails = createMockUserDetails(null);
+        UserDetails userDetails = createMockUserDetails("test", null);
         Long id = 1L;
         ServiceTicketCreationDTO dto = createMockServiceTicketCreationDTO();
         doReturn(Optional.of(createMockServiceTicket())).when(serviceTicketRepository).findById(id);
@@ -265,7 +265,7 @@ class ServiceTicketServiceUnitTest {
     @Test
     public void shouldDeleteServiceTicket_Success() {
         // Arrange
-        UserDetails userDetails = createMockUserDetails(new String[]{"CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE"});
+        UserDetails userDetails = createMockUserDetails("test", new String[]{"CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE"});
         Long id = 1L;
         doReturn(Optional.of(createMockServiceTicket())).when(serviceTicketRepository).findById(id);
 
@@ -282,7 +282,7 @@ class ServiceTicketServiceUnitTest {
     @Test
     public void shouldDeleteServiceTicket_NoServiceTicketFound() {
         // Arrange
-        UserDetails userDetails = createMockUserDetails(new String[]{"CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE"});
+        UserDetails userDetails = createMockUserDetails("test", new String[]{"CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE"});
         Long id = 1L;
         doReturn(Optional.empty()).when(serviceTicketRepository).findById(id);
 
@@ -300,7 +300,7 @@ class ServiceTicketServiceUnitTest {
     @Test
     public void shouldDeleteServiceTicket_NoPrivileges() {
         // Arrange
-        UserDetails userDetails = createMockUserDetails(null);
+        UserDetails userDetails = createMockUserDetails("test", null);
         Long id = 1L;
         doReturn(Optional.of(createMockServiceTicket())).when(serviceTicketRepository).findById(id);
 

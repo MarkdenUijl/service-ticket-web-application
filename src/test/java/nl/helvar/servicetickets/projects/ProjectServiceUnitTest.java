@@ -118,7 +118,7 @@ class ProjectServiceUnitTest {
     @Test
     public void shouldFindProjectById_Success() {
         // Arrange
-        UserDetails userDetails = createMockUserDetails(null);
+        UserDetails userDetails = createMockUserDetails("test", null);
         Long id = 1L;
 
         doReturn(Optional.of(createMockProject())).when(projectRepository).findById(anyLong());
@@ -135,7 +135,7 @@ class ProjectServiceUnitTest {
     @Test
     public void shouldFindProjectById_WithPrivilege_Success() {
         // Arrange
-        UserDetails userDetails = createMockUserDetails(new String[]{"CAN_SEE_PROJECTS_PRIVILEGE"});
+        UserDetails userDetails = createMockUserDetails("test", new String[]{"CAN_SEE_PROJECTS_PRIVILEGE"});
         Long id = 1L;
         Project mockProject = createMockProject();
 
@@ -154,7 +154,7 @@ class ProjectServiceUnitTest {
     @Test
     public void shouldNotFindProjectById_RecordNotFoundException() {
         // Arrange
-        UserDetails userDetails = createMockUserDetails(null);
+        UserDetails userDetails = createMockUserDetails("test", null);
         Long id = 1L;
 
         doReturn(Optional.empty()).when(projectRepository).findById(anyLong());

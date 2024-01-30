@@ -93,22 +93,6 @@ public class TicketResponseService {
             throw new RuntimeException(e);
         }
 
-//        if (ticketResponse instanceof EngineerResponse) {
-//            Optional<ServiceTicket> ticketOptional = serviceTicketRepository.findById(ticketResponseCreationDTO.getServiceTicketId());
-//
-//            if (ticketOptional.isPresent()) {
-//                ServiceTicket ticket = ticketOptional.get();
-//                List<TicketResponse> allResponses = ticket.getResponses();
-//
-//                boolean hasEngineerResponse = checkListForProperty(allResponses, "minutesSpent");
-//
-//                if(!hasEngineerResponse) {
-//                    ticket.setStatus(TicketStatus.PENDING);
-//                    serviceTicketRepository.save(ticket);
-//                }
-//            }
-//        }
-
         ticketResponseRepository.save(ticketResponse);
 
         return TicketResponseDTO.toDto(ticketResponse);
