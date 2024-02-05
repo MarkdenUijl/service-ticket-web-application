@@ -1,9 +1,11 @@
 package nl.helvar.servicetickets.files;
 
+import jakarta.validation.Valid;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
 import nl.helvar.servicetickets.servicetickets.ServiceTicketService;
 import org.apache.tika.Tika;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,11 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.URI;
-import java.util.Base64;
 import java.util.List;
-
-import static nl.helvar.servicetickets.helpers.UriCreator.createUri;
 
 @RestController
 @RequestMapping("/serviceTickets/{ticketId}/files")
@@ -61,7 +59,8 @@ public class FileController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> addFilesToTicket(@RequestPart("files") List<MultipartFile> files,
-                                                   @PathVariable("ticketId") Long id) throws IOException {
+                                                   @PathVariable("ticketId") Long id
+    ) throws IOException {
         StringBuilder responseBuilder = new StringBuilder();
 
         for (MultipartFile data : files) {

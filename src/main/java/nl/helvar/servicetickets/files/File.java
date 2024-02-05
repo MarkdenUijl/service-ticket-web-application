@@ -12,11 +12,8 @@ public class File {
     @GeneratedValue
     private Long id;
     private String name;
-
     @Lob
     private byte[] data;
-
-    // Relations:
     @ManyToOne
     @JoinColumn(name = "ticket_id")
     private ServiceTicket ticket;

@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
@@ -49,11 +48,6 @@ public class ExceptionController {
     @ExceptionHandler(value = EmailExistsException.class)
     public ResponseEntity<Object> emailExistsException (EmailExistsException emailExistsException) {
         return new ResponseEntity<>(emailExistsException.getMessage(), HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(JwtTokenExpiredException.class)
-    public ResponseEntity<Object> handleJwtExpiredException(JwtTokenExpiredException jwtTokenExpiredException) {
-        return new ResponseEntity<>(jwtTokenExpiredException.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     // Existing exceptions overridden.

@@ -42,11 +42,14 @@ public class EmailService {
         SendGrid sg = new SendGrid(apiKey);
         Request request = new Request();
 
-
-        request.setMethod(Method.POST);
-        request.setEndpoint("mail/send");
-        request.setBody(mail.build());
-        sg.api(request);
+        try {
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            sg.api(request);
+        } catch (IOException ex) {
+            throw new IOException("Failed to send email: " + ex.getMessage());
+        }
     }
 
     private String createTicketGreeting(String recipient) {
