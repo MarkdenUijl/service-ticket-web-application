@@ -49,7 +49,7 @@ public class ServiceContractService {
     public List<ServiceContractDTO> getAllServiceContracts(String type) {
         Specification<ServiceContract> filters = null;
         if (!StringUtils.isBlank(type)) {
-            filters = typeEquals(type);
+            filters = contractTypeEquals(type);
         }
 
         List<ServiceContractDTO> serviceContracts = serviceContractRepository.findAll(filters)

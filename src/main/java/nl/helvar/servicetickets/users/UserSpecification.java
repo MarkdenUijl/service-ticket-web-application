@@ -8,7 +8,7 @@ import nl.helvar.servicetickets.roles.Role;
 import org.springframework.data.jpa.domain.Specification;
 
 public class UserSpecification {
-    public static Specification<User> roleEquals(String roleName) {
+    public static Specification<User> userRoleEquals(String roleName) {
         return (Root<User> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) -> {
             Join<User, Role> roleJoin = root.join("roles");
 
@@ -16,7 +16,7 @@ public class UserSpecification {
         };
     }
 
-    public static Specification<User> roleLike(String roleName) {
+    public static Specification<User> userRoleLike(String roleName) {
         return (Root<User> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) -> {
             Join<User, Role> roleJoin = root.join("roles");
 
@@ -26,7 +26,7 @@ public class UserSpecification {
         };
     }
 
-    public static Specification<User> emailEquals(String email) {
+    public static Specification<User> userEmailEquals(String email) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("email"), email);
     }
 }

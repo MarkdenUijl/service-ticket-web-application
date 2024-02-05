@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServiceContractSpecification {
-    public static Specification<ServiceContract> typeEquals(String contractType) {
+    public static Specification<ServiceContract> contractTypeEquals(String contractType) {
         List<ContractType> matchingTypes = new ArrayList<>();
 
         for (ContractType type : ContractType.values()) {

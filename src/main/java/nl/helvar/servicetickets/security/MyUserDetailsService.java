@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static nl.helvar.servicetickets.users.UserSpecification.emailEquals;
+import static nl.helvar.servicetickets.users.UserSpecification.userEmailEquals;
 
 @Service("userDetailsService")
 @Transactional
@@ -29,7 +29,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Specification<User> emailFilter = Specification.where(emailEquals(email));
+        Specification<User> emailFilter = Specification.where(userEmailEquals(email));
 
         Optional<User> optionalUser = userRepository.findOne(emailFilter);
 

@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static nl.helvar.servicetickets.helpers.UserDetailsValidator.hasPrivilege;
-import static nl.helvar.servicetickets.ticketresponses.TicketResponseSpecification.userIdEquals;
-import static nl.helvar.servicetickets.users.UserSpecification.emailEquals;
+import static nl.helvar.servicetickets.ticketresponses.TicketResponseSpecification.responseUserIdEquals;
+import static nl.helvar.servicetickets.users.UserSpecification.userEmailEquals;
 
 @Service
 public class TicketResponseService {
@@ -56,7 +56,7 @@ public class TicketResponseService {
 
         TicketResponse ticketResponse = ticketResponseCreationDTO.fromDto(serviceTicketRepository);
 
-        Specification<User> filter = Specification.where(emailEquals(userDetails.getUsername()));
+        Specification<User> filter = Specification.where(userEmailEquals(userDetails.getUsername()));
         Optional<User> user = userRepository.findOne(filter);
 
         user.ifPresent(ticketResponse::setSubmittedBy);
@@ -103,10 +103,10 @@ public class TicketResponseService {
             String firstName,
             String lastName
     ) {
-        Specification<TicketResponse> filter = Specification.where(userId == null ? null : userIdEquals(userId))
-                .and(StringUtils.isBlank(email) ? null : TicketResponseSpecification.userEmailEquals(email))
-                .and(StringUtils.isBlank(firstName) ? null : TicketResponseSpecification.firstNameEquals(firstName))
-                .and(StringUtils.isBlank(lastName) ? null : TicketResponseSpecification.lastNameEquals(lastName));
+        Specification<TicketResponse> filter = Specification.where(userId == null ? null : responseUserIdEquals(userId))
+                .and(StringUtils.isBlank(email) ? null : TicketResponseSpecification.responseUserEmailEquals(email))
+                .and(StringUtils.isBlank(firstName) ? null : TicketResponseSpecification.responseFirstNameEquals(firstName))
+                .and(StringUtils.isBlank(lastName) ? null : TicketResponseSpecification.responseLastNameEquals(lastName));
 
         List<TicketResponseDTO> ticketResponses = ticketResponseRepository.findAll(filter)
                 .stream()

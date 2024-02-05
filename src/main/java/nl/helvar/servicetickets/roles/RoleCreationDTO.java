@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static nl.helvar.servicetickets.privileges.PrivilegeSpecification.privilegeEquals;
+import static nl.helvar.servicetickets.privileges.PrivilegeSpecification.privilegeNameEquals;
 
 public class RoleCreationDTO {
     private Long id;
@@ -53,7 +53,7 @@ public class RoleCreationDTO {
             Set<Privilege> privilegeSet = new HashSet<>();
 
             for (String privilegeName : this.getPrivileges()) {
-                Specification<Privilege> filter = Specification.where(privilegeEquals(privilegeName));
+                Specification<Privilege> filter = Specification.where(privilegeNameEquals(privilegeName));
 
                 Optional<Privilege> optionalPrivilege = privilegeRepository.findOne(filter);
 

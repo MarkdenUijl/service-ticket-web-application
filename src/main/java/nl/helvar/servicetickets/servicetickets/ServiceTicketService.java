@@ -18,7 +18,7 @@ import java.util.Optional;
 
 import static nl.helvar.servicetickets.helpers.UserDetailsValidator.hasPrivilege;
 import static nl.helvar.servicetickets.servicetickets.ServiceTicketSpecification.*;
-import static nl.helvar.servicetickets.users.UserSpecification.emailEquals;
+import static nl.helvar.servicetickets.users.UserSpecification.userEmailEquals;
 
 @Service
 public class ServiceTicketService {
@@ -37,7 +37,7 @@ public class ServiceTicketService {
     }
 
     public ServiceTicketDTO createServiceTicket(UserDetails userDetails, ServiceTicketCreationDTO serviceTicketCreationDTO) {
-        Specification<User> filters = Specification.where(emailEquals(userDetails.getUsername()));
+        Specification<User> filters = Specification.where(userEmailEquals(userDetails.getUsername()));
         Optional<User> user = userRepository.findOne(filters);
 
         if (user.isEmpty()) {
@@ -67,15 +67,15 @@ public class ServiceTicketService {
             String submitterEmail,
             Long submitterId
     ) {
-        Specification<ServiceTicket> filters = Specification.where(StringUtils.isBlank(type) ? null : typeEquals(type))
-                .and(StringUtils.isBlank(status) ? null : statusEquals(status))
-                .and(projectId == null ? null : projectIdEquals(projectId))
-                .and(StringUtils.isBlank(projectName) ? null : projectNameLike(projectName))
-                .and(ServiceTicketSpecification.dateRange(issuedAfter, issuedBefore))
-                .and(StringUtils.isBlank(submitterFirstName) ? null : userFirstNameEquals(submitterFirstName))
-                .and(StringUtils.isBlank(submitterLastName) ? null : userLastNameEquals(submitterLastName))
-                .and(StringUtils.isBlank(submitterEmail) ? null : userEmailEquals(submitterEmail))
-                .and(submitterId == null ? null : userIdEquals(submitterId));
+        Specification<ServiceTicket> filters = Specification.where(StringUtils.isBlank(type) ? null : ticketTypeEquals(type))
+                .and(StringUtils.isBlank(status) ? null : ticketStatusEquals(status))
+                .and(projectId == null ? null : ticketProjectIdEquals(projectId))
+                .and(StringUtils.isBlank(projectName) ? null : ticketProjectNameLike(projectName))
+                .and(ServiceTicketSpecification.ticketDateRange(issuedAfter, issuedBefore))
+                .and(StringUtils.isBlank(submitterFirstName) ? null : ticketUserFirstNameEquals(submitterFirstName))
+                .and(StringUtils.isBlank(submitterLastName) ? null : ticketUserLastNameEquals(submitterLastName))
+                .and(StringUtils.isBlank(submitterEmail) ? null : ticketUserEmailEquals(submitterEmail))
+                .and(submitterId == null ? null : ticketUserIdEquals(submitterId));
 
         List<ServiceTicket> serviceTickets = serviceTicketRepository.findAll(filters);
 

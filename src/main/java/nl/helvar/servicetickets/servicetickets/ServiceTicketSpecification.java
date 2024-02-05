@@ -6,14 +6,13 @@ import nl.helvar.servicetickets.exceptions.InvalidEnumConstantException;
 import nl.helvar.servicetickets.projects.Project;
 import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.servicetickets.enums.TicketType;
-import nl.helvar.servicetickets.ticketresponses.TicketResponse;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class ServiceTicketSpecification {
-    public static Specification<ServiceTicket> typeEquals(String ticketType) {
+    public static Specification<ServiceTicket> ticketTypeEquals(String ticketType) {
         try {
             TicketType type = TicketType.valueOf(ticketType.toUpperCase());
             return (root, query, builder) -> builder.equal(root.get("type"), type);
@@ -22,7 +21,7 @@ public class ServiceTicketSpecification {
         }
     }
 
-    public static Specification<ServiceTicket> statusEquals(String ticketStatus) {
+    public static Specification<ServiceTicket> ticketStatusEquals(String ticketStatus) {
         try {
             TicketStatus status = TicketStatus.valueOf(ticketStatus.toUpperCase());
             return (root, query, builder) -> builder.equal(root.get("status"), status);
@@ -31,7 +30,7 @@ public class ServiceTicketSpecification {
         }
     }
 
-    public static Specification<ServiceTicket> projectIdEquals(Long projectId) {
+    public static Specification<ServiceTicket> ticketProjectIdEquals(Long projectId) {
         return ((root, query, builder) -> {
             Join<ServiceTicket, Project> projectJoin = root.join("project");
             Predicate predicate = builder.equal(projectJoin.get("id"), projectId);
@@ -40,7 +39,7 @@ public class ServiceTicketSpecification {
         });
     }
 
-    public static Specification<ServiceTicket> projectNameLike(String projectName) {
+    public static Specification<ServiceTicket> ticketProjectNameLike(String projectName) {
         String formattedNameLike = "%" + projectName.toLowerCase() + "%";
         return ((root, query, builder) -> {
             Join<ServiceTicket, Project> projectJoin = root.join("project");
@@ -49,7 +48,7 @@ public class ServiceTicketSpecification {
         });
     }
 
-    public static Specification<ServiceTicket> issuedAfterDate(LocalDate issuedAfter) {
+    public static Specification<ServiceTicket> ticketIssuedAfterDate(LocalDate issuedAfter) {
         return (root, query, builder) -> {
             if (issuedAfter != null) {
                 LocalDateTime issuedAfterDateTime = issuedAfter.atStartOfDay();
@@ -59,7 +58,7 @@ public class ServiceTicketSpecification {
         };
     }
 
-    public static Specification<ServiceTicket> issuedBeforeDate(LocalDate issuedBefore) {
+    public static Specification<ServiceTicket> ticketIssuedBeforeDate(LocalDate issuedBefore) {
         return (root, query, builder) -> {
             if (issuedBefore != null) {
                 LocalDateTime issuedBeforeDateTime = issuedBefore.atStartOfDay().plusDays(1);
@@ -69,23 +68,23 @@ public class ServiceTicketSpecification {
         };
     }
 
-    public static Specification<ServiceTicket> dateRange(LocalDate issuedAfter, LocalDate issuedBefore) {
-        return Specification.where(issuedAfterDate(issuedAfter)).and(issuedBeforeDate(issuedBefore));
+    public static Specification<ServiceTicket> ticketDateRange(LocalDate issuedAfter, LocalDate issuedBefore) {
+        return Specification.where(ticketIssuedAfterDate(issuedAfter)).and(ticketIssuedBeforeDate(issuedBefore));
     }
 
-    public static Specification<ServiceTicket> userIdEquals(Long userId) {
+    public static Specification<ServiceTicket> ticketUserIdEquals(Long userId) {
         return (root, query, builder) -> builder.equal(root.get("submittedBy").get("id"), userId);
     }
 
-    public static Specification<ServiceTicket> userEmailEquals(String email) {
+    public static Specification<ServiceTicket> ticketUserEmailEquals(String email) {
         return (root, query, builder) -> builder.equal(root.get("submittedBy").get("email"), email);
     }
 
-    public static Specification<ServiceTicket> userFirstNameEquals(String firstName) {
+    public static Specification<ServiceTicket> ticketUserFirstNameEquals(String firstName) {
         return (root, query, builder) -> builder.equal(builder.lower(root.get("submittedBy").get("firstName")), firstName.toLowerCase());
     }
 
-    public static Specification<ServiceTicket> userLastNameEquals(String lastName) {
+    public static Specification<ServiceTicket> ticketUserLastNameEquals(String lastName) {
         return (root, query, builder) -> builder.equal(builder.lower(root.get("submittedBy").get("lastName")), lastName.toLowerCase());
     }
 }
