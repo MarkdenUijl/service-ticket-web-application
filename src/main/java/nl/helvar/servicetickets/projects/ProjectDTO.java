@@ -16,7 +16,6 @@ public class ProjectDTO implements Identifyable {
     private ServiceContractDTO serviceContract;
     private List<ServiceTicketDTO> tickets;
 
-    // GETTERS AND SETTERS:
     public Long getId() {
         return id;
     }

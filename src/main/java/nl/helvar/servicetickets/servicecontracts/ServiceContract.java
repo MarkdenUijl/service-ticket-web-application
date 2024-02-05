@@ -18,14 +18,10 @@ public class ServiceContract {
     private int usedTime;
     private LocalDate startDate;
     private LocalDate endDate;
-
-    // Relations
     @OneToOne(mappedBy = "serviceContract")
     @JsonIgnore
     private Project project;
 
-
-    // Getters and Setters
     public Long getId() {
         return id;
     }

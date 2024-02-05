@@ -8,9 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServiceContractSpecification {
-    private ServiceContractSpecification() {}
-
-    // First request parameter filter: Service contract type
     public static Specification<ServiceContract> typeEquals(String contractType) {
         List<ContractType> matchingTypes = new ArrayList<>();
 

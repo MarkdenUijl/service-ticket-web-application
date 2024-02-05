@@ -122,14 +122,6 @@ public class SecurityConfig {
         return roleHierarchy;
     }
 
-//    @Bean
-//    public AuthenticationManager authenticationManager(UserDetailsService udService, PasswordEncoder passwordEncoder) {
-//        var auth = new DaoAuthenticationProvider();
-//        auth.setPasswordEncoder(passwordEncoder);
-//        auth.setUserDetailsService(udService);
-//        return new ProviderManager(auth);
-//    }
-
     @Bean
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
@@ -144,19 +136,4 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
-
-
-//    @Bean
-//    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
-//        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
-//
-//        authenticationManagerBuilder.jdbcAuthentication().dataSource(dataSource)
-//                .usersByUsernameQuery("SELECT username, password, enabled" +
-//                        " FROM users" +
-//                        " WHERE username=?")
-//                .authoritiesByUsernameQuery("SELECT username, authority" +
-//                        " FROM authorities " +
-//                        " WHERE username=?");
-//        return authenticationManagerBuilder.build();
-//    }
 }

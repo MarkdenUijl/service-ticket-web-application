@@ -1,7 +1,6 @@
 package nl.helvar.servicetickets.ticketresponses;
 
 import nl.helvar.servicetickets.interfaces.Identifyable;
-import nl.helvar.servicetickets.ticketresponses.subclasses.EngineerResponse;
 import nl.helvar.servicetickets.users.User;
 import nl.helvar.servicetickets.users.UserDTO;
 
@@ -53,15 +52,6 @@ public class TicketResponseDTO implements Identifyable {
     public void setEngineerResponse(boolean engineerResponse) {
         isEngineerResponse = engineerResponse;
     }
-
-//    public static TicketResponse fromDto(TicketResponseDTO ticketResponseDTO) {
-//        TicketResponse ticketResponse = new TicketResponse();
-//
-//        ticketResponse.setResponse(ticketResponseDTO.getResponse());
-//        ticketResponse.setCreationDate(ticketResponseDTO.getCreationDate());
-//
-//        return ticketResponse;
-//    }
 
     public static TicketResponseDTO toDto(TicketResponse ticketResponse) {
         TicketResponseDTO ticketResponseDTO = new TicketResponseDTO();

@@ -38,7 +38,6 @@ public class ServiceTicket {
     @JsonIgnore
     private User submittedBy;
 
-    // GETTERS AND SETTERS:
     public Long getId() {
         return id;
     }

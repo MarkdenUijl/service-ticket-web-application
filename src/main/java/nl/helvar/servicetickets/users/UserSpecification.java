@@ -8,8 +8,6 @@ import nl.helvar.servicetickets.roles.Role;
 import org.springframework.data.jpa.domain.Specification;
 
 public class UserSpecification {
-    private UserSpecification() {}
-
     public static Specification<User> roleEquals(String roleName) {
         return (Root<User> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) -> {
             Join<User, Role> roleJoin = root.join("roles");

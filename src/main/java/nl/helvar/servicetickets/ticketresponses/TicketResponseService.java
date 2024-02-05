@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static nl.helvar.servicetickets.helpers.UserDetailsValidator.hasPrivilege;
-import static nl.helvar.servicetickets.projects.ProjectSpecification.houseNumberLike;
 import static nl.helvar.servicetickets.ticketresponses.TicketResponseSpecification.userIdEquals;
 import static nl.helvar.servicetickets.users.UserSpecification.emailEquals;
 

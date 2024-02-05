@@ -13,8 +13,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class ServiceTicketSpecification {
-    private ServiceTicketSpecification() {}
-
     public static Specification<ServiceTicket> typeEquals(String ticketType) {
         try {
             TicketType type = TicketType.valueOf(ticketType.toUpperCase());

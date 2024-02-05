@@ -16,10 +16,12 @@ public class UserCreationDTO {
     private String firstName;
     private String lastName;
     @Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}",
-            flags = Pattern.Flag.CASE_INSENSITIVE)
+            flags = Pattern.Flag.CASE_INSENSITIVE,
+            message = "Invalid email address"
+    )
     private String email;
     private String password;
-    @Pattern(regexp = "^(?:\\+31|0|\\+0031|\\0031)?\\s?[1-9](?:\\s?\\d){8}$")
+    @Pattern(regexp = "^(?:\\+31|0|\\+0031|\\0031)?\\s?[1-9](?:\\s?\\d){8}$", message = "Invalid phone number")
     private String phoneNumber;
     private String[] roles;
 

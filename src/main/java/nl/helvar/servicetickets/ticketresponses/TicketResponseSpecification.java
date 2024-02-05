@@ -3,8 +3,6 @@ package nl.helvar.servicetickets.ticketresponses;
 import org.springframework.data.jpa.domain.Specification;
 
 public class TicketResponseSpecification {
-    private TicketResponseSpecification() {}
-
     public static Specification<TicketResponse> userIdEquals(Long userId) {
         return (root, query, builder) -> builder.equal(root.get("submittedBy").get("id"), userId);
     }
