@@ -17,7 +17,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static nl.helvar.servicetickets.helpers.Assertions.*;
 import static nl.helvar.servicetickets.helpers.CreateMockClasses.*;
 import static nl.helvar.servicetickets.helpers.MockHttpRequests.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
