@@ -75,7 +75,6 @@ public class ServiceContractCreationDTO {
         this.endDate = endDate;
     }
 
-    // MAPPERS:
     public ServiceContract fromDto() {
         ServiceContract serviceContract = new ServiceContract();
 

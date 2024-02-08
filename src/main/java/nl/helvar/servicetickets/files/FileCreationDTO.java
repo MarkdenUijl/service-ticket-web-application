@@ -2,7 +2,6 @@ package nl.helvar.servicetickets.files;
 
 import jakarta.validation.constraints.NotNull;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
-import nl.helvar.servicetickets.interfaces.Identifyable;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
 import nl.helvar.servicetickets.servicetickets.ServiceTicketRepository;
 
@@ -13,6 +12,7 @@ public class FileCreationDTO {
     private String name;
     @NotNull
     private Long ticketId;
+    @NotNull
     private byte[] data;
 
     public Long getId() {

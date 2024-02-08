@@ -58,7 +58,7 @@ public class UserService {
     }
 
     public List<UserDTO> getAllUsers(String roleName) {
-        Specification<User> filters = Specification.where(StringUtils.isBlank(roleName) ? null : roleLike(roleName));
+        Specification<User> filters = Specification.where(StringUtils.isBlank(roleName) ? null : userRoleLike(roleName));
 
         List<UserDTO> filteredUsers = userRepository.findAll(filters)
                 .stream()
@@ -104,7 +104,7 @@ public class UserService {
 
                 if (canModify && newUser.getRoles() != null) {
                     if (existingUser.hasAdminRole() && newUser.getRoles() != null && !newUser.hasAdminRole()) {
-                        Specification<User> filters = Specification.where(roleEquals("ROLE_ADMIN"));
+                        Specification<User> filters = Specification.where(userRoleEquals("ROLE_ADMIN"));
 
                         List<User> optionalAdminUsers = userRepository.findAll(filters);
 
@@ -135,7 +135,7 @@ public class UserService {
             User user = optionalUser.get();
 
             if (user.hasAdminRole()) {
-                Specification<User> filters = Specification.where(roleEquals("ROLE_ADMIN"));
+                Specification<User> filters = Specification.where(userRoleEquals("ROLE_ADMIN"));
 
                 List<User> optionalAdminUsers = userRepository.findAll(filters);
 

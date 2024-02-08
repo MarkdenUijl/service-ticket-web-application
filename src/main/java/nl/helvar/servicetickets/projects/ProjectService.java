@@ -26,7 +26,7 @@ public class ProjectService {
     }
 
     public ProjectDTO createProject(ProjectCreationDTO projectCreationDto) {
-        Specification<Project> projectByAddressFilter = Specification.where(findByAddress(
+        Specification<Project> projectByAddressFilter = Specification.where(findProjectByAddress(
                 projectCreationDto.getCity(),
                 projectCreationDto.getStreet(),
                 projectCreationDto.getZipCode(),
@@ -53,12 +53,12 @@ public class ProjectService {
                                            Integer houseNumber,
                                            Boolean hasServiceContract
     ) {
-        Specification<Project> filters = Specification.where(StringUtils.isBlank(name) ? null : nameLike(name))
-                .and(StringUtils.isBlank(city) ? null : cityLike(city))
-                .and(StringUtils.isBlank(zipCode) ? null : zipCodeLike(zipCode))
-                .and(StringUtils.isBlank(street) ? null : streetLike(street))
-                .and(houseNumber == null ? null : houseNumberLike(houseNumber))
-                .and(hasServiceContract == null ? null : serviceContractLike(hasServiceContract));
+        Specification<Project> filters = Specification.where(StringUtils.isBlank(name) ? null : projectNameLike(name))
+                .and(StringUtils.isBlank(city) ? null : projectCityLike(city))
+                .and(StringUtils.isBlank(zipCode) ? null : projectZipCodeLike(zipCode))
+                .and(StringUtils.isBlank(street) ? null : projectStreetLike(street))
+                .and(houseNumber == null ? null : projectHouseNumberLike(houseNumber))
+                .and(hasServiceContract == null ? null : projectServiceContractLike(hasServiceContract));
 
         List<ProjectDTO> filteredProjects = projectRepository.findAll(filters)
                 .stream()

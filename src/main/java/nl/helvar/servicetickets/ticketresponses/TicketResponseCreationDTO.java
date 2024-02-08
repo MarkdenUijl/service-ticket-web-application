@@ -96,7 +96,7 @@ public class TicketResponseCreationDTO {
         }
     }
 
-    public TicketResponse fromPutDto(ServiceTicketRepository serviceTicketRepository) {
+    public TicketResponse fromPutDto() {
         if (this.getIsEngineerResponse() || this.getMinutesSpent() != 0) {
             EngineerResponse engineerResponse = new EngineerResponse();
 
@@ -113,16 +113,4 @@ public class TicketResponseCreationDTO {
             return ticketResponse;
         }
     }
-
-//    public static TicketResponseCreationDTO toDto(TicketResponse ticketResponse) {
-//        TicketResponseCreationDTO ticketResponseCreationDTO = new TicketResponseCreationDTO();
-//
-//        ticketResponseCreationDTO.setId(ticketResponse.getId());
-//        ticketResponseCreationDTO.setResponse(ticketResponse.getResponse());
-//        ticketResponseCreationDTO.setCreationDate(ticketResponse.getCreationDate());
-//        ticketResponseCreationDTO.setServiceTicketId(ticketResponse.getTicket().getId());
-//        ticketResponseCreationDTO.setMinutesSpent(ticketResponseCreationDTO.getMinutesSpent());
-//
-//        return ticketResponseCreationDTO;
-//    }
 }

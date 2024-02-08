@@ -19,7 +19,6 @@ public class DataLoader implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
-        // Load file data into the database here
         initializeFileData();
     }
 

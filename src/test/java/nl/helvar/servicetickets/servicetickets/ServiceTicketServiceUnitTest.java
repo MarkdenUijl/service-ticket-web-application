@@ -70,7 +70,7 @@ class ServiceTicketServiceUnitTest {
         });
 
         // Assert
-        String expectedMessage = "Could not find user with email 'testuser' in database.";
+        String expectedMessage = "Could not find user with email 'test' in database.";
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));

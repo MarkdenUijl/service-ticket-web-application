@@ -15,7 +15,6 @@ public class Role {
     private String name;
     @ManyToMany(mappedBy = "roles")
     private Set<User> users;
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "roles_privileges",

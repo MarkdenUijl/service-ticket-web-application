@@ -23,9 +23,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static nl.helvar.servicetickets.helpers.UserDetailsValidator.hasPrivilege;
-import static nl.helvar.servicetickets.projects.ProjectSpecification.houseNumberLike;
-import static nl.helvar.servicetickets.ticketresponses.TicketResponseSpecification.userIdEquals;
-import static nl.helvar.servicetickets.users.UserSpecification.emailEquals;
+import static nl.helvar.servicetickets.ticketresponses.TicketResponseSpecification.responseUserIdEquals;
+import static nl.helvar.servicetickets.users.UserSpecification.userEmailEquals;
 
 @Service
 public class TicketResponseService {
@@ -52,36 +51,35 @@ public class TicketResponseService {
             UserDetails userDetails,
             TicketResponseCreationDTO ticketResponseCreationDTO
     ) {
+        boolean isEngineerResponse = hasPrivilege("CAN_MAKE_ENGINEER_RESPONSE_PRIVILEGE", userDetails);
         LocalDateTime currentTime = LocalDateTime.now();
         ticketResponseCreationDTO.setCreationDate(currentTime);
 
+        if (isEngineerResponse) {
+            ticketResponseCreationDTO.setIsEngineerResponse(true);
+        }
+
         TicketResponse ticketResponse = ticketResponseCreationDTO.fromDto(serviceTicketRepository);
 
-        Specification<User> filter = Specification.where(emailEquals(userDetails.getUsername()));
+        Specification<User> filter = Specification.where(userEmailEquals(userDetails.getUsername()));
         Optional<User> user = userRepository.findOne(filter);
 
         user.ifPresent(ticketResponse::setSubmittedBy);
 
-        if (hasPrivilege("CAN_MAKE_ENGINEER_RESPONSE_PRIVILEGE", userDetails)) {
-            Optional<ServiceTicket> optionalTicket = serviceTicketRepository.findById(ticketResponseCreationDTO.getServiceTicketId());
+        if (isEngineerResponse) {
 
-            if (optionalTicket.isPresent()) {
-                ServiceTicket ticket = optionalTicket.get();
+            ServiceTicket ticket = ticketResponse.getTicket();
 
-                if(ticket.getStatus() == TicketStatus.OPEN) {
-                    ticket.setStatus(TicketStatus.PENDING);
-                    serviceTicketRepository.save(ticket);
-                }
+            if(ticket.getStatus() == TicketStatus.OPEN) {
+                ticket.setStatus(TicketStatus.PENDING);
             }
 
-            Optional<ServiceContract> contract = extractServiceContract(ticketResponse);
+            ServiceContract contract = ticketResponse.getTicket().getProject().getServiceContract();
 
-            if (contract.isPresent()) {
+            if (contract != null) {
                 int minutesSpent = ticketResponseCreationDTO.getMinutesSpent();
-                ServiceContract existingContract = contract.get();
 
-                existingContract.addUsedTime(minutesSpent);
-                serviceContractRepository.save(existingContract);
+                contract.addUsedTime(minutesSpent);
             }
         }
 
@@ -104,10 +102,10 @@ public class TicketResponseService {
             String firstName,
             String lastName
     ) {
-        Specification<TicketResponse> filter = Specification.where(userId == null ? null : userIdEquals(userId))
-                .and(StringUtils.isBlank(email) ? null : TicketResponseSpecification.userEmailEquals(email))
-                .and(StringUtils.isBlank(firstName) ? null : TicketResponseSpecification.firstNameEquals(firstName))
-                .and(StringUtils.isBlank(lastName) ? null : TicketResponseSpecification.lastNameEquals(lastName));
+        Specification<TicketResponse> filter = Specification.where(userId == null ? null : responseUserIdEquals(userId))
+                .and(StringUtils.isBlank(email) ? null : TicketResponseSpecification.responseUserEmailEquals(email))
+                .and(StringUtils.isBlank(firstName) ? null : TicketResponseSpecification.responseFirstNameEquals(firstName))
+                .and(StringUtils.isBlank(lastName) ? null : TicketResponseSpecification.responseLastNameEquals(lastName));
 
         List<TicketResponseDTO> ticketResponses = ticketResponseRepository.findAll(filter)
                 .stream()
@@ -138,20 +136,19 @@ public class TicketResponseService {
             throw new RecordNotFoundException("Ticket response with id '" + id + "' was not found in the database.");
         } else {
             TicketResponse existingTicketResponse = ticketResponse.get();
-            TicketResponse newTicketResponse = newTicketResponseDTO.fromPutDto(serviceTicketRepository);
+            TicketResponse newTicketResponse = newTicketResponseDTO.fromPutDto();
             User submittedBy = existingTicketResponse.getSubmittedBy();
+
 
             if (hasPrivilege("CAN_MODERATE_TICKET_RESPONSES_PRIVILEGE", userDetails) || userDetails.getUsername().equals(submittedBy.getEmail())) {
 
-                if (existingTicketResponse instanceof EngineerResponse existingEngineerResponse &&
-                        newTicketResponse instanceof EngineerResponse newEngineerResponse
-                ) {
-                    ServiceContract contract = existingEngineerResponse.getTicket().getProject().getServiceContract();
+                if (submittedBy.hasPrivilege("CAN_MAKE_ENGINEER_RESPONSE_PRIVILEGE")) {
+                    ServiceContract contract = existingTicketResponse.getTicket().getProject().getServiceContract();
 
                     if (contract != null) {
-                        int oldMinutesSpent = existingEngineerResponse.getMinutesSpent();
-                        int newMinutesSpent = newEngineerResponse.getMinutesSpent();
-                        int valueAdjustment = newMinutesSpent - oldMinutesSpent;;
+                        int oldMinutesSpent = ((EngineerResponse) existingTicketResponse).getMinutesSpent();
+                        int newMinutesSpent = ((EngineerResponse) newTicketResponse).getMinutesSpent();
+                        int valueAdjustment = newMinutesSpent - oldMinutesSpent;
 
                         contract.addUsedTime(valueAdjustment);
                         serviceContractRepository.save(contract);
@@ -162,11 +159,19 @@ public class TicketResponseService {
                     }
                 }
 
-                ObjectCopyUtils.copyNonNullProperties(newTicketResponse, existingTicketResponse);
+                if (existingTicketResponse instanceof EngineerResponse engineerResponse) {
+                    ObjectCopyUtils.copyNonNullProperties(newTicketResponse, engineerResponse);
 
-                ticketResponseRepository.save(existingTicketResponse);
+                    ticketResponseRepository.save(engineerResponse);
 
-                return TicketResponseDTO.toDto(existingTicketResponse);
+                    return TicketResponseDTO.toDto(engineerResponse);
+                } else {
+                    ObjectCopyUtils.copyNonNullProperties(newTicketResponse, existingTicketResponse);
+
+                    ticketResponseRepository.save(existingTicketResponse);
+
+                    return TicketResponseDTO.toDto(existingTicketResponse);
+                }
             } else {
                 throw new InvalidRequestException("You do not have the required privileges to change this ticket response.");
             }
@@ -189,14 +194,5 @@ public class TicketResponseService {
                 throw new InvalidRequestException("You do not have the required privileges to delete this ticket response.");
             }
         }
-    }
-
-    public Optional<ServiceContract> extractServiceContract(TicketResponse ticketResponse) {
-        return serviceContractRepository.findById(ticketResponse
-                .getTicket()
-                .getProject()
-                .getServiceContract()
-                .getId()
-        );
     }
 }

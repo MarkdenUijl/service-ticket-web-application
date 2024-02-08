@@ -3,7 +3,6 @@ package nl.helvar.servicetickets.privileges;
 import jakarta.persistence.*;
 import nl.helvar.servicetickets.roles.Role;
 
-import java.util.List;
 import java.util.Set;
 
 @Entity(name = "privileges")

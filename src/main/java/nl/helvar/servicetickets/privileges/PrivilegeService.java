@@ -1,8 +1,6 @@
 package nl.helvar.servicetickets.privileges;
 
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
-import nl.helvar.servicetickets.helpers.ObjectCopyUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

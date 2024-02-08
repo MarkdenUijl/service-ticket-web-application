@@ -45,6 +45,13 @@ public class MockHttpRequests {
                         .content(content))
                 .andDo(MockMvcResultHandlers.print());
     }
+    public static ResultActions performPutRequest(MockMvc mockMvc, String url, long id, String content, UserDetails userDetails) throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.put(url + "/{id}", id)
+                        .with(user(userDetails))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content))
+                .andDo(MockMvcResultHandlers.print());
+    }
 
     public static ResultActions performDeleteRequest(MockMvc mockMvc, String url, long id) throws Exception {
         return mockMvc.perform(MockMvcRequestBuilders.delete(url + "/{id}", id)

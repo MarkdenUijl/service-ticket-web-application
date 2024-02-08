@@ -61,7 +61,6 @@ public class ServiceContractDTO implements Identifyable {
         this.endDate = endDate;
     }
 
-    // MAPPERS:
     public static ServiceContractDTO toDto(ServiceContract serviceContract) {
         ServiceContractDTO serviceContractDTO = new ServiceContractDTO();
 

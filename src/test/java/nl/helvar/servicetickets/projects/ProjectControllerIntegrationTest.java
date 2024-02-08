@@ -39,6 +39,19 @@ public class ProjectControllerIntegrationTest {
     }
 
     @Test
+    void shouldCreateIncorrectProject() throws Exception {
+        String requestJson = createMockProjectJson("This is a test project", "Amsterdam", "124 AB", "Teststraat", 1);
+
+        UserDetails userDetails = createMockUserDetails("test", null);
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
+        SecurityContextHolder.setContext(securityContext);
+
+        performPostRequest(mockMvc, "/projects", requestJson , userDetails)
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
     void shouldGetCorrectProject() throws Exception {
         String requestJson = createMockProjectJson("This is a test project", "Amsterdam", "5678 AB", "Teststraat", 2);
 
@@ -103,6 +116,24 @@ public class ProjectControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.zipCode").value("5678 CD"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.street").value("Updated Street"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.houseNumber").value(2));
+    }
+
+    @Test
+    void shouldNotReplaceProject() throws Exception {
+        String requestJson = createMockProjectJson("Test Project 1", "Amsterdam", "1274 AB", "Teststraat", 6);
+
+        UserDetails userDetails = createMockUserDetails("test", null);
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
+        SecurityContextHolder.setContext(securityContext);
+        ResultActions createResult = performPostRequest(mockMvc, "/projects", requestJson , userDetails);
+
+        long createdId = assertCreatedIdAndStatusIsOk(createResult.andReturn());
+
+        String newProjectJson = createMockProjectJson("Updated Test Project", "New York", "578 CD", "Updated Street", 2);
+
+        performPutRequest(mockMvc, "/projects", createdId, newProjectJson)
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test

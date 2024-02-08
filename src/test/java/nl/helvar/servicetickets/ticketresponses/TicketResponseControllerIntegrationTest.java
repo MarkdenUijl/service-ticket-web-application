@@ -17,7 +17,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static nl.helvar.servicetickets.helpers.Assertions.*;
 import static nl.helvar.servicetickets.helpers.CreateMockClasses.*;
 import static nl.helvar.servicetickets.helpers.MockHttpRequests.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
@@ -87,9 +86,9 @@ class TicketResponseControllerIntegrationTest {
 
     @Test
     void shouldReplaceTicketResponse() throws Exception {
-        String requestJson = createMockTicketResponseJson("This is a test ticket response", 1);
+        String requestJson = createMockTicketResponseJson("This is a test ticket response", 51);
 
-        UserDetails userDetails = createMockUserDetails("admin@tester.nl", new String[]{"ROLE_ADMIN"});
+        UserDetails userDetails = createMockUserDetails("admin@tester.nl", new String[]{"ROLE_ADMIN", "CAN_MODERATE_TICKET_RESPONSES_PRIVILEGE"});
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
         SecurityContextHolder.setContext(securityContext);
@@ -98,9 +97,9 @@ class TicketResponseControllerIntegrationTest {
 
         long createdId = assertCreatedIdAndStatusIsOk(createResult.andReturn());
 
-        String replaceJson = createMockTicketResponseJson("This is a replaced ticket response", 1);
+        String replaceJson = createMockTicketResponseJson("This is a replaced ticket response", 51);
 
-        performPutRequest(mockMvc, "/ticketResponses/", createdId, replaceJson)
+        performPutRequest(mockMvc, "/ticketResponses/", createdId, replaceJson, userDetails)
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(createdId))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.response").value("This is a replaced ticket response"));
