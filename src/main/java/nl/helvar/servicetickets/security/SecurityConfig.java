@@ -26,17 +26,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final JwtService jwtService;
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final UserDetailsService userDetailsService;
 
     public SecurityConfig(JwtService service,
                           UserRepository userRepository,
-                          RoleRepository roleRepository,
                           UserDetailsService userDetailsService)
     {
         this.jwtService = service;
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
         this.userDetailsService = userDetailsService;
     }
 

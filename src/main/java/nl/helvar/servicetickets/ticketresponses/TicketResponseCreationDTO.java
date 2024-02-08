@@ -96,7 +96,7 @@ public class TicketResponseCreationDTO {
         }
     }
 
-    public TicketResponse fromPutDto(ServiceTicketRepository serviceTicketRepository) {
+    public TicketResponse fromPutDto() {
         if (this.getIsEngineerResponse() || this.getMinutesSpent() != 0) {
             EngineerResponse engineerResponse = new EngineerResponse();
 
