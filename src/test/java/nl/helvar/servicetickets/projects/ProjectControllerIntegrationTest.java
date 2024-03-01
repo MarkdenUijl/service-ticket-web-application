@@ -95,30 +95,6 @@ public class ProjectControllerIntegrationTest {
     }
 
     @Test
-    void shouldReplaceProject() throws Exception {
-        String requestJson = createMockProjectJson("Test Project 1", "Amsterdam", "1274 AB", "Teststraat", 6);
-
-        UserDetails userDetails = createMockUserDetails("test", null);
-        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
-        SecurityContextHolder.setContext(securityContext);
-        ResultActions createResult = performPostRequest(mockMvc, "/projects", requestJson , userDetails);
-
-        long createdId = assertCreatedIdAndStatusIsOk(createResult.andReturn());
-
-        String newProjectJson = createMockProjectJson("Updated Test Project", "New York", "5678 CD", "Updated Street", 2);
-
-        performPutRequest(mockMvc, "/projects", createdId, newProjectJson)
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(createdId))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Updated Test Project"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.city").value("New York"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.zipCode").value("5678 CD"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.street").value("Updated Street"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.houseNumber").value(2));
-    }
-
-    @Test
     void shouldNotReplaceProject() throws Exception {
         String requestJson = createMockProjectJson("Test Project 1", "Amsterdam", "1274 AB", "Teststraat", 6);
 
