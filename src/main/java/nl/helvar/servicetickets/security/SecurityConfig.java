@@ -54,7 +54,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth ->
                         auth
                                 .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/test").permitAll()
 
                                 .requestMatchers("/privileges/**")
                                 .hasAuthority("CAN_MODIFY_USERS_PRIVILEGE")
