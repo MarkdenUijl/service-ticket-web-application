@@ -1,7 +1,7 @@
 package nl.helvar.servicetickets.auth;
 
+import nl.helvar.servicetickets.helpers.TokenResponse;
 import nl.helvar.servicetickets.security.JwtService;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,8 +36,7 @@ public class AuthController {
             String token = jwtService.generateToken(ud);
 
             return ResponseEntity.ok()
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                    .body("Token generated");
+                    .body(new TokenResponse(token));
         }
         catch (AuthenticationException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
