@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.Map;
 
 public final class JwtCryptoUtil {
-    private static final String SECRET_KEY = "u8v9y+Ae1n7w4q4v+FqYZpQn+H8bHk3+5L2efrZT2xA=";
+    private static final String SECRET_KEY = "001329476e2381e62170c27458a5c800d96ea537f6cf0025a8c5a4605a281dff7943e7b47dc47d217f15510563ff4704981cdbc884ebc6cc6c1c0ab9c5409909";
 
     private static Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
