@@ -5,16 +5,19 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;
 
 public final class JwtCryptoUtil {
-    private static final String SECRET_KEY = "001329476e2381e62170c27458a5c800d96ea537f6cf0025a8c5a4605a281dff7943e7b47dc47d217f15510563ff4704981cdbc884ebc6cc6c1c0ab9c5409909";
-
     private static Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        String secretKey = System.getenv("JWT_SECRET_KEY");
+        if (secretKey == null || secretKey.isEmpty()) {
+            throw new IllegalStateException("JWT_SECRET_KEY environment variable is not set");
+        }
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
