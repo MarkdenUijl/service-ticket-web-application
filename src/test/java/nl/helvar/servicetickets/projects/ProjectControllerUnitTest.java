@@ -1,5 +1,6 @@
 package nl.helvar.servicetickets.projects;
 
+import nl.helvar.servicetickets.security.JwtCryptoUtil;
 import nl.helvar.servicetickets.security.JwtService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

@@ -5,23 +5,33 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;
 
-public final class JwtCryptoUtil {
-    private static Key getSigningKey() {
-        String secretKey = System.getenv("JWT_SECRET_KEY");
+@Component
+public class JwtCryptoUtil {
+
+    private final JwtConfig jwtConfig;
+
+    public JwtCryptoUtil(JwtConfig jwtConfig) {
+        this.jwtConfig = jwtConfig;
+    }
+
+    private Key getSigningKey() {
+        String secretKey = jwtConfig.getSecretKey();
+
         if (secretKey == null || secretKey.isEmpty()) {
-            throw new IllegalStateException("JWT_SECRET_KEY environment variable is not set");
+            throw new IllegalStateException("jwt.secret.key is not set in env.properties");
         }
+
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public static String createToken(Map<String, Object> claims, String subject, long validPeriodMillis) {
+    public String createToken(Map<String, Object> claims, String subject, long validPeriodMillis) {
         long currentTime = System.currentTimeMillis();
         return Jwts.builder()
                 .setClaims(claims)
@@ -32,7 +42,7 @@ public final class JwtCryptoUtil {
                 .compact();
     }
 
-    public static Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
