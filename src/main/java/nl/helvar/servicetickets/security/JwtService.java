@@ -12,6 +12,12 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
+    private final JwtCryptoUtil jwtCryptoUtil;
+
+    public JwtService(JwtCryptoUtil jwtCryptoUtil) {
+        this.jwtCryptoUtil = jwtCryptoUtil;
+    }
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -21,7 +27,7 @@ public class JwtService {
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = JwtCryptoUtil.extractAllClaims(token);
+        final Claims claims = jwtCryptoUtil.extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
@@ -32,7 +38,7 @@ public class JwtService {
     public String generateToken(UserDetails userDetails, Boolean tokenPersist) {
         Map<String, Object> claims = new HashMap<>();
         long validPeriod = tokenPersist ? 1000L * 60 * 60 * 24 * 30 : 1000 * 60 * 60 * 3;
-        return JwtCryptoUtil.createToken(claims, userDetails.getUsername(), validPeriod);
+        return jwtCryptoUtil.createToken(claims, userDetails.getUsername(), validPeriod);
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
