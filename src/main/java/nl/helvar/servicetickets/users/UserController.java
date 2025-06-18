@@ -30,8 +30,11 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> getAllUsers(@RequestParam(required = false) String roleName) {
-        List<UserDTO> userDTOS = userService.getAllUsers(roleName);
+    public ResponseEntity<List<UserDTO>> getAllUsers(
+            @RequestParam(required = false) String roleName,
+            @RequestParam(required = false) String email
+            ) {
+        List<UserDTO> userDTOS = userService.getAllUsers(roleName, email);
 
         return new ResponseEntity<>(userDTOS, HttpStatus.OK);
     }
@@ -39,6 +42,13 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> findUserById(@AuthenticationPrincipal UserDetails userDetails, @PathVariable("id") Long id) {
         UserDTO userDTO = userService.findUserById(userDetails, id);
+
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+        UserDTO userDTO = userService.findByUsername(userDetails.getUsername());
 
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }

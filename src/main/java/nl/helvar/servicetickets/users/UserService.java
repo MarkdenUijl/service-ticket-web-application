@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import static nl.helvar.servicetickets.helpers.UserDetailsValidator.hasPrivilege;
 import static nl.helvar.servicetickets.roles.RoleSpecification.roleNameEquals;
+import static nl.helvar.servicetickets.servicetickets.ServiceTicketSpecification.ticketStatusEquals;
 import static nl.helvar.servicetickets.users.UserSpecification.*;
 
 @Service
@@ -57,8 +58,9 @@ public class UserService {
         }
     }
 
-    public List<UserDTO> getAllUsers(String roleName) {
-        Specification<User> filters = Specification.where(StringUtils.isBlank(roleName) ? null : userRoleLike(roleName));
+    public List<UserDTO> getAllUsers(String roleName, String email) {
+        Specification<User> filters = Specification.where(StringUtils.isBlank(roleName) ? null : userRoleLike(roleName))
+                .and(StringUtils.isBlank(email) ? null : userEmailEquals(email));
 
         List<UserDTO> filteredUsers = userRepository.findAll(filters)
                 .stream()
@@ -83,6 +85,17 @@ public class UserService {
             } else {
                 return UserDTO.toSimpleDto(optionalUser.get());
             }
+        }
+    }
+
+    public UserDTO findByUsername(String email) {
+        Specification<User> filter = UserSpecification.userEmailEquals(email);
+        Optional<User> optionalUser = userRepository.findOne(filter);
+
+        if (optionalUser.isEmpty()) {
+            throw new RecordNotFoundException("Could not find any user with email '" + email + "' in the database.");
+        } else {
+            return UserDTO.toDto(optionalUser.get());
         }
     }
 
