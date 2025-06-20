@@ -95,7 +95,7 @@ public class UserService {
         if (optionalUser.isEmpty()) {
             throw new RecordNotFoundException("Could not find any user with email '" + email + "' in the database.");
         } else {
-            return UserDTO.toDto(optionalUser.get());
+            return UserDTO.toSimpleDto(optionalUser.get());
         }
     }
 
