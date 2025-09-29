@@ -62,34 +62,34 @@ public class CreateMockClasses {
         return user;
     }
 
-    public static ServiceTicketCreationDTO createMockServiceTicketCreationDTO() {
-        ServiceTicketCreationDTO dto = new ServiceTicketCreationDTO();
-        dto.setCreationDate(null);
-        dto.setName("TestName");
-        dto.setStatus("OPEN");
-        dto.setType("SUPPORT");
-        dto.setDescription("TestDescription");
-        dto.setResponses(null);
-        dto.setMinutesSpent(0);
-        dto.setCreationDate(LocalDateTime.now());
-
-        return dto;
-    }
-
-    public static ServiceTicket createMockServiceTicket() {
-        ServiceTicket serviceTicket = new ServiceTicket();
-        serviceTicket.setCreationDate(LocalDateTime.now());
-        serviceTicket.setName("TestName");
-        serviceTicket.setDescription("TestDescription");
-        serviceTicket.setType(TicketType.valueOf("SUPPORT"));
-        serviceTicket.setStatus(TicketStatus.valueOf("OPEN"));
-        serviceTicket.setMinutesSpent(0);
-        serviceTicket.setResponses(null);
-        serviceTicket.setSubmittedBy(createMockUser());
-        serviceTicket.setProject(null);
-
-        return serviceTicket;
-    }
+//    public static ServiceTicketCreationDTO createMockServiceTicketCreationDTO() {
+//        ServiceTicketCreationDTO dto = new ServiceTicketCreationDTO();
+//        dto.setCreationDate(null);
+//        dto.setName("TestName");
+//        dto.setStatus("OPEN");
+//        dto.setType("SUPPORT");
+//        dto.setDescription("TestDescription");
+//        dto.setResponses(null);
+//        dto.setMinutesSpent(0);
+//        dto.setCreationDate(LocalDateTime.now());
+//
+//        return dto;
+//    }
+//
+//    public static ServiceTicket createMockServiceTicket() {
+//        ServiceTicket serviceTicket = new ServiceTicket();
+//        serviceTicket.setCreationDate(LocalDateTime.now());
+//        serviceTicket.setName("TestName");
+//        serviceTicket.setDescription("TestDescription");
+//        serviceTicket.setType(TicketType.valueOf("SUPPORT"));
+//        serviceTicket.setStatus(TicketStatus.valueOf("OPEN"));
+//        serviceTicket.setMinutesSpent(0);
+//        serviceTicket.setResponses(null);
+//        serviceTicket.setSubmittedBy(createMockUser());
+//        serviceTicket.setProject(null);
+//
+//        return serviceTicket;
+//    }
 
     public static String createMockProjectJson(String name, String city, String zipCode, String street, int houseNumber) {
         return String.format("""

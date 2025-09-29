@@ -43,8 +43,8 @@ public class ServiceTicketService {
         if (user.isEmpty()) {
             throw new RecordNotFoundException("Could not find user with email '" + userDetails.getUsername() + "' in database.");
         } else {
-            LocalDateTime currentTime = LocalDateTime.now();
-            serviceTicketCreationDTO.setCreationDate(currentTime);
+//            LocalDateTime currentTime = LocalDateTime.now();
+//            serviceTicketCreationDTO.setCreationDate(currentTime);
 
             ServiceTicket serviceTicket = serviceTicketCreationDTO.fromDto(projectRepository);
             serviceTicket.setSubmittedBy(user.get());

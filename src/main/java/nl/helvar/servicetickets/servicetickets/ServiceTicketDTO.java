@@ -1,11 +1,13 @@
 package nl.helvar.servicetickets.servicetickets;
 
 import nl.helvar.servicetickets.interfaces.Identifyable;
+import nl.helvar.servicetickets.projects.ProjectDTO;
 import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.servicetickets.enums.TicketType;
 import nl.helvar.servicetickets.ticketresponses.TicketResponseDTO;
 import nl.helvar.servicetickets.users.UserDTO;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -22,8 +24,9 @@ public class ServiceTicketDTO implements Identifyable {
     private String description;
     private List<TicketResponseDTO> responses;
     private int minutesSpent;
-    private LocalDateTime creationDate;
+    private Instant creationDate;
     private HashMap<Long, String> files;
+    private ProjectDTO project;
 
     public Long getId() {
         return id;
@@ -89,11 +92,11 @@ public class ServiceTicketDTO implements Identifyable {
         this.minutesSpent = minutesSpent;
     }
 
-    public LocalDateTime getCreationDate() {
+    public Instant getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(LocalDateTime creationDate) {
+    public void setCreationDate(Instant creationDate) {
         this.creationDate = creationDate;
     }
 
@@ -105,9 +108,16 @@ public class ServiceTicketDTO implements Identifyable {
         this.files = files;
     }
 
+    public ProjectDTO getProject() {
+        return project;
+    }
+
+    public void setProject(ProjectDTO project) {
+        this.project = project;
+    }
+
     public static ServiceTicketDTO toDto(ServiceTicket serviceTicket) {
         ServiceTicketDTO serviceTicketDTO = new ServiceTicketDTO();
-
 
         serviceTicketDTO.setId(serviceTicket.getId());
         serviceTicketDTO.setSubmittedBy(toSimpleDto(serviceTicket.getSubmittedBy()));
@@ -132,6 +142,10 @@ public class ServiceTicketDTO implements Identifyable {
                     .stream()
                     .collect(HashMap::new, (key, value) -> key.put(value.getId(), value.getName()), HashMap::putAll)
             );
+        }
+
+        if (serviceTicket.getProject() != null) {
+            serviceTicketDTO.setProject(ProjectDTO.toBaseDto(serviceTicket.getProject()));
         }
 
         return serviceTicketDTO;

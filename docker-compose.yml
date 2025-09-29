@@ -17,6 +17,7 @@ services:
 
   backend:
     image: service-tickets
+#    image: ghcr.io/markdenuijl/service-tickets:latest
     build: .
     ports:
       - "8443:8443"

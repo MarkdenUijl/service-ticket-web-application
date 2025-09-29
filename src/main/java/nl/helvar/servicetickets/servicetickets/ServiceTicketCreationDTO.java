@@ -10,6 +10,7 @@ import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.servicetickets.enums.TicketType;
 import nl.helvar.servicetickets.ticketresponses.TicketResponse;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +29,8 @@ public class ServiceTicketCreationDTO {
     private String description;
     private List<TicketResponse> responses;
     private int minutesSpent;
-    private LocalDateTime creationDate;
+//    private LocalDateTime creationDate;
+    private Instant creationDate;
     private Long projectId;
 
     public Long getId() {
@@ -87,11 +89,11 @@ public class ServiceTicketCreationDTO {
         this.minutesSpent = minutesSpent;
     }
 
-    public LocalDateTime getCreationDate() {
+    public Instant getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(LocalDateTime creationDate) {
+    public void setCreationDate(Instant creationDate) {
         this.creationDate = creationDate;
     }
 

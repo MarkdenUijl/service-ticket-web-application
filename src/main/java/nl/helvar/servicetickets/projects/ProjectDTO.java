@@ -12,7 +12,7 @@ public class ProjectDTO implements Identifyable {
     private String city;
     private String zipCode;
     private String street;
-    private int houseNumber;
+    private Integer houseNumber;
     private ServiceContractDTO serviceContract;
     private List<ServiceTicketDTO> tickets;
 
@@ -56,11 +56,11 @@ public class ProjectDTO implements Identifyable {
         this.street = street;
     }
 
-    public int getHouseNumber() {
+    public Integer getHouseNumber() {
         return houseNumber;
     }
 
-    public void setHouseNumber(int houseNumber) {
+    public void setHouseNumber(Integer houseNumber) {
         this.houseNumber = houseNumber;
     }
 
@@ -118,5 +118,18 @@ public class ProjectDTO implements Identifyable {
         projectSimpleDTO.setHouseNumber(project.getHouseNumber());
 
         return projectSimpleDTO;
+    }
+
+    public static ProjectDTO toBaseDto(Project project) {
+        ProjectDTO projectBaseDTO = new ProjectDTO();
+
+        projectBaseDTO.setId(project.getId());
+        projectBaseDTO.setName(project.getName());
+
+        if (project.getServiceContract() != null) {
+            projectBaseDTO.setServiceContract(ServiceContractDTO.toDto(project.getServiceContract()));
+        }
+
+        return projectBaseDTO;
     }
 }

@@ -10,6 +10,7 @@ import nl.helvar.servicetickets.ticketresponses.TicketResponse;
 import nl.helvar.servicetickets.users.User;
 
 import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,13 +31,21 @@ public class ServiceTicket {
     @JsonIgnore
     private Project project;
     private int minutesSpent;
-    private LocalDateTime creationDate;
+    @Column(nullable = false)
+    private Instant creationDate;
     @OneToMany(mappedBy = "ticket", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<File> files;
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User submittedBy;
+
+    @PrePersist
+    void onCreate() {
+        if (creationDate == null) {
+            creationDate = Instant.now(); // always UTC
+        }
+    }
 
     public Long getId() {
         return id;
@@ -98,11 +107,11 @@ public class ServiceTicket {
         this.minutesSpent = minutesSpent;
     }
 
-    public LocalDateTime getCreationDate() {
+    public Instant getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(LocalDateTime creationDate) {
+    public void setCreationDate(Instant creationDate) {
         this.creationDate = creationDate;
     }
 

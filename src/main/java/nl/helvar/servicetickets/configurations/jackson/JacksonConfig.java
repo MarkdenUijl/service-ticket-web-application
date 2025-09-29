@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.*;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -20,6 +21,7 @@ public class JacksonConfig {
         SimpleModule customLocalDateTimeModule = new SimpleModule();
         customLocalDateTimeModule.addSerializer(LocalDateTime.class, new CustomLocalDateTimeSerializer());
         customLocalDateTimeModule.addSerializer(LocalDate.class, new CustomLocalDateSerializer());
+        customLocalDateTimeModule.addSerializer(Instant.class, new CustomInstantSerializer());
 
         objectMapper.registerModule(customLocalDateTimeModule);
 
