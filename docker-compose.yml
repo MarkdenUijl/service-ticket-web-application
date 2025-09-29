@@ -24,6 +24,7 @@ services:
     volumes:
       - ./env.properties:/app/env.properties
     environment:
+      SPRING_PROFILES_ACTIVE: prod
       DATABASE_URL: jdbc:postgresql://postgres:5432/helvar_service_tickets
       DATABASE_USERNAME: postgres
       DATABASE_PASSWORD: postgres
