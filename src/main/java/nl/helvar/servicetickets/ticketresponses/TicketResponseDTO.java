@@ -4,13 +4,13 @@ import nl.helvar.servicetickets.interfaces.Identifyable;
 import nl.helvar.servicetickets.users.User;
 import nl.helvar.servicetickets.users.UserDTO;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public class TicketResponseDTO implements Identifyable {
     private Long id;
     private UserDTO submittedBy;
     private String response;
-    private LocalDateTime creationDate;
+    private Instant creationDate;
     private boolean isEngineerResponse;
 
     public Long getId() {
@@ -37,11 +37,11 @@ public class TicketResponseDTO implements Identifyable {
         this.response = response;
     }
 
-    public LocalDateTime getCreationDate() {
+    public Instant getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(LocalDateTime creationDate) {
+    public void setCreationDate(Instant creationDate) {
         this.creationDate = creationDate;
     }
 

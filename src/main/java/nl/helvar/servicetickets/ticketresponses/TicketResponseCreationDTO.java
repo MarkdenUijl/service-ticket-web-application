@@ -3,20 +3,18 @@ package nl.helvar.servicetickets.ticketresponses;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
-import nl.helvar.servicetickets.interfaces.Identifyable;
-import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
 import nl.helvar.servicetickets.servicetickets.ServiceTicketRepository;
 import nl.helvar.servicetickets.ticketresponses.subclasses.EngineerResponse;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 public class TicketResponseCreationDTO {
     private Long id;
     @NotBlank
     private String response;
-    private LocalDateTime creationDate;
+    private Instant creationDate;
     @NotNull
     private Long serviceTicketId;
     private int minutesSpent;
@@ -38,11 +36,11 @@ public class TicketResponseCreationDTO {
         this.response = response;
     }
 
-    public LocalDateTime getCreationDate() {
+    public Instant getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(LocalDateTime creationDate) {
+    public void setCreationDate(Instant creationDate) {
         this.creationDate = creationDate;
     }
 

@@ -1,5 +1,6 @@
 package nl.helvar.servicetickets.ticketresponses;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import nl.helvar.servicetickets.email.EmailService;
 import nl.helvar.servicetickets.exceptions.InvalidRequestException;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
@@ -18,7 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,7 +53,7 @@ public class TicketResponseService {
             TicketResponseCreationDTO ticketResponseCreationDTO
     ) {
         boolean isEngineerResponse = hasPrivilege("CAN_MAKE_ENGINEER_RESPONSE_PRIVILEGE", userDetails);
-        LocalDateTime currentTime = LocalDateTime.now();
+        Instant currentTime = Instant.now();
         ticketResponseCreationDTO.setCreationDate(currentTime);
 
         if (isEngineerResponse) {

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
 import nl.helvar.servicetickets.users.User;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,7 +22,7 @@ public class TicketResponse {
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User submittedBy;
-    private LocalDateTime creationDate;
+    private Instant creationDate;
     @ManyToOne
     @JoinColumn(name = "ticket_id")
     private ServiceTicket ticket;
@@ -46,11 +47,11 @@ public class TicketResponse {
         this.submittedBy = submittedBy;
     }
 
-    public LocalDateTime getCreationDate() {
+    public Instant getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(LocalDateTime creationDate) {
+    public void setCreationDate(Instant creationDate) {
         this.creationDate = creationDate;
     }
 
