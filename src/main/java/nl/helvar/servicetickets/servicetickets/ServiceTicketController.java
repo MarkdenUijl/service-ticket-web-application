@@ -9,11 +9,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static nl.helvar.servicetickets.helpers.DTOValidator.buildErrorMessage;
 import static nl.helvar.servicetickets.helpers.UriCreator.createUri;
@@ -23,10 +25,12 @@ import static nl.helvar.servicetickets.helpers.UriCreator.createUri;
 public class ServiceTicketController {
     private final ServiceTicketService service;
     private final EmailService emailService;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public ServiceTicketController(ServiceTicketService service, EmailService emailService) {
+    public ServiceTicketController(ServiceTicketService service, EmailService emailService, SimpMessagingTemplate messagingTemplate) {
         this.service = service;
         this.emailService = emailService;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @GetMapping
@@ -79,6 +83,9 @@ public class ServiceTicketController {
         } else {
             ServiceTicketDTO serviceTicketOutput = service.createServiceTicket(userDetails, serviceTicket);
 
+            // push update to all clients subscribed to /topic/tickets
+            messagingTemplate.convertAndSend("/topic/tickets", serviceTicketOutput);
+
             URI uri = createUri(serviceTicketOutput);
 
             try {
@@ -97,7 +104,13 @@ public class ServiceTicketController {
             @PathVariable("id") Long id,
             @RequestBody ServiceTicketCreationDTO newServiceTicket
     ) {
-        return new ResponseEntity<>(ServiceTicketDTO.toDto(service.replaceServiceTicket(userDetails, id, newServiceTicket)), HttpStatus.OK);
+        ServiceTicketDTO updatedTicket = ServiceTicketDTO.toDto(
+            service.replaceServiceTicket(userDetails, id, newServiceTicket)
+        );
+
+        messagingTemplate.convertAndSend("/topic/tickets", updatedTicket);
+
+        return new ResponseEntity<>(updatedTicket, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -105,6 +118,13 @@ public class ServiceTicketController {
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable("id") Long id
     ) {
-        return new ResponseEntity<>(service.deleteServiceTicket(userDetails, id), HttpStatus.OK);
+        String response = service.deleteServiceTicket(userDetails, id);
+
+        // notify clients of deletion
+        messagingTemplate.convertAndSend("/topic/tickets",
+                Map.of("action", "delete", "id", id)
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
