@@ -6,10 +6,10 @@ import nl.helvar.servicetickets.files.File;
 import nl.helvar.servicetickets.projects.Project;
 import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.servicetickets.enums.TicketType;
+import nl.helvar.servicetickets.servicetickets.enums.TicketSource;
 import nl.helvar.servicetickets.ticketresponses.TicketResponse;
 import nl.helvar.servicetickets.users.User;
 
-import java.time.LocalDateTime;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
@@ -23,6 +23,7 @@ public class ServiceTicket {
     private String name;
     private TicketStatus status;
     private TicketType type;
+    private TicketSource source = TicketSource.WEB;
     private String description;
     @OneToMany(mappedBy = "ticket", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<TicketResponse> responses;
@@ -74,6 +75,14 @@ public class ServiceTicket {
     public void setType(TicketType type) {
         this.type = type;
     }
+    public TicketSource getSource() {
+        return source;
+    }
+
+    public void setSource(TicketSource source) {
+        this.source = source;
+    }
+
 
     public String getDescription() {
         return description;

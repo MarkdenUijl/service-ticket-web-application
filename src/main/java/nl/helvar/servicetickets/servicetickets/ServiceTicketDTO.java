@@ -2,6 +2,7 @@ package nl.helvar.servicetickets.servicetickets;
 
 import nl.helvar.servicetickets.interfaces.Identifyable;
 import nl.helvar.servicetickets.projects.ProjectDTO;
+import nl.helvar.servicetickets.servicetickets.enums.TicketSource;
 import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.servicetickets.enums.TicketType;
 import nl.helvar.servicetickets.ticketresponses.TicketResponseDTO;
@@ -21,6 +22,7 @@ public class ServiceTicketDTO implements Identifyable {
     private String name;
     private TicketStatus status;
     private TicketType type;
+    private TicketSource source;
     private String description;
     private List<TicketResponseDTO> responses;
     private int minutesSpent;
@@ -66,6 +68,14 @@ public class ServiceTicketDTO implements Identifyable {
 
     public void setType(TicketType type) {
         this.type = type;
+    }
+
+    public TicketSource getSource() {
+        return source;
+    }
+
+    public void setSource(TicketSource source) {
+        this.source = source;
     }
 
     public String getDescription() {
@@ -124,6 +134,7 @@ public class ServiceTicketDTO implements Identifyable {
         serviceTicketDTO.setName(serviceTicket.getName());
         serviceTicketDTO.setStatus(serviceTicket.getStatus());
         serviceTicketDTO.setType(serviceTicket.getType());
+        serviceTicketDTO.setSource(serviceTicket.getSource());
         serviceTicketDTO.setDescription(serviceTicket.getDescription());
         serviceTicketDTO.setMinutesSpent(serviceTicket.getMinutesSpent());
         serviceTicketDTO.setCreationDate(serviceTicket.getCreationDate());

@@ -4,6 +4,7 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import nl.helvar.servicetickets.exceptions.InvalidEnumConstantException;
 import nl.helvar.servicetickets.projects.Project;
+import nl.helvar.servicetickets.servicetickets.enums.TicketSource;
 import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.servicetickets.enums.TicketType;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,6 +28,15 @@ public class ServiceTicketSpecification {
             return (root, query, builder) -> builder.equal(root.get("status"), status);
         } catch (IllegalArgumentException ex) {
             throw new InvalidEnumConstantException(TicketStatus.values());
+        }
+    }
+
+    public static Specification<ServiceTicket> ticketSourceEquals(String ticketSource) {
+        try {
+            TicketSource source = TicketSource.valueOf(ticketSource.toUpperCase());
+            return (root, query, builder) -> builder.equal(root.get("source"), source);
+        } catch (IllegalArgumentException ex) {
+            throw new InvalidEnumConstantException(TicketSource.values());
         }
     }
 

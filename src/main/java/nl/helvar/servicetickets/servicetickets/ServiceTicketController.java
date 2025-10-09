@@ -37,6 +37,7 @@ public class ServiceTicketController {
     public ResponseEntity<List<ServiceTicketDTO>> getAllServiceTickets(
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String status,
+            @RequestParam(required = false) String source,
             @RequestParam(required = false) Long projectId,
             @RequestParam(required = false) String projectName,
             @RequestParam(required = false) LocalDate issuedBefore,
@@ -49,6 +50,7 @@ public class ServiceTicketController {
         List<ServiceTicketDTO> serviceTicketDTOS = service.getAllServiceTickets(
                         type,
                         status,
+                        source,
                         projectId,
                         projectName,
                         issuedBefore,
@@ -89,7 +91,11 @@ public class ServiceTicketController {
             URI uri = createUri(serviceTicketOutput);
 
             try {
-                emailService.sendTicketConfirmationEmail(userDetails.getUsername(), serviceTicket.getId(), serviceTicket.getName());
+                emailService.sendTicketConfirmationEmail(
+                        serviceTicketOutput.getSubmittedBy().getEmail(),
+                        serviceTicketOutput.getId(),
+                        serviceTicketOutput.getName()
+                );
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

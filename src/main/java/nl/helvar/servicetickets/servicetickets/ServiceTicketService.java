@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,27 +36,28 @@ public class ServiceTicketService {
     }
 
     public ServiceTicketDTO createServiceTicket(UserDetails userDetails, ServiceTicketCreationDTO serviceTicketCreationDTO) {
-        Specification<User> filters = Specification.where(userEmailEquals(userDetails.getUsername()));
-        Optional<User> user = userRepository.findOne(filters);
-
-        if (user.isEmpty()) {
-            throw new RecordNotFoundException("Could not find user with email '" + userDetails.getUsername() + "' in database.");
-        } else {
-//            LocalDateTime currentTime = LocalDateTime.now();
-//            serviceTicketCreationDTO.setCreationDate(currentTime);
-
-            ServiceTicket serviceTicket = serviceTicketCreationDTO.fromDto(projectRepository);
-            serviceTicket.setSubmittedBy(user.get());
-
-            serviceTicketRepository.save(serviceTicket);
-
-            return ServiceTicketDTO.toDto(serviceTicket);
+        if (serviceTicketCreationDTO.getSource() == null) {
+            serviceTicketCreationDTO.setSource("WEB");
         }
+
+        // Build entity from DTO (project, fields, etc.)
+        ServiceTicket serviceTicket = serviceTicketCreationDTO.fromDto(projectRepository);
+
+        // Resolve who the submitter is (self or another user if allowed)
+        User submittedBy = resolveSubmitter(userDetails, serviceTicketCreationDTO);
+        serviceTicket.setSubmittedBy(submittedBy);
+
+        // Persist
+        serviceTicketRepository.save(serviceTicket);
+
+        // Map to output
+        return ServiceTicketDTO.toDto(serviceTicket);
     }
 
     public List<ServiceTicket> getAllServiceTickets(
             String type,
             String status,
+            String source,
             Long projectId,
             String projectName,
             LocalDate issuedBefore,
@@ -69,6 +69,7 @@ public class ServiceTicketService {
     ) {
         Specification<ServiceTicket> filters = Specification.where(StringUtils.isBlank(type) ? null : ticketTypeEquals(type))
                 .and(StringUtils.isBlank(status) ? null : ticketStatusEquals(status))
+                .and(StringUtils.isBlank(source) ? null : ticketSourceEquals(source))
                 .and(projectId == null ? null : ticketProjectIdEquals(projectId))
                 .and(StringUtils.isBlank(projectName) ? null : ticketProjectNameLike(projectName))
                 .and(ServiceTicketSpecification.ticketDateRange(issuedAfter, issuedBefore))
@@ -117,11 +118,27 @@ public class ServiceTicketService {
             ServiceTicket newTicket = newServiceTicket.fromDto(projectRepository);
             User submittedBy = existingServiceTicket.getSubmittedBy();
 
-            if (hasPrivilege("CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE", userDetails) || userDetails.getUsername().equals(submittedBy.getEmail())) {
+            if (hasPrivilege("CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE", userDetails)
+                    || userDetails.getUsername().equals(submittedBy.getEmail())) {
+
+                // Prevent submittedBy changes unless moderator explicitly allowed to
+                if (newServiceTicket.getSubmittedByUserId() != null
+                        && !newServiceTicket.getSubmittedByUserId().equals(submittedBy.getId())) {
+                    // Either ignore silently or enforce moderator-only:
+                    if (!hasPrivilege("CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE", userDetails)) {
+                        throw new InvalidRequestException("Changing ticket submitter is not allowed.");
+                    }
+                    // If you DO want to allow moderators to change it:
+                    User newSubmitter = userRepository.findById(newServiceTicket.getSubmittedByUserId())
+                            .orElseThrow(() -> new RecordNotFoundException(
+                                    "Could not find target user with id '" + newServiceTicket.getSubmittedByUserId() + "'."));
+                    existingServiceTicket.setSubmittedBy(newSubmitter);
+                }
+
+                // Copy all other non-null fields
                 ObjectCopyUtils.copyNonNullProperties(newTicket, existingServiceTicket);
 
                 serviceTicketRepository.save(existingServiceTicket);
-
                 return existingServiceTicket;
             } else {
                 throw new InvalidRequestException("You do not have the required privileges to change this ticket.");
@@ -149,5 +166,34 @@ public class ServiceTicketService {
                 throw new InvalidRequestException("You do not have the required privileges to delete this ticket.");
             }
         }
+    }
+
+    // METHODS:
+    private User resolveSubmitter(UserDetails userDetails, ServiceTicketCreationDTO dto) {
+        // 1) Who is calling?
+        User creator = userRepository.findOne(Specification.where(userEmailEquals(userDetails.getUsername())))
+                .orElseThrow(() -> new RecordNotFoundException(
+                        "Could not find user with email '" + userDetails.getUsername() + "' in database.")
+                );
+
+        // 2) Default submitter is the creator
+        User submittedBy = creator;
+
+        // 3) If caller tries to submit for another user, check permission and load target user
+        Long requestedSubmitterId = dto.getSubmittedByUserId();
+        if (requestedSubmitterId != null && !requestedSubmitterId.equals(creator.getId())) {
+            boolean canCreateForOthers = hasPrivilege("CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE", userDetails);
+
+            if (!canCreateForOthers) {
+                throw new InvalidRequestException("You are not allowed to create tickets for other users.");
+            }
+
+            submittedBy = userRepository.findById(requestedSubmitterId)
+                    .orElseThrow(() -> new RecordNotFoundException(
+                            "Could not find target user with id '" + requestedSubmitterId + "'.")
+                    );
+        }
+
+        return submittedBy;
     }
 }
