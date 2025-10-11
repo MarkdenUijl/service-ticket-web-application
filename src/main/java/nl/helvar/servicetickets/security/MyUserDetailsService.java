@@ -38,7 +38,7 @@ public class MyUserDetailsService implements UserDetailsService {
         } else {
             User user = optionalUser.get();
 
-            return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), true, true, true, true, getAuthorities(user.getRoles()));
+            return new MyUserDetails(user);
         }
     }
 
@@ -46,19 +46,35 @@ public class MyUserDetailsService implements UserDetailsService {
         return getGrantedAuthorities(getPrivileges(roles));
     }
 
+//    private List<String> getPrivileges(Collection<Role> roles) {
+//        List<String> privileges = new ArrayList<>();
+//        List<Privilege> collection = new ArrayList<>();
+//
+//        for (Role role : roles) {
+//            privileges.add(role.getName());
+//            collection.addAll(role.getPrivileges());
+//        }
+//
+//        for (Privilege item : collection) {
+//            privileges.add(item.getName());
+//        }
+//        return privileges;
+//    }
+
     private List<String> getPrivileges(Collection<Role> roles) {
         List<String> privileges = new ArrayList<>();
-        List<Privilege> collection = new ArrayList<>();
 
         for (Role role : roles) {
-            privileges.add(role.getName());
-            collection.addAll(role.getPrivileges());
+            for (Privilege privilege : role.getPrivileges()) {
+                privileges.add(privilege.getName());
+            }
         }
 
-        for (Privilege item : collection) {
-            privileges.add(item.getName());
-        }
         return privileges;
+    }
+
+    public List<String> extractPrivilegesFromUser(User user) {
+        return getPrivileges(user.getRoles());
     }
 
     private List<GrantedAuthority> getGrantedAuthorities(List<String> privileges) {

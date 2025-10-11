@@ -7,7 +7,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class FileUtils {
-    public static final int BUFFER_SIZE = 4 * 1024;
+    public static final int BUFFER_SIZE = 8 * 1024;
 
     public static byte[] compressFile(byte[] data) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
