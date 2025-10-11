@@ -32,9 +32,10 @@ public class ServiceTicketController {
         this.emailService = emailService;
         this.messagingTemplate = messagingTemplate;
     }
-
+    
     @GetMapping
     public ResponseEntity<List<ServiceTicketDTO>> getAllServiceTickets(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String source,
@@ -47,24 +48,18 @@ public class ServiceTicketController {
             @RequestParam(required = false) String submitterEmail,
             @RequestParam(required = false) Long submitterId
     ) {
-        List<ServiceTicketDTO> serviceTicketDTOS = service.getAllServiceTickets(
-                        type,
-                        status,
-                        source,
-                        projectId,
-                        projectName,
-                        issuedBefore,
-                        issuedAfter,
-                        submitterFirstName,
-                        submitterLastName,
-                        submitterEmail,
-                        submitterId
-                )
-                .stream()
+        List<ServiceTicketDTO> tickets = service.getAllServiceTicketsFiltered(
+                        userDetails,
+                        type, status, source,
+                        projectId, projectName,
+                        issuedBefore, issuedAfter,
+                        submitterFirstName, submitterLastName,
+                        submitterEmail, submitterId
+                ).stream()
                 .map(ServiceTicketDTO::toDto)
-                .toList();;
+                .toList();
 
-        return new ResponseEntity<>(serviceTicketDTOS, HttpStatus.OK);
+        return ResponseEntity.ok(tickets);
     }
 
     @GetMapping("/{id}")

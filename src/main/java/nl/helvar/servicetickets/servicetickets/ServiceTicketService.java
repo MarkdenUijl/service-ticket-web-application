@@ -87,6 +87,48 @@ public class ServiceTicketService {
         }
     }
 
+    public List<ServiceTicket> getAllServiceTicketsFiltered(
+            UserDetails userDetails,
+            String type,
+            String status,
+            String source,
+            Long projectId,
+            String projectName,
+            LocalDate issuedBefore,
+            LocalDate issuedAfter,
+            String submitterFirstName,
+            String submitterLastName,
+            String submitterEmail,
+            Long submitterId
+    ) {
+        boolean canModerate = hasPrivilege("CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE", userDetails);
+
+        // Build base filters (same as your current implementation)
+        Specification<ServiceTicket> filters = Specification.where(StringUtils.isBlank(type) ? null : ticketTypeEquals(type))
+                .and(StringUtils.isBlank(status) ? null : ticketStatusEquals(status))
+                .and(StringUtils.isBlank(source) ? null : ticketSourceEquals(source))
+                .and(projectId == null ? null : ticketProjectIdEquals(projectId))
+                .and(StringUtils.isBlank(projectName) ? null : ticketProjectNameLike(projectName))
+                .and(ServiceTicketSpecification.ticketDateRange(issuedAfter, issuedBefore))
+                .and(StringUtils.isBlank(submitterFirstName) ? null : ticketUserFirstNameEquals(submitterFirstName))
+                .and(StringUtils.isBlank(submitterLastName) ? null : ticketUserLastNameEquals(submitterLastName))
+                .and(StringUtils.isBlank(submitterEmail) ? null : ticketUserEmailEquals(submitterEmail))
+                .and(submitterId == null ? null : ticketUserIdEquals(submitterId));
+
+        // Apply user restriction if not moderator
+        if (!canModerate) {
+            filters = filters.and(ticketUserEmailEquals(userDetails.getUsername()));
+        }
+
+        List<ServiceTicket> serviceTickets = serviceTicketRepository.findAll(filters);
+
+        if (serviceTickets.isEmpty()) {
+            throw new RecordNotFoundException("Could not find service tickets with these parameters in the database.");
+        }
+
+        return serviceTickets;
+    }
+
     public ServiceTicket findById(UserDetails userDetails, Long id) {
         Optional<ServiceTicket> serviceTicket = serviceTicketRepository.findById(id);
 

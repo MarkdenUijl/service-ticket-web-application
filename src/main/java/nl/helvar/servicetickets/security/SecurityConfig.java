@@ -90,7 +90,7 @@ public class SecurityConfig {
                                 .hasAuthority("CAN_MODIFY_PROJECTS_PRIVILEGE")
 
                                 .requestMatchers(HttpMethod.GET, "/serviceTickets")
-                                .hasAuthority("CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE")
+                                .authenticated()
                                 .requestMatchers(HttpMethod.DELETE, "/serviceTickets/*/files/**")
                                 .hasAuthority("CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE")
                                 .requestMatchers("/serviceTickets/**")
