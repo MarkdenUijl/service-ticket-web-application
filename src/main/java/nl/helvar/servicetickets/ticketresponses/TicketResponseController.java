@@ -2,12 +2,15 @@ package nl.helvar.servicetickets.ticketresponses;
 
 import jakarta.validation.Valid;
 import nl.helvar.servicetickets.exceptions.BadObjectCreationException;
+import nl.helvar.servicetickets.servicetickets.ServiceTicketDTO;
+import nl.helvar.servicetickets.servicetickets.ServiceTicketService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.net.URI;
 import java.util.List;
@@ -19,9 +22,17 @@ import static nl.helvar.servicetickets.helpers.UriCreator.createUri;
 @RequestMapping("/ticketResponses")
 public class TicketResponseController {
     private final TicketResponseService service;
+    private final ServiceTicketService serviceTicketService;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public TicketResponseController(TicketResponseService service) {
+    public TicketResponseController(
+            TicketResponseService service,
+            ServiceTicketService serviceTicketService,
+            SimpMessagingTemplate messagingTemplate
+    ) {
         this.service = service;
+        this.serviceTicketService = serviceTicketService;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @GetMapping
@@ -50,6 +61,13 @@ public class TicketResponseController {
             throw new BadObjectCreationException(buildErrorMessage(br));
         } else {
             TicketResponseDTO ticketResponseOutput = service.createTicketResponse(userDetails, ticketResponse);
+
+            ServiceTicketDTO parentTicket = ServiceTicketDTO.toDto(
+                    serviceTicketService.findById(userDetails, ticketResponse.getServiceTicketId())
+            );
+
+            // Broadcast ticket update to all clients on websocket
+            messagingTemplate.convertAndSend("/topic/tickets", parentTicket);
 
             URI uri = createUri(ticketResponseOutput);
 

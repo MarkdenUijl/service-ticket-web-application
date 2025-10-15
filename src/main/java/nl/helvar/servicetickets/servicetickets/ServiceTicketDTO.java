@@ -27,6 +27,7 @@ public class ServiceTicketDTO implements Identifyable {
     private List<TicketResponseDTO> responses;
     private int minutesSpent;
     private Instant creationDate;
+    private Instant lastUpdated;
     private HashMap<Long, String> files;
     private ProjectDTO project;
 
@@ -110,6 +111,14 @@ public class ServiceTicketDTO implements Identifyable {
         this.creationDate = creationDate;
     }
 
+    public Instant getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Instant lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
     public HashMap<Long, String> getFiles() {
         return files;
     }
@@ -139,13 +148,23 @@ public class ServiceTicketDTO implements Identifyable {
         serviceTicketDTO.setMinutesSpent(serviceTicket.getMinutesSpent());
         serviceTicketDTO.setCreationDate(serviceTicket.getCreationDate());
 
-        if (serviceTicket.getResponses() != null) {
+        if (serviceTicket.getResponses() != null && !serviceTicket.getResponses().isEmpty()) {
             serviceTicketDTO.setResponses(serviceTicket.getResponses()
                     .stream()
                     .map(TicketResponseDTO::toDto)
                     .sorted(Comparator.comparing(TicketResponseDTO::getCreationDate))
                     .toList()
             );
+
+            Instant lastResponseDate = serviceTicket.getResponses()
+                    .stream()
+                    .map(r -> r.getCreationDate())
+                    .max(Comparator.naturalOrder())
+                    .orElse(serviceTicket.getCreationDate());
+
+            serviceTicketDTO.setLastUpdated(lastResponseDate);
+        } else {
+            serviceTicketDTO.setLastUpdated(serviceTicket.getCreationDate());
         }
 
         if (serviceTicket.getFiles() != null) {
@@ -158,6 +177,8 @@ public class ServiceTicketDTO implements Identifyable {
         if (serviceTicket.getProject() != null) {
             serviceTicketDTO.setProject(ProjectDTO.toBaseDto(serviceTicket.getProject()));
         }
+
+
 
         return serviceTicketDTO;
     }

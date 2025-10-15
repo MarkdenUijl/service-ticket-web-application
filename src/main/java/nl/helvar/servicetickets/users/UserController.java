@@ -32,9 +32,11 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers(
             @RequestParam(required = false) String roleName,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String email
             ) {
-        List<UserDTO> userDTOS = userService.getAllUsers(roleName, email);
+        List<UserDTO> userDTOS = userService.getAllUsers(roleName, firstName, lastName, email);
 
         return new ResponseEntity<>(userDTOS, HttpStatus.OK);
     }

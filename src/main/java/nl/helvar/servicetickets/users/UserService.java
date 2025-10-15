@@ -58,8 +58,10 @@ public class UserService {
         }
     }
 
-    public List<UserDTO> getAllUsers(String roleName, String email) {
+    public List<UserDTO> getAllUsers(String roleName, String firstName, String lastName, String email) {
         Specification<User> filters = Specification.where(StringUtils.isBlank(roleName) ? null : userRoleLike(roleName))
+                .and(StringUtils.isBlank(firstName) ? null : userFirstNameLike(firstName))
+                .and(StringUtils.isBlank(lastName) ? null : userLastNameLike(lastName))
                 .and(StringUtils.isBlank(email) ? null : userEmailEquals(email));
 
         List<UserDTO> filteredUsers = userRepository.findAll(filters)
