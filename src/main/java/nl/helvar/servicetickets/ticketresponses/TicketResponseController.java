@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 
 import static nl.helvar.servicetickets.helpers.DTOValidator.buildErrorMessage;
@@ -61,13 +62,6 @@ public class TicketResponseController {
             throw new BadObjectCreationException(buildErrorMessage(br));
         } else {
             TicketResponseDTO ticketResponseOutput = service.createTicketResponse(userDetails, ticketResponse);
-
-            ServiceTicketDTO parentTicket = ServiceTicketDTO.toDto(
-                    serviceTicketService.findById(userDetails, ticketResponse.getServiceTicketId())
-            );
-
-            // Broadcast ticket update to all clients on websocket
-            messagingTemplate.convertAndSend("/topic/tickets", parentTicket);
 
             URI uri = createUri(ticketResponseOutput);
 

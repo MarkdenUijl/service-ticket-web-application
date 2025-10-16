@@ -80,14 +80,14 @@ public class TicketResponseCreationDTO {
                 engineerResponse.setResponse(this.getResponse());
                 engineerResponse.setCreationDate(this.getCreationDate());
                 engineerResponse.setMinutesSpent(this.getMinutesSpent());
-                engineerResponse.setTicket(serviceTicket.get());
+                serviceTicket.get().addResponse(engineerResponse);
 
                 return engineerResponse;
             } else {
                 TicketResponse ticketResponse = new TicketResponse();
                 ticketResponse.setResponse(this.getResponse());
                 ticketResponse.setCreationDate(this.getCreationDate());
-                ticketResponse.setTicket(serviceTicket.get());
+                serviceTicket.get().addResponse(ticketResponse);
 
                 return ticketResponse;
             }

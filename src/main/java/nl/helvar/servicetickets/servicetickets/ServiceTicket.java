@@ -100,6 +100,14 @@ public class ServiceTicket {
         this.responses = responses;
     }
 
+    public void addResponse(TicketResponse r) {
+        if (this.responses == null) {
+            this.responses = new java.util.ArrayList<>();
+        }
+        this.responses.add(r);
+        r.setTicket(this);
+    }
+
     public Project getProject() {
         return project;
     }

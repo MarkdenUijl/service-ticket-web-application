@@ -1,6 +1,7 @@
 package nl.helvar.servicetickets.ticketresponses;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.transaction.Transactional;
 import nl.helvar.servicetickets.email.EmailService;
 import nl.helvar.servicetickets.exceptions.InvalidRequestException;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
@@ -8,6 +9,7 @@ import nl.helvar.servicetickets.helpers.ObjectCopyUtils;
 import nl.helvar.servicetickets.servicecontracts.ServiceContract;
 import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
+import nl.helvar.servicetickets.servicetickets.ServiceTicketDTO;
 import nl.helvar.servicetickets.servicetickets.ServiceTicketRepository;
 import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.ticketresponses.subclasses.EngineerResponse;
@@ -15,6 +17,7 @@ import nl.helvar.servicetickets.users.User;
 import nl.helvar.servicetickets.users.UserRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -34,20 +37,24 @@ public class TicketResponseService {
     private final ServiceContractRepository serviceContractRepository;
     private final EmailService emailService;
     private final UserRepository userRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public TicketResponseService(TicketResponseRepository ticketResponseRepository,
                                  ServiceTicketRepository serviceTicketRepository,
                                  ServiceContractRepository serviceContractRepository,
                                  UserRepository userRepository,
-                                 EmailService emailService
+                                 EmailService emailService,
+                                 SimpMessagingTemplate messagingTemplate
                                  ) {
         this.ticketResponseRepository = ticketResponseRepository;
         this.serviceTicketRepository = serviceTicketRepository;
         this.serviceContractRepository = serviceContractRepository;
         this.userRepository = userRepository;
         this.emailService = emailService;
+        this.messagingTemplate = messagingTemplate;
     }
 
+    @Transactional
     public TicketResponseDTO createTicketResponse(
             UserDetails userDetails,
             TicketResponseCreationDTO ticketResponseCreationDTO
@@ -61,6 +68,7 @@ public class TicketResponseService {
         }
 
         TicketResponse ticketResponse = ticketResponseCreationDTO.fromDto(serviceTicketRepository);
+        ServiceTicket ticket = ticketResponse.getTicket();
 
         Specification<User> filter = Specification.where(userEmailEquals(userDetails.getUsername()));
         Optional<User> user = userRepository.findOne(filter);
@@ -68,8 +76,6 @@ public class TicketResponseService {
         user.ifPresent(ticketResponse::setSubmittedBy);
 
         if (isEngineerResponse) {
-
-            ServiceTicket ticket = ticketResponse.getTicket();
 
             if(ticket.getStatus() == TicketStatus.OPEN) {
                 ticket.setStatus(TicketStatus.PENDING);
@@ -84,7 +90,7 @@ public class TicketResponseService {
             }
         }
 
-        String ticketOwnerMail = ticketResponse.getTicket().getSubmittedBy().getEmail();
+        String ticketOwnerMail = ticket.getSubmittedBy().getEmail();
 
         try {
             emailService.sendTicketUpdate(ticketOwnerMail, ticketResponse.getTicket().getName(), ticketResponse.getResponse());
@@ -93,6 +99,13 @@ public class TicketResponseService {
         }
 
         ticketResponseRepository.save(ticketResponse);
+        ticketResponseRepository.flush();
+
+        // Broadcast the updated ticket (inside same transaction context)
+        messagingTemplate.convertAndSend(
+                "/topic/tickets",
+                ServiceTicketDTO.toDto(ticket)
+        );
 
         return TicketResponseDTO.toDto(ticketResponse);
     }
