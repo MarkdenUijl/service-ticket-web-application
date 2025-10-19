@@ -2,6 +2,7 @@ package nl.helvar.servicetickets.ticketresponses;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
 import nl.helvar.servicetickets.servicetickets.ServiceTicketRepository;
@@ -13,6 +14,7 @@ import java.util.Optional;
 public class TicketResponseCreationDTO {
     private Long id;
     @NotBlank
+    @Size(max = 5000)
     private String response;
     private Instant creationDate;
     @NotNull

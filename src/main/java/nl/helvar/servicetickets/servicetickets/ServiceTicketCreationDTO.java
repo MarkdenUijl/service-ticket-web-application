@@ -27,6 +27,7 @@ public class ServiceTicketCreationDTO {
     private String type;
     private String source;
     @NotBlank
+    @Size(max = 5000)
     private String description;
     private List<TicketResponse> responses;
     private int minutesSpent;

@@ -2,6 +2,7 @@ package nl.helvar.servicetickets.ticketresponses;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.transaction.Transactional;
+import nl.helvar.servicetickets.configurations.websocket.TicketUpdateNotifier;
 import nl.helvar.servicetickets.email.EmailService;
 import nl.helvar.servicetickets.exceptions.InvalidRequestException;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
@@ -38,13 +39,15 @@ public class TicketResponseService {
     private final EmailService emailService;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final TicketUpdateNotifier ticketUpdateNotifier;
 
     public TicketResponseService(TicketResponseRepository ticketResponseRepository,
                                  ServiceTicketRepository serviceTicketRepository,
                                  ServiceContractRepository serviceContractRepository,
                                  UserRepository userRepository,
                                  EmailService emailService,
-                                 SimpMessagingTemplate messagingTemplate
+                                 SimpMessagingTemplate messagingTemplate,
+                                 TicketUpdateNotifier ticketUpdateNotifier
                                  ) {
         this.ticketResponseRepository = ticketResponseRepository;
         this.serviceTicketRepository = serviceTicketRepository;
@@ -52,6 +55,7 @@ public class TicketResponseService {
         this.userRepository = userRepository;
         this.emailService = emailService;
         this.messagingTemplate = messagingTemplate;
+        this.ticketUpdateNotifier = ticketUpdateNotifier;
     }
 
     @Transactional
@@ -106,6 +110,9 @@ public class TicketResponseService {
                 "/topic/tickets",
                 ServiceTicketDTO.toDto(ticket)
         );
+
+        // Broadcast to detail view
+        ticketUpdateNotifier.broadcastTicketUpdate(ServiceTicketDTO.toDto(ticket));
 
         return TicketResponseDTO.toDto(ticketResponse);
     }

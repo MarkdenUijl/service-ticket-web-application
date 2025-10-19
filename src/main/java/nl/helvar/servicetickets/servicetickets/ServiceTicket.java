@@ -24,6 +24,7 @@ public class ServiceTicket {
     private TicketStatus status;
     private TicketType type;
     private TicketSource source = TicketSource.WEB;
+    @Column(columnDefinition = "TEXT")
     private String description;
     @OneToMany(mappedBy = "ticket", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<TicketResponse> responses;
@@ -34,7 +35,7 @@ public class ServiceTicket {
     private int minutesSpent;
     @Column(nullable = false)
     private Instant creationDate;
-    @OneToMany(mappedBy = "ticket", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "ticket", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<File> files;
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -138,6 +139,18 @@ public class ServiceTicket {
 
     public void setFiles(List<File> files) {
         this.files = files;
+    }
+
+    public void addFile(File f) {
+        if (this.files == null) {
+            this.files = new java.util.ArrayList<>();
+        }
+        this.files.add(f);
+        f.setTicket(this);
+    }
+
+    public void removeFile(File f) {
+        this.files.remove(f);
     }
 
     public User getSubmittedBy() {

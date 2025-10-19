@@ -17,6 +17,7 @@ public class TicketResponse {
     @Id
     @GeneratedValue
     private Long id;
+    @Column(columnDefinition = "TEXT")
     private String response;
     @ManyToOne
     @JoinColumn(name = "user_id")

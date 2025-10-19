@@ -60,6 +60,8 @@ public class FileCreationDTO {
         file.setTicket(serviceTicket.get());
         file.setData(this.getData());
 
+        serviceTicket.get().addFile(file);
+
         return file;
     }
 

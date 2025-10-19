@@ -115,6 +115,7 @@ public class UserDTO implements Identifyable {
         userDTO.setFirstName(user.getFirstName());
         userDTO.setLastName(user.getLastName());
         userDTO.setEmail(user.getEmail());
+        userDTO.setPhoneNumber(user.getPhoneNumber());
 
         return userDTO;
     }

@@ -69,46 +69,46 @@ VALUES
     (nextval('users_seq'), 'User', 'Tester', 'user@tester.nl', '$2a$10$EFG1ijoIuHicy2zpiqXvZ.qF.1kcxttcYz.znrI67el1rgmMkMj3W', '+31612345678');
 
 /* SERVICE TICKETS DATA */
-INSERT INTO service_tickets (id, name, status, type, description, project_id, minutes_spent, creation_date, user_id)
-VALUES
-    (nextval('service_tickets_seq'), 'Issue with Server', 0, 0, 'Experiencing connectivity problems', 1, 0, '2023-06-28T09:00:00', 101),
-    (nextval('service_tickets_seq'), 'Network Latency', 1, 1, 'Experiencing slow internet speeds', 51, 0, '2023-09-02T10:30:00', 101),
-    (nextval('service_tickets_seq'), 'Software Installation', 1, 1, 'Request for software setup on workstation', 101, 0, '2024-01-01T11:45:00', 101),
-    (nextval('service_tickets_seq'), 'Email Configuration Issue', 2, 0, 'Unable to send/receive emails', 151, 0, '2024-01-06T13:15:00', 101),
-    (nextval('service_tickets_seq'), 'Database Migration Request', 0, 1, 'Need to migrate PostgreSQL DB', 201, 0, '2024-03-10T10:00:00', 101),
-    (nextval('service_tickets_seq'), 'VPN Connection Issue', 1, 0, 'VPN not connecting for remote users', 251, 0, '2024-04-05T14:45:00', 101),
-    (nextval('service_tickets_seq'), 'Firewall Rules Update', 2, 1, 'Request to update outgoing rules', 301, 0, '2024-05-12T16:30:00', 101),
-    (nextval('service_tickets_seq'), 'Printer Not Responding', 0, 0, 'Office printer stuck in queue', 351, 0, '2024-05-21T09:20:00', 101),
-    (nextval('service_tickets_seq'), 'Password Reset Request', 1, 1, 'User cannot log in to portal', 401, 0, '2024-06-01T08:00:00', 101),
-    (nextval('service_tickets_seq'), 'Hardware Replacement', 2, 1, 'Old workstation needs replacement', 451, 0, '2024-06-18T13:30:00', 101),
-    (nextval('service_tickets_seq'), 'Data Loss Incident', 0, 0, 'Files disappeared from shared drive', 501, 0, '2024-07-03T11:15:00', 101),
-    (nextval('service_tickets_seq'), 'Security Patch Deployment', 1, 1, 'Urgent update for critical CVE', 551, 0, '2024-07-25T15:40:00', 101),
-    (nextval('service_tickets_seq'), 'Mobile App Crash', 0, 0, 'Crash after login on Android devices', 601, 0, '2024-08-01T17:00:00', 101),
-    (nextval('service_tickets_seq'), 'Wi-Fi Downtime', 2, 1, 'Office Wi-Fi inaccessible intermittently', 601, 0, '2024-08-05T08:45:00', 101);
-
-/* SERVICE TICKET RESPONSE DATA */
-INSERT INTO ticket_responses (id, response_type, response, creation_date, ticket_id, minutes_spent, user_id)
-VALUES
-    (nextval('ticket_responses_seq'), 'engineer_response', 'Tried rebooting the router', '2023-12-28T09:10:00', 1, 2, 51),
-    (nextval('ticket_responses_seq'), 'basic_response', 'Performed speed test, investigating the issue', '2024-01-02T10:35:00', 51, null, 101),
-    (nextval('ticket_responses_seq'), 'engineer_response', 'Identified high latency due to ISP issue, contacting ISP support', '2024-01-02T11:00:00', 51, 4, 51),
-    (nextval('ticket_responses_seq'), 'basic_response', 'ISP confirmed issue in the area, estimated resolution time provided', '2024-01-02T11:30:00', 51, null, 101),
-    (nextval('ticket_responses_seq'), 'engineer_response', 'Contacting user to gather software requirements', '2024-01-02T11:50:00', 101, 3, 51),
-    (nextval('ticket_responses_seq'), 'basic_response', 'Received software specifications, initiating installation', '2024-01-02T12:15:00', 101, null, 101),
-    (nextval('ticket_responses_seq'), 'engineer_response', 'Software installation completed successfully', '2024-01-02T13:00:00', 101, 6, 51),
-    (nextval('ticket_responses_seq'), 'basic_response', 'Checking mail server settings for possible issues', '2024-01-02T13:20:00', 151, null, 101),
-    (nextval('ticket_responses_seq'), 'engineer_response', 'Adjusted SMTP settings, testing outgoing mail', '2024-01-02T13:40:00', 151, 7, 51),
-    (nextval('ticket_responses_seq'), 'basic_response', 'Incoming mail settings updated, testing incoming mail', '2024-01-02T14:00:00', 151, null, 101),
-    (nextval('ticket_responses_seq'), 'engineer_response', 'Initiated PostgreSQL dump backup', '2024-03-10T10:15:00', 201, 4, 51),
-    (nextval('ticket_responses_seq'), 'basic_response', 'Backup completed, starting migration', '2024-03-10T10:45:00', 201, null, 101),
-    (nextval('ticket_responses_seq'), 'engineer_response', 'VPN gateway config reset', '2024-04-05T15:00:00', 251, 2, 51),
-    (nextval('ticket_responses_seq'), 'basic_response', 'Tested from client side, still failing', '2024-04-05T15:20:00', 251, null, 101),
-    (nextval('ticket_responses_seq'), 'engineer_response', 'Firewall rules updated for port 443', '2024-05-12T17:00:00', 301, 3, 51),
-    (nextval('ticket_responses_seq'), 'basic_response', 'Confirmed remote access now working', '2024-05-12T17:15:00', 301, null, 101),
-    (nextval('ticket_responses_seq'), 'engineer_response', 'Printer restarted, job flushed', '2024-05-21T09:40:00', 351, 1, 51),
-    (nextval('ticket_responses_seq'), 'basic_response', 'Printed test document successfully', '2024-05-21T09:50:00', 351, null, 101),
-    (nextval('ticket_responses_seq'), 'engineer_response', 'Password reset token generated', '2024-06-01T08:15:00', 401, 1, 51),
-    (nextval('ticket_responses_seq'), 'basic_response', 'Password changed and working', '2024-06-01T08:25:00', 401, null, 101);
+-- INSERT INTO service_tickets (id, name, status, type, description, project_id, minutes_spent, creation_date, user_id)
+-- VALUES
+--     (nextval('service_tickets_seq'), 'Issue with Server', 0, 0, 'Experiencing connectivity problems', 1, 0, '2023-06-28T09:00:00', 101),
+--     (nextval('service_tickets_seq'), 'Network Latency', 1, 1, 'Experiencing slow internet speeds', 51, 0, '2023-09-02T10:30:00', 101),
+--     (nextval('service_tickets_seq'), 'Software Installation', 1, 1, 'Request for software setup on workstation', 101, 0, '2024-01-01T11:45:00', 101),
+--     (nextval('service_tickets_seq'), 'Email Configuration Issue', 2, 0, 'Unable to send/receive emails', 151, 0, '2024-01-06T13:15:00', 101),
+--     (nextval('service_tickets_seq'), 'Database Migration Request', 0, 1, 'Need to migrate PostgreSQL DB', 201, 0, '2024-03-10T10:00:00', 101),
+--     (nextval('service_tickets_seq'), 'VPN Connection Issue', 1, 0, 'VPN not connecting for remote users', 251, 0, '2024-04-05T14:45:00', 101),
+--     (nextval('service_tickets_seq'), 'Firewall Rules Update', 2, 1, 'Request to update outgoing rules', 301, 0, '2024-05-12T16:30:00', 101),
+--     (nextval('service_tickets_seq'), 'Printer Not Responding', 0, 0, 'Office printer stuck in queue', 351, 0, '2024-05-21T09:20:00', 101),
+--     (nextval('service_tickets_seq'), 'Password Reset Request', 1, 1, 'User cannot log in to portal', 401, 0, '2024-06-01T08:00:00', 101),
+--     (nextval('service_tickets_seq'), 'Hardware Replacement', 2, 1, 'Old workstation needs replacement', 451, 0, '2024-06-18T13:30:00', 101),
+--     (nextval('service_tickets_seq'), 'Data Loss Incident', 0, 0, 'Files disappeared from shared drive', 501, 0, '2024-07-03T11:15:00', 101),
+--     (nextval('service_tickets_seq'), 'Security Patch Deployment', 1, 1, 'Urgent update for critical CVE', 551, 0, '2024-07-25T15:40:00', 101),
+--     (nextval('service_tickets_seq'), 'Mobile App Crash', 0, 0, 'Crash after login on Android devices', 601, 0, '2024-08-01T17:00:00', 101),
+--     (nextval('service_tickets_seq'), 'Wi-Fi Downtime', 2, 1, 'Office Wi-Fi inaccessible intermittently', 601, 0, '2024-08-05T08:45:00', 101);
+--
+-- /* SERVICE TICKET RESPONSE DATA */
+-- INSERT INTO ticket_responses (id, response_type, response, creation_date, ticket_id, minutes_spent, user_id)
+-- VALUES
+--     (nextval('ticket_responses_seq'), 'engineer_response', 'Tried rebooting the router', '2023-12-28T09:10:00', 1, 2, 51),
+--     (nextval('ticket_responses_seq'), 'basic_response', 'Performed speed test, investigating the issue', '2024-01-02T10:35:00', 51, null, 101),
+--     (nextval('ticket_responses_seq'), 'engineer_response', 'Identified high latency due to ISP issue, contacting ISP support', '2024-01-02T11:00:00', 51, 4, 51),
+--     (nextval('ticket_responses_seq'), 'basic_response', 'ISP confirmed issue in the area, estimated resolution time provided', '2024-01-02T11:30:00', 51, null, 101),
+--     (nextval('ticket_responses_seq'), 'engineer_response', 'Contacting user to gather software requirements', '2024-01-02T11:50:00', 101, 3, 51),
+--     (nextval('ticket_responses_seq'), 'basic_response', 'Received software specifications, initiating installation', '2024-01-02T12:15:00', 101, null, 101),
+--     (nextval('ticket_responses_seq'), 'engineer_response', 'Software installation completed successfully', '2024-01-02T13:00:00', 101, 6, 51),
+--     (nextval('ticket_responses_seq'), 'basic_response', 'Checking mail server settings for possible issues', '2024-01-02T13:20:00', 151, null, 101),
+--     (nextval('ticket_responses_seq'), 'engineer_response', 'Adjusted SMTP settings, testing outgoing mail', '2024-01-02T13:40:00', 151, 7, 51),
+--     (nextval('ticket_responses_seq'), 'basic_response', 'Incoming mail settings updated, testing incoming mail', '2024-01-02T14:00:00', 151, null, 101),
+--     (nextval('ticket_responses_seq'), 'engineer_response', 'Initiated PostgreSQL dump backup', '2024-03-10T10:15:00', 201, 4, 51),
+--     (nextval('ticket_responses_seq'), 'basic_response', 'Backup completed, starting migration', '2024-03-10T10:45:00', 201, null, 101),
+--     (nextval('ticket_responses_seq'), 'engineer_response', 'VPN gateway config reset', '2024-04-05T15:00:00', 251, 2, 51),
+--     (nextval('ticket_responses_seq'), 'basic_response', 'Tested from client side, still failing', '2024-04-05T15:20:00', 251, null, 101),
+--     (nextval('ticket_responses_seq'), 'engineer_response', 'Firewall rules updated for port 443', '2024-05-12T17:00:00', 301, 3, 51),
+--     (nextval('ticket_responses_seq'), 'basic_response', 'Confirmed remote access now working', '2024-05-12T17:15:00', 301, null, 101),
+--     (nextval('ticket_responses_seq'), 'engineer_response', 'Printer restarted, job flushed', '2024-05-21T09:40:00', 351, 1, 51),
+--     (nextval('ticket_responses_seq'), 'basic_response', 'Printed test document successfully', '2024-05-21T09:50:00', 351, null, 101),
+--     (nextval('ticket_responses_seq'), 'engineer_response', 'Password reset token generated', '2024-06-01T08:15:00', 401, 1, 51),
+--     (nextval('ticket_responses_seq'), 'basic_response', 'Password changed and working', '2024-06-01T08:25:00', 401, null, 101);
 
 
 /* SUB TABLES DATA */
