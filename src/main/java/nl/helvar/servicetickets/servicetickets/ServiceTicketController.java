@@ -46,7 +46,10 @@ public class ServiceTicketController {
             @RequestParam(required = false) String submitterFirstName,
             @RequestParam(required = false) String submitterLastName,
             @RequestParam(required = false) String submitterEmail,
-            @RequestParam(required = false) Long submitterId
+            @RequestParam(required = false) Long submitterId,
+            @RequestParam(required = false, defaultValue = "creationDate") String sortBy,
+            @RequestParam(required = false, defaultValue = "desc") String sortOrder,
+            @RequestParam(required = false) Integer limit
     ) {
         List<ServiceTicketDTO> tickets = service.getAllServiceTicketsFiltered(
                         userDetails,
@@ -54,7 +57,9 @@ public class ServiceTicketController {
                         projectId, projectName,
                         issuedBefore, issuedAfter,
                         submitterFirstName, submitterLastName,
-                        submitterEmail, submitterId
+                        submitterEmail, submitterId,
+                        sortBy, sortOrder,
+                        limit
                 ).stream()
                 .map(ServiceTicketDTO::toDto)
                 .toList();

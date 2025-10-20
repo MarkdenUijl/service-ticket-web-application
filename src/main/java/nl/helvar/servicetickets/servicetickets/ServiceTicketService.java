@@ -7,6 +7,9 @@ import nl.helvar.servicetickets.projects.ProjectRepository;
 import nl.helvar.servicetickets.users.User;
 import nl.helvar.servicetickets.users.UserRepository;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -99,7 +102,10 @@ public class ServiceTicketService {
             String submitterFirstName,
             String submitterLastName,
             String submitterEmail,
-            Long submitterId
+            Long submitterId,
+            String sortBy,
+            String sortOrder,
+            Integer limit
     ) {
         boolean canModerate = hasPrivilege("CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE", userDetails);
 
@@ -120,7 +126,11 @@ public class ServiceTicketService {
             filters = filters.and(ticketUserEmailEquals(userDetails.getUsername()));
         }
 
-        List<ServiceTicket> serviceTickets = serviceTicketRepository.findAll(filters);
+        Sort.Direction direction = "asc".equalsIgnoreCase(sortOrder) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy != null ? sortBy : "creationDate");
+        Pageable pageable = limit != null ? PageRequest.of(0, limit, sort) : Pageable.unpaged();
+
+        List<ServiceTicket> serviceTickets = serviceTicketRepository.findAll(filters, pageable).getContent();
 
         if (serviceTickets.isEmpty()) {
             throw new RecordNotFoundException("Could not find service tickets with these parameters in the database.");
