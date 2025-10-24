@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.projects.Project;
 import nl.helvar.servicetickets.projects.ProjectRepository;
+import nl.helvar.servicetickets.servicetickets.enums.TicketPriority;
 import nl.helvar.servicetickets.servicetickets.enums.TicketSource;
 import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.servicetickets.enums.TicketType;
@@ -26,6 +27,7 @@ public class ServiceTicketCreationDTO {
     @NotNull
     private String type;
     private String source;
+    private String priority;
     @NotBlank
     @Size(max = 5000)
     private String description;
@@ -73,6 +75,14 @@ public class ServiceTicketCreationDTO {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public TicketPriority getPriority() {
+        return (TicketPriority) getEnumConstantFromString(TicketPriority.values(), this.priority);
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
     }
 
     public String getDescription() {
@@ -130,6 +140,7 @@ public class ServiceTicketCreationDTO {
         serviceTicket.setStatus(this.getStatus());
         serviceTicket.setType(this.getType());
         serviceTicket.setSource(this.getSource());
+        serviceTicket.setTicketPriority(this.getPriority());
         serviceTicket.setDescription(this.getDescription());
         serviceTicket.setResponses(this.getResponses());
         serviceTicket.setMinutesSpent(this.getMinutesSpent());

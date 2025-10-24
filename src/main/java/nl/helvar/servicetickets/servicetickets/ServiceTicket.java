@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import nl.helvar.servicetickets.files.File;
 import nl.helvar.servicetickets.projects.Project;
+import nl.helvar.servicetickets.servicetickets.enums.TicketPriority;
 import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.servicetickets.enums.TicketType;
 import nl.helvar.servicetickets.servicetickets.enums.TicketSource;
@@ -24,6 +25,7 @@ public class ServiceTicket {
     private TicketStatus status;
     private TicketType type;
     private TicketSource source = TicketSource.WEB;
+    private TicketPriority priority = TicketPriority.LOW;
     @Column(columnDefinition = "TEXT")
     private String description;
     @OneToMany(mappedBy = "ticket", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.REMOVE)
@@ -84,6 +86,12 @@ public class ServiceTicket {
         this.source = source;
     }
 
+    public TicketPriority getPriority() {
+        return priority;
+    }
+    public void setTicketPriority(TicketPriority priority) {
+        this.priority = priority;
+    }
 
     public String getDescription() {
         return description;

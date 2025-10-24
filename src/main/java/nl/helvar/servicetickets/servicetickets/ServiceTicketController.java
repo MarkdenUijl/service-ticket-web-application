@@ -39,6 +39,7 @@ public class ServiceTicketController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String source,
+            @RequestParam(required = false) String priority,
             @RequestParam(required = false) Long projectId,
             @RequestParam(required = false) String projectName,
             @RequestParam(required = false) LocalDate issuedBefore,
@@ -53,7 +54,7 @@ public class ServiceTicketController {
     ) {
         List<ServiceTicketDTO> tickets = service.getAllServiceTicketsFiltered(
                         userDetails,
-                        type, status, source,
+                        type, status, source, priority,
                         projectId, projectName,
                         issuedBefore, issuedAfter,
                         submitterFirstName, submitterLastName,

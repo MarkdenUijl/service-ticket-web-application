@@ -104,6 +104,7 @@ public class ServiceTicketService {
             String type,
             String status,
             String source,
+            String priority,
             Long projectId,
             String projectName,
             LocalDate issuedBefore,
@@ -121,6 +122,7 @@ public class ServiceTicketService {
         Specification<ServiceTicket> filters = Specification.where(StringUtils.isBlank(type) ? null : ticketTypeEquals(type))
                 .and(StringUtils.isBlank(status) ? null : ticketStatusEquals(status))
                 .and(StringUtils.isBlank(source) ? null : ticketSourceEquals(source))
+                .and(StringUtils.isBlank(source) ? null : ticketPriorityEquals(priority))
                 .and(projectId == null ? null : ticketProjectIdEquals(projectId))
                 .and(StringUtils.isBlank(projectName) ? null : ticketProjectNameLike(projectName))
                 .and(ServiceTicketSpecification.ticketDateRange(issuedAfter, issuedBefore))
