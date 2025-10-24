@@ -1,6 +1,5 @@
 package nl.helvar.servicetickets.ticketresponses;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.transaction.Transactional;
 import nl.helvar.servicetickets.configurations.websocket.TicketUpdateNotifier;
 import nl.helvar.servicetickets.email.EmailService;
@@ -12,7 +11,7 @@ import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
 import nl.helvar.servicetickets.servicetickets.ServiceTicketDTO;
 import nl.helvar.servicetickets.servicetickets.ServiceTicketRepository;
-import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
+import nl.helvar.servicetickets.helpers.TicketStatusUpdater;
 import nl.helvar.servicetickets.ticketresponses.subclasses.EngineerResponse;
 import nl.helvar.servicetickets.users.User;
 import nl.helvar.servicetickets.users.UserRepository;
@@ -66,43 +65,37 @@ public class TicketResponseService {
         boolean isEngineerResponse = hasPrivilege("CAN_MAKE_ENGINEER_RESPONSE_PRIVILEGE", userDetails);
         Instant currentTime = Instant.now();
         ticketResponseCreationDTO.setCreationDate(currentTime);
-
-        if (isEngineerResponse) {
-            ticketResponseCreationDTO.setIsEngineerResponse(true);
-        }
+        ticketResponseCreationDTO.setIsEngineerResponse(isEngineerResponse);
 
         TicketResponse ticketResponse = ticketResponseCreationDTO.fromDto(serviceTicketRepository);
+
+        // Assign user
+        userRepository.findOne(Specification.where(userEmailEquals(userDetails.getUsername())))
+                .ifPresent(ticketResponse::setSubmittedBy);
+
         ServiceTicket ticket = ticketResponse.getTicket();
 
-        Specification<User> filter = Specification.where(userEmailEquals(userDetails.getUsername()));
-        Optional<User> user = userRepository.findOne(filter);
+        // Auto-update status based on responder role
+        TicketStatusUpdater.updateTicketStatusAutomatically(ticket, isEngineerResponse);
 
-        user.ifPresent(ticketResponse::setSubmittedBy);
-
+        // Update contract time if engineer responded
         if (isEngineerResponse) {
-
-            if(ticket.getStatus() == TicketStatus.OPEN) {
-                ticket.setStatus(TicketStatus.PENDING);
-            }
-
-            ServiceContract contract = ticketResponse.getTicket().getProject().getServiceContract();
-
+            ServiceContract contract = ticket.getProject().getServiceContract();
             if (contract != null) {
-                int minutesSpent = ticketResponseCreationDTO.getMinutesSpent();
-
-                contract.addUsedTime(minutesSpent);
+                contract.addUsedTime(ticketResponseCreationDTO.getMinutesSpent());
             }
         }
 
+        // Notify ticket owner by email
         String ticketOwnerMail = ticket.getSubmittedBy().getEmail();
-
         try {
-            emailService.sendTicketUpdate(ticketOwnerMail, ticketResponse.getTicket().getName(), ticketResponse.getResponse());
+            emailService.sendTicketUpdate(ticketOwnerMail, ticket.getName(), ticketResponse.getResponse());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         ticketResponseRepository.save(ticketResponse);
+        serviceTicketRepository.save(ticket); // ensure the new status persists
         ticketResponseRepository.flush();
 
         // Broadcast the updated ticket (inside same transaction context)

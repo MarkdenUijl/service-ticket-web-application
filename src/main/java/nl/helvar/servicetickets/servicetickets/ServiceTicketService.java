@@ -1,9 +1,11 @@
 package nl.helvar.servicetickets.servicetickets;
 
+import nl.helvar.servicetickets.configurations.websocket.TicketUpdateNotifier;
 import nl.helvar.servicetickets.exceptions.InvalidRequestException;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.helpers.ObjectCopyUtils;
 import nl.helvar.servicetickets.projects.ProjectRepository;
+import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.users.User;
 import nl.helvar.servicetickets.users.UserRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -11,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -27,15 +30,21 @@ public class ServiceTicketService {
     private final ServiceTicketRepository serviceTicketRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final TicketUpdateNotifier ticketUpdateNotifier;
 
     public ServiceTicketService(
             ServiceTicketRepository serviceTicketRepository,
             ProjectRepository projectRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            SimpMessagingTemplate messagingTemplate,
+            TicketUpdateNotifier ticketUpdateNotifier
     ) {
         this.serviceTicketRepository = serviceTicketRepository;
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
+        this.messagingTemplate = messagingTemplate;
+        this.ticketUpdateNotifier = ticketUpdateNotifier;
     }
 
     public ServiceTicketDTO createServiceTicket(UserDetails userDetails, ServiceTicketCreationDTO serviceTicketCreationDTO) {
@@ -109,7 +118,6 @@ public class ServiceTicketService {
     ) {
         boolean canModerate = hasPrivilege("CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE", userDetails);
 
-        // Build base filters (same as your current implementation)
         Specification<ServiceTicket> filters = Specification.where(StringUtils.isBlank(type) ? null : ticketTypeEquals(type))
                 .and(StringUtils.isBlank(status) ? null : ticketStatusEquals(status))
                 .and(StringUtils.isBlank(source) ? null : ticketSourceEquals(source))
@@ -154,6 +162,32 @@ public class ServiceTicketService {
                 throw new InvalidRequestException("You do not have the required privileges to access this ticket.");
             }
         }
+    }
+
+    public ServiceTicketDTO updateTicketStatus(UserDetails userDetails, Long id, TicketStatus newStatus) {
+        ServiceTicket ticket = serviceTicketRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("Ticket with id '" + id + "' not found."));
+
+        // Security: only moderators or ticket owner can change status
+        if (!hasPrivilege("CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE", userDetails) &&
+                !userDetails.getUsername().equals(ticket.getSubmittedBy().getEmail())) {
+            throw new InvalidRequestException("You do not have permission to change this ticket's status.");
+        }
+
+        ticket.setStatus(newStatus);
+        serviceTicketRepository.save(ticket);
+        serviceTicketRepository.flush();
+
+        messagingTemplate.convertAndSend(
+                "/topic/tickets",
+                ServiceTicketDTO.toDto(ticket)
+        );
+
+        // Broadcast to detail view
+        ticketUpdateNotifier.broadcastTicketUpdate(ServiceTicketDTO.toDto(ticket));
+
+
+        return ServiceTicketDTO.toDto(ticket);
     }
 
     public ServiceTicket replaceServiceTicket(

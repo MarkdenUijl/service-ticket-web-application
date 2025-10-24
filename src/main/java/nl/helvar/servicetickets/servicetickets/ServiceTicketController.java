@@ -104,6 +104,20 @@ public class ServiceTicketController {
         }
     }
 
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ServiceTicketDTO> updateTicketStatus(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long id,
+            @RequestBody TicketStatusUpdateDTO statusUpdate
+    ) {
+        ServiceTicketDTO updatedTicket = service.updateTicketStatus(userDetails, id, statusUpdate.status());
+
+        // Broadcast to WebSocket clients (same as your other controllers)
+        messagingTemplate.convertAndSend("/topic/tickets", updatedTicket);
+
+        return ResponseEntity.ok(updatedTicket);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ServiceTicketDTO> replaceServiceTicket(
             @AuthenticationPrincipal UserDetails userDetails,
