@@ -4,6 +4,7 @@ import nl.helvar.servicetickets.configurations.websocket.TicketUpdateNotifier;
 import nl.helvar.servicetickets.exceptions.InvalidRequestException;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
 import nl.helvar.servicetickets.helpers.ObjectCopyUtils;
+import nl.helvar.servicetickets.prioritization.TicketPriorityEvaluator;
 import nl.helvar.servicetickets.projects.ProjectRepository;
 import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.users.User;
@@ -32,19 +33,22 @@ public class ServiceTicketService {
     private final UserRepository userRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final TicketUpdateNotifier ticketUpdateNotifier;
+    private final TicketPriorityEvaluator ticketPriorityEvaluator;
 
     public ServiceTicketService(
             ServiceTicketRepository serviceTicketRepository,
             ProjectRepository projectRepository,
             UserRepository userRepository,
             SimpMessagingTemplate messagingTemplate,
-            TicketUpdateNotifier ticketUpdateNotifier
+            TicketUpdateNotifier ticketUpdateNotifier,
+            TicketPriorityEvaluator ticketPriorityEvaluator
     ) {
         this.serviceTicketRepository = serviceTicketRepository;
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
         this.messagingTemplate = messagingTemplate;
         this.ticketUpdateNotifier = ticketUpdateNotifier;
+        this.ticketPriorityEvaluator = ticketPriorityEvaluator;
     }
 
     public ServiceTicketDTO createServiceTicket(UserDetails userDetails, ServiceTicketCreationDTO serviceTicketCreationDTO) {
@@ -59,6 +63,7 @@ public class ServiceTicketService {
         User submittedBy = resolveSubmitter(userDetails, serviceTicketCreationDTO);
         serviceTicket.setSubmittedBy(submittedBy);
 
+        serviceTicket.setTicketPriority(ticketPriorityEvaluator.evaluate(serviceTicket));
         // Persist
         serviceTicketRepository.save(serviceTicket);
 
@@ -177,6 +182,8 @@ public class ServiceTicketService {
         }
 
         ticket.setStatus(newStatus);
+        ticket.setTicketPriority(ticketPriorityEvaluator.evaluate(ticket));
+
         serviceTicketRepository.save(ticket);
         serviceTicketRepository.flush();
 
@@ -225,6 +232,8 @@ public class ServiceTicketService {
 
                 // Copy all other non-null fields
                 ObjectCopyUtils.copyNonNullProperties(newTicket, existingServiceTicket);
+
+                existingServiceTicket.setTicketPriority(ticketPriorityEvaluator.evaluate(existingServiceTicket));
 
                 serviceTicketRepository.save(existingServiceTicket);
                 return existingServiceTicket;

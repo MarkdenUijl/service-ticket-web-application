@@ -32,6 +32,15 @@ public class ServiceTicketSpecification {
         }
     }
 
+    public static Specification<ServiceTicket> ticketStatusNotEquals(String ticketStatus) {
+        try {
+            TicketStatus status = TicketStatus.valueOf(ticketStatus.toUpperCase());
+            return (root, query, builder) -> builder.notEqual(root.get("status"), status);
+        } catch (IllegalArgumentException ex) {
+            throw new InvalidEnumConstantException(TicketStatus.values());
+        }
+    }
+
     public static Specification<ServiceTicket> ticketSourceEquals(String ticketSource) {
         try {
             TicketSource source = TicketSource.valueOf(ticketSource.toUpperCase());

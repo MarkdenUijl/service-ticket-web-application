@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "priority.rules.ageContractCriticalThresholdMinutes",
+      "type": "java.lang.String",
+      "description": "Description for priority.rules.ageContractCriticalThresholdMinutes."
+  }
+] }

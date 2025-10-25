@@ -144,7 +144,7 @@ public class ServiceTicketCreationDTO {
         serviceTicket.setDescription(this.getDescription());
         serviceTicket.setResponses(this.getResponses());
         serviceTicket.setMinutesSpent(this.getMinutesSpent());
-        serviceTicket.setCreationDate(this.getCreationDate());
+        serviceTicket.setCreationDate(Instant.now());
 
         if (this.getProjectId() != null) {
             Optional<Project> project = projectRepository.findById(this.getProjectId());
