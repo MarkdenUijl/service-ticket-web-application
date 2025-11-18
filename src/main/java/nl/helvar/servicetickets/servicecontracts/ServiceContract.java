@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import nl.helvar.servicetickets.projects.Project;
 import nl.helvar.servicetickets.servicecontracts.enums.ContractType;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
 
@@ -76,5 +77,10 @@ public class ServiceContract {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public boolean isValid() {
+        LocalDate today = LocalDate.now();
+        return this.endDate.isAfter(today);
     }
 }

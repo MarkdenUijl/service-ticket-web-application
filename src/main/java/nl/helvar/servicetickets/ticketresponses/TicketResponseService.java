@@ -78,9 +78,12 @@ public class TicketResponseService {
         // Update contract time if engineer responded
         if (isEngineerResponse) {
             ServiceContract contract = ticket.getProject().getServiceContract();
-            if (contract != null) {
+
+            if (contract != null && contract.isValid()) {
                 contract.addUsedTime(ticketResponseCreationDTO.getMinutesSpent());
             }
+
+            ticket.addMinutesSpent(ticketResponseCreationDTO.getMinutesSpent());
         }
 
         // Notify ticket owner by email

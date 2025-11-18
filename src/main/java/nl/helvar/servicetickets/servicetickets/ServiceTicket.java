@@ -133,6 +133,9 @@ public class ServiceTicket {
     public void setMinutesSpent(int minutesSpent) {
         this.minutesSpent = minutesSpent;
     }
+    public void addMinutesSpent(int minutesSpent) {
+        this.minutesSpent += minutesSpent;
+    }
 
     public Instant getCreationDate() {
         return creationDate;
