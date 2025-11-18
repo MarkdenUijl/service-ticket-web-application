@@ -9,13 +9,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 import static nl.helvar.servicetickets.helpers.DTOValidator.buildErrorMessage;
 import static nl.helvar.servicetickets.helpers.UriCreator.createUri;
@@ -25,12 +23,10 @@ import static nl.helvar.servicetickets.helpers.UriCreator.createUri;
 public class ServiceTicketController {
     private final ServiceTicketService service;
     private final EmailService emailService;
-    private final SimpMessagingTemplate messagingTemplate;
 
-    public ServiceTicketController(ServiceTicketService service, EmailService emailService, SimpMessagingTemplate messagingTemplate) {
+    public ServiceTicketController(ServiceTicketService service, EmailService emailService) {
         this.service = service;
         this.emailService = emailService;
-        this.messagingTemplate = messagingTemplate;
     }
     
     @GetMapping
@@ -86,9 +82,6 @@ public class ServiceTicketController {
         } else {
             ServiceTicketDTO serviceTicketOutput = service.createServiceTicket(userDetails, serviceTicket);
 
-            // push update to all clients subscribed to /topic/tickets
-            messagingTemplate.convertAndSend("/topic/tickets", serviceTicketOutput);
-
             URI uri = createUri(serviceTicketOutput);
 
             try {
@@ -105,6 +98,16 @@ public class ServiceTicketController {
         }
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<ServiceTicketDTO> updateServiceTicket(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long id,
+            @RequestBody ServiceTicketUpdateDTO updates
+    ) {
+        ServiceTicketDTO updated = service.updateServiceTicket(userDetails, id, updates);
+        return ResponseEntity.ok(updated);
+    }
+
     @PatchMapping("/{id}/status")
     public ResponseEntity<ServiceTicketDTO> updateTicketStatus(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -112,9 +115,6 @@ public class ServiceTicketController {
             @RequestBody TicketStatusUpdateDTO statusUpdate
     ) {
         ServiceTicketDTO updatedTicket = service.updateTicketStatus(userDetails, id, statusUpdate.status());
-
-        // Broadcast to WebSocket clients (same as your other controllers)
-        messagingTemplate.convertAndSend("/topic/tickets", updatedTicket);
 
         return ResponseEntity.ok(updatedTicket);
     }
@@ -129,8 +129,6 @@ public class ServiceTicketController {
             service.replaceServiceTicket(userDetails, id, newServiceTicket)
         );
 
-        messagingTemplate.convertAndSend("/topic/tickets", updatedTicket);
-
         return new ResponseEntity<>(updatedTicket, HttpStatus.OK);
     }
 
@@ -140,11 +138,6 @@ public class ServiceTicketController {
             @PathVariable("id") Long id
     ) {
         String response = service.deleteServiceTicket(userDetails, id);
-
-        // notify clients of deletion
-        messagingTemplate.convertAndSend("/topic/tickets",
-                Map.of("action", "delete", "id", id)
-        );
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

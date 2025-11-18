@@ -37,7 +37,6 @@ public class TicketResponseService {
     private final ServiceContractRepository serviceContractRepository;
     private final EmailService emailService;
     private final UserRepository userRepository;
-    private final SimpMessagingTemplate messagingTemplate;
     private final TicketUpdateNotifier ticketUpdateNotifier;
 
     public TicketResponseService(TicketResponseRepository ticketResponseRepository,
@@ -45,7 +44,6 @@ public class TicketResponseService {
                                  ServiceContractRepository serviceContractRepository,
                                  UserRepository userRepository,
                                  EmailService emailService,
-                                 SimpMessagingTemplate messagingTemplate,
                                  TicketUpdateNotifier ticketUpdateNotifier
                                  ) {
         this.ticketResponseRepository = ticketResponseRepository;
@@ -53,7 +51,6 @@ public class TicketResponseService {
         this.serviceContractRepository = serviceContractRepository;
         this.userRepository = userRepository;
         this.emailService = emailService;
-        this.messagingTemplate = messagingTemplate;
         this.ticketUpdateNotifier = ticketUpdateNotifier;
     }
 
@@ -95,14 +92,8 @@ public class TicketResponseService {
         }
 
         ticketResponseRepository.save(ticketResponse);
-        serviceTicketRepository.save(ticket); // ensure the new status persists
+        serviceTicketRepository.save(ticket);
         ticketResponseRepository.flush();
-
-        // Broadcast the updated ticket (inside same transaction context)
-        messagingTemplate.convertAndSend(
-                "/topic/tickets",
-                ServiceTicketDTO.toDto(ticket)
-        );
 
         // Broadcast to detail view
         ticketUpdateNotifier.broadcastTicketUpdate(ServiceTicketDTO.toDto(ticket));
@@ -141,6 +132,36 @@ public class TicketResponseService {
         } else {
             return TicketResponseDTO.toDto(ticketResponseOptional.get());
         }
+    }
+
+    public TicketResponseDTO updateTicketResponse(
+            UserDetails userDetails,
+            Long id,
+            TicketResponseUpdateDTO updates
+    ) {
+        TicketResponse ticketResponse = ticketResponseRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException(
+                        "Ticket response with id '" + id + "' not found.")
+                );
+
+        User submittedBy = ticketResponse.getSubmittedBy();
+
+        if (!hasPrivilege("CAN_MODERATE_TICKET_RESPONSES_PRIVILEGE", userDetails) &&
+                !userDetails.getUsername().equals(submittedBy.getEmail())) {
+            throw new InvalidRequestException("You do not have permission to modify this ticket response.");
+        }
+
+        if (updates.getResponse() != null) {
+            ticketResponse.setResponse(updates.getResponse());
+        }
+
+        ticketResponseRepository.save(ticketResponse);
+        ticketResponseRepository.flush();
+
+        ServiceTicket ticket = ticketResponse.getTicket();
+        ticketUpdateNotifier.broadcastTicketUpdate(ServiceTicketDTO.toDto(ticket));
+
+        return TicketResponseDTO.toDto(ticketResponse);
     }
 
     public TicketResponseDTO replaceTicketResponse(UserDetails userDetails, Long id, TicketResponseCreationDTO newTicketResponseDTO) {

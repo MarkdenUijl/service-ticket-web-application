@@ -30,6 +30,7 @@ public class ServiceTicketDTO implements Identifyable {
     private int minutesSpent;
     private Instant creationDate;
     private Instant lastUpdated;
+    private Instant closingDate;
     private HashMap<Long, String> files;
     private ProjectDTO project;
 
@@ -129,6 +130,14 @@ public class ServiceTicketDTO implements Identifyable {
         this.lastUpdated = lastUpdated;
     }
 
+    public Instant getClosingDate() {
+        return closingDate;
+    }
+
+    public void setClosingDate(Instant closingDate) {
+        this.closingDate = closingDate;
+    }
+
     public HashMap<Long, String> getFiles() {
         return files;
     }
@@ -189,7 +198,9 @@ public class ServiceTicketDTO implements Identifyable {
             serviceTicketDTO.setProject(ProjectDTO.toBaseDto(serviceTicket.getProject()));
         }
 
-
+        if (serviceTicket.getClosingDate() != null) {
+            serviceTicketDTO.setClosingDate(serviceTicket.getClosingDate());
+        }
 
         return serviceTicketDTO;
     }

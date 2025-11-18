@@ -37,6 +37,7 @@ public class ServiceTicket {
     private int minutesSpent;
     @Column(nullable = false)
     private Instant creationDate;
+    private Instant closingDate;
     @OneToMany(mappedBy = "ticket", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<File> files;
     @ManyToOne
@@ -47,7 +48,7 @@ public class ServiceTicket {
     @PrePersist
     void onCreate() {
         if (creationDate == null) {
-            creationDate = Instant.now(); // always UTC
+            creationDate = Instant.now();
         }
     }
 
@@ -139,6 +140,13 @@ public class ServiceTicket {
 
     public void setCreationDate(Instant creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public Instant getClosingDate() {
+        return closingDate;
+    }
+    public void setClosingDate(Instant closingDate) {
+        this.closingDate = closingDate;
     }
 
     public List<File> getFiles() {

@@ -94,7 +94,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.DELETE, "/serviceTickets/*/files/**")
                                 .hasAuthority("CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE")
                                 .requestMatchers(HttpMethod.PATCH, "/serviceTickets/*/status")
-                                .hasAuthority("CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE")
+                                .authenticated()
                                 .requestMatchers("/serviceTickets/**")
                                 .authenticated()
                                 .requestMatchers("/serviceTickets/*/files/**")

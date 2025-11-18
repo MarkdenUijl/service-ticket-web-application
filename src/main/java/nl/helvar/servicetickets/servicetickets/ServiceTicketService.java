@@ -18,6 +18,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -66,6 +67,10 @@ public class ServiceTicketService {
         serviceTicket.setTicketPriority(ticketPriorityEvaluator.evaluate(serviceTicket));
         // Persist
         serviceTicketRepository.save(serviceTicket);
+        serviceTicketRepository.flush();
+
+        // Broadcast
+        ticketUpdateNotifier.broadcastTicketCreated(ServiceTicketDTO.toDto(serviceTicket));
 
         // Map to output
         return ServiceTicketDTO.toDto(serviceTicket);
@@ -171,6 +176,51 @@ public class ServiceTicketService {
         }
     }
 
+    public ServiceTicketDTO updateServiceTicket(
+            UserDetails userDetails,
+            Long id,
+            ServiceTicketUpdateDTO updates
+    ) {
+        ServiceTicket ticket = serviceTicketRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException(
+                        "Ticket with id '" + id + "' not found.")
+                );
+
+        User submittedBy = ticket.getSubmittedBy();
+
+        if (!hasPrivilege("CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE", userDetails) &&
+                !userDetails.getUsername().equals(submittedBy.getEmail())) {
+            throw new InvalidRequestException("You do not have permission to modify this ticket.");
+        }
+
+        // PATCH ONLY PROVIDED FIELDS:
+        if (updates.getName() != null) {
+            ticket.setName(updates.getName());
+        }
+        if (updates.getDescription() != null) {
+            ticket.setDescription(updates.getDescription());
+        }
+        if (updates.getType() != null) {
+            ticket.setType(updates.getType());
+        }
+        if (updates.getProjectId() != null) {
+            var project = projectRepository.findById(updates.getProjectId())
+                    .orElseThrow(() -> new RecordNotFoundException(
+                            "Could not find project with id '" + updates.getProjectId() + "'.")
+                    );
+            ticket.setProject(project);
+        }
+
+        ticket.setTicketPriority(ticketPriorityEvaluator.evaluate(ticket));
+
+        serviceTicketRepository.save(ticket);
+        serviceTicketRepository.flush();
+
+        ticketUpdateNotifier.broadcastTicketUpdate(ServiceTicketDTO.toDto(ticket));
+
+        return ServiceTicketDTO.toDto(ticket);
+    }
+
     public ServiceTicketDTO updateTicketStatus(UserDetails userDetails, Long id, TicketStatus newStatus) {
         ServiceTicket ticket = serviceTicketRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("Ticket with id '" + id + "' not found."));
@@ -181,20 +231,18 @@ public class ServiceTicketService {
             throw new InvalidRequestException("You do not have permission to change this ticket's status.");
         }
 
+        if (newStatus == TicketStatus.CLOSED || newStatus == TicketStatus.CANCELLED) {
+            ticket.setClosingDate(Instant.now());
+        }
+
         ticket.setStatus(newStatus);
         ticket.setTicketPriority(ticketPriorityEvaluator.evaluate(ticket));
 
         serviceTicketRepository.save(ticket);
         serviceTicketRepository.flush();
 
-        messagingTemplate.convertAndSend(
-                "/topic/tickets",
-                ServiceTicketDTO.toDto(ticket)
-        );
-
         // Broadcast to detail view
         ticketUpdateNotifier.broadcastTicketUpdate(ServiceTicketDTO.toDto(ticket));
-
 
         return ServiceTicketDTO.toDto(ticket);
     }
@@ -236,6 +284,10 @@ public class ServiceTicketService {
                 existingServiceTicket.setTicketPriority(ticketPriorityEvaluator.evaluate(existingServiceTicket));
 
                 serviceTicketRepository.save(existingServiceTicket);
+                serviceTicketRepository.flush();
+
+                ticketUpdateNotifier.broadcastTicketUpdate(ServiceTicketDTO.toDto(existingServiceTicket));
+
                 return existingServiceTicket;
             } else {
                 throw new InvalidRequestException("You do not have the required privileges to change this ticket.");
@@ -257,6 +309,8 @@ public class ServiceTicketService {
 
             if (hasPrivilege("CAN_MODERATE_SERVICE_TICKETS_PRIVILEGE", userDetails) || userDetails.getUsername().equals(submittedBy.getEmail())) {
                 serviceTicketRepository.delete(existingServiceTicket);
+
+                ticketUpdateNotifier.broadcastTicketDeleted(id);
 
                 return "Service ticket with id '" + id + "' was successfully deleted.";
             } else {

@@ -2,18 +2,14 @@ package nl.helvar.servicetickets.ticketresponses;
 
 import jakarta.validation.Valid;
 import nl.helvar.servicetickets.exceptions.BadObjectCreationException;
-import nl.helvar.servicetickets.servicetickets.ServiceTicketDTO;
-import nl.helvar.servicetickets.servicetickets.ServiceTicketService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.net.URI;
-import java.time.Instant;
 import java.util.List;
 
 import static nl.helvar.servicetickets.helpers.DTOValidator.buildErrorMessage;
@@ -23,17 +19,11 @@ import static nl.helvar.servicetickets.helpers.UriCreator.createUri;
 @RequestMapping("/ticketResponses")
 public class TicketResponseController {
     private final TicketResponseService service;
-    private final ServiceTicketService serviceTicketService;
-    private final SimpMessagingTemplate messagingTemplate;
 
     public TicketResponseController(
-            TicketResponseService service,
-            ServiceTicketService serviceTicketService,
-            SimpMessagingTemplate messagingTemplate
+            TicketResponseService service
     ) {
         this.service = service;
-        this.serviceTicketService = serviceTicketService;
-        this.messagingTemplate = messagingTemplate;
     }
 
     @GetMapping
@@ -67,6 +57,16 @@ public class TicketResponseController {
 
             return ResponseEntity.created(uri).body(ticketResponseOutput);
         }
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<TicketResponseDTO> updateTicketResponse(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long id,
+            @RequestBody TicketResponseUpdateDTO updates
+    ) {
+        TicketResponseDTO updated = service.updateTicketResponse(userDetails, id, updates);
+        return ResponseEntity.ok(updated);
     }
 
     @PutMapping("/{id}")

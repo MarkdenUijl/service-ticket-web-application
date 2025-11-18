@@ -2,6 +2,7 @@ package nl.helvar.servicetickets.prioritization;
 
 import nl.helvar.servicetickets.servicetickets.ServiceTicket;
 import nl.helvar.servicetickets.servicetickets.enums.TicketPriority;
+import nl.helvar.servicetickets.servicetickets.enums.TicketStatus;
 import nl.helvar.servicetickets.servicetickets.enums.TicketType;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +21,8 @@ public class TicketPriorityEvaluator {
 
     public TicketPriority evaluate(ServiceTicket ticket) {
         if (ticket == null || ticket.getCreationDate() == null) return TicketPriority.MEDIUM;
+
+        if (ticket.getStatus() == TicketStatus.CLOSED || ticket.getStatus() == TicketStatus.CANCELLED) return TicketPriority.LOW;
 
         long ageMinutes = Duration.between(ticket.getCreationDate(), Instant.now()).toMinutes();
         boolean isContractValid = ticket.getProject() != null &&
