@@ -3,6 +3,7 @@ package nl.helvar.servicetickets.projects;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import nl.helvar.servicetickets.exceptions.RecordNotFoundException;
+import nl.helvar.servicetickets.helpers.StringUtilsHelper;
 import nl.helvar.servicetickets.servicecontracts.ServiceContract;
 import nl.helvar.servicetickets.servicecontracts.ServiceContractRepository;
 
@@ -80,10 +81,10 @@ public class ProjectCreationDTO {
     public Project fromDto(ServiceContractRepository serviceContractRepository) {
         Project project = new Project();
 
-        project.setName(this.getName());
-        project.setCity(this.getCity());
-        project.setZipCode(this.getZipCode());
-        project.setStreet(this.getStreet());
+        project.setName(StringUtilsHelper.capitalizeWords(this.getName()));
+        project.setCity(StringUtilsHelper.capitalizeWords(this.getCity()));
+        project.setZipCode(StringUtilsHelper.capitalizeWords(this.getZipCode()));
+        project.setStreet(StringUtilsHelper.capitalizeWords(this.getStreet()));
         project.setHouseNumber(this.getHouseNumber());
 
         if (this.getServiceContractId() != null) {

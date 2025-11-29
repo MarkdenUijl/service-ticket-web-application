@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "priority.rules")
 public class TicketPriorityProperties {
     // Example rules – add more as you need
-    private int ageHighThresholdMinutes = 2880;
-    private int ageCriticalThresholdMinutes = 10080;
-    private int ageContractCriticalThresholdMinutes = 1440;
+    private int ageHighThresholdMinutes = 1440;
+    private int ageCriticalThresholdMinutes = 2880;
+    private int ageContractCriticalThresholdMinutes = 120;
     private int contractCriticalRemainingMinutes = 60;
     private boolean enableScheduler = true;
     private int schedulerFixedRateSeconds = 3600;
