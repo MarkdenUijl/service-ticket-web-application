@@ -13,15 +13,28 @@ public class ObjectCopyUtils {
         for (java.beans.PropertyDescriptor propertyDescriptor : propertyDescriptors) {
             String propertyName = propertyDescriptor.getName();
 
-            // Exclude the 'class' property
-            if (!propertyName.equals("class")) {
-                Object srcValue = srcWrapper.getPropertyValue(propertyName);
-
-                // Only copy non-null values and non-zero numeric values
-                if (srcValue != null && !(srcValue instanceof Number && ((Number) srcValue).intValue() == 0)) {
-                    targetWrapper.setPropertyValue(propertyName, srcValue);
-                }
+            // Exclude the 'class' pseudo-property
+            if ("class".equals(propertyName)) {
+                continue;
             }
+
+            // Skip properties that are not readable on the source or not writable on the target
+            if (!srcWrapper.isReadableProperty(propertyName) || !targetWrapper.isWritableProperty(propertyName)) {
+                continue;
+            }
+
+            Object srcValue = srcWrapper.getPropertyValue(propertyName);
+
+            // Only copy non-null values and non-zero numeric values
+            if (srcValue == null) {
+                continue;
+            }
+
+            if (srcValue instanceof Number && ((Number) srcValue).intValue() == 0) {
+                continue;
+            }
+
+            targetWrapper.setPropertyValue(propertyName, srcValue);
         }
     }
 }

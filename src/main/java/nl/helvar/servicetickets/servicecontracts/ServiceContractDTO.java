@@ -1,6 +1,7 @@
 package nl.helvar.servicetickets.servicecontracts;
 
 import nl.helvar.servicetickets.interfaces.Identifyable;
+import nl.helvar.servicetickets.projects.ProjectDTO;
 import nl.helvar.servicetickets.servicecontracts.enums.ContractType;
 
 import java.time.LocalDate;
@@ -12,6 +13,7 @@ public class ServiceContractDTO implements Identifyable {
     private int usedTime;
     private LocalDate startDate;
     private LocalDate endDate;
+    private String projectName;
 
     public Long getId() {
         return id;
@@ -61,6 +63,15 @@ public class ServiceContractDTO implements Identifyable {
         this.endDate = endDate;
     }
 
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+
     public static ServiceContractDTO toDto(ServiceContract serviceContract) {
         ServiceContractDTO serviceContractDTO = new ServiceContractDTO();
 
@@ -70,6 +81,9 @@ public class ServiceContractDTO implements Identifyable {
         serviceContractDTO.setUsedTime(serviceContract.getUsedTime());
         serviceContractDTO.setStartDate(serviceContract.getStartDate());
         serviceContractDTO.setEndDate(serviceContract.getEndDate());
+        serviceContractDTO.setProjectName(
+                serviceContract.getProject().getName()
+        );
 
         return serviceContractDTO;
     }
