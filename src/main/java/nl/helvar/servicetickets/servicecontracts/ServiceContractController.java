@@ -47,6 +47,15 @@ public class ServiceContractController {
         }
     }
 
+    @PostMapping("/{id}/renew")
+    public ResponseEntity<ServiceContractDTO> renewServiceContract(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody ServiceContractRenewDTO renewDTO
+    ) {
+        ServiceContractDTO renewed = service.renewServiceContract(id, renewDTO);
+        return new ResponseEntity<>(renewed, HttpStatus.OK);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ServiceContractDTO> replaceServiceContract(@PathVariable("id") Long id, @RequestBody ServiceContractCreationDTO newServiceContract) {
         return new ResponseEntity<>(service.replaceServiceContract(id, newServiceContract), HttpStatus.OK);

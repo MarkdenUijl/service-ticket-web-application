@@ -19,9 +19,15 @@ public class ServiceContract {
     private int usedTime;
     private LocalDate startDate;
     private LocalDate endDate;
-    @OneToOne(mappedBy = "serviceContract")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
     @JsonIgnore
     private Project project;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "previous_contract_id")
+    @JsonIgnore
+    private ServiceContract previousContract;
 
     public Long getId() {
         return id;
@@ -77,6 +83,14 @@ public class ServiceContract {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public ServiceContract getPreviousContract() {
+        return previousContract;
+    }
+
+    public void setPreviousContract(ServiceContract previousContract) {
+        this.previousContract = previousContract;
     }
 
     public boolean isValid() {

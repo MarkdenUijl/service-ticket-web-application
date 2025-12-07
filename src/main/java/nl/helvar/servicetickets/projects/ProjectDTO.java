@@ -14,6 +14,7 @@ public class ProjectDTO implements Identifyable {
     private String street;
     private Integer houseNumber;
     private ServiceContractDTO serviceContract;
+    private List<ServiceContractDTO> historicContracts;
     private List<ServiceTicketDTO> tickets;
 
     public Long getId() {
@@ -72,6 +73,14 @@ public class ProjectDTO implements Identifyable {
         this.serviceContract = serviceContract;
     }
 
+    public List<ServiceContractDTO> getHistoricContracts () {
+        return historicContracts;
+    }
+
+    public void setHistoricContracts(List<ServiceContractDTO> historicContracts) {
+        this.historicContracts = historicContracts;
+    }
+
     public List<ServiceTicketDTO> getTickets() {
         return tickets;
     }
@@ -100,6 +109,14 @@ public class ProjectDTO implements Identifyable {
             projectDTO.setTickets(project.getTickets()
                     .stream()
                     .map(ServiceTicketDTO::toDto)
+                    .toList()
+            );
+        }
+
+        if (project.getHistoricContracts() != null) {
+            projectDTO.setHistoricContracts(project.getHistoricContracts()
+                    .stream()
+                    .map(ServiceContractDTO::toDto)
                     .toList()
             );
         }

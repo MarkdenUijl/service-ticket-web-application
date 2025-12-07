@@ -19,9 +19,14 @@ public class Project {
     private int houseNumber;
 
     // Relations
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ServiceTicket> tickets;
-    @OneToOne(cascade = CascadeType.ALL)
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ServiceContract> historicContracts;
+
+    @OneToOne
+    @JoinColumn(name = "current_contract_id")
     private ServiceContract serviceContract;
 
     public Long getId() {
@@ -86,5 +91,14 @@ public class Project {
 
     public void setServiceContract(ServiceContract serviceContract) {
         this.serviceContract = serviceContract;
+    }
+
+    public List<ServiceContract> getHistoricContracts() {
+        return historicContracts;
+    }
+
+    public void addHistoricContract(ServiceContract contract) {
+        historicContracts.add(contract);
+        contract.setProject(this);
     }
 }
