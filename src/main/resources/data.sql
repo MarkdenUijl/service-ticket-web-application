@@ -155,4 +155,6 @@ UPDATE projects p
 SET current_contract_id = c.id
     FROM service_contracts c
 WHERE c.project_id = p.id
-  AND c.previous_contract_id IS NULL;     (SELECT COALESCE(MAX(id), 1) FROM projects));
+  AND c.previous_contract_id IS NULL;
+
+-- (SELECT COALESCE(MAX(id), 1) FROM projects));

@@ -31,6 +31,9 @@ public class ServiceTicketDTO implements Identifyable {
     private Instant creationDate;
     private Instant lastUpdated;
     private Instant closingDate;
+    private boolean hadValidContractAtCreation;
+    private Instant contractValidFromAtCreation;
+    private Instant contractValidUntilAtCreation;
     private HashMap<Long, String> files;
     private ProjectDTO project;
 
@@ -138,6 +141,30 @@ public class ServiceTicketDTO implements Identifyable {
         this.closingDate = closingDate;
     }
 
+    public boolean isHadValidContractAtCreation() {
+        return hadValidContractAtCreation;
+    }
+
+    public void setHadValidContractAtCreation(boolean hadValidContractAtCreation) {
+        this.hadValidContractAtCreation = hadValidContractAtCreation;
+    }
+
+    public Instant getContractValidFromAtCreation() {
+        return contractValidFromAtCreation;
+    }
+
+    public void setContractValidFromAtCreation(Instant contractValidFromAtCreation) {
+        this.contractValidFromAtCreation = contractValidFromAtCreation;
+    }
+
+    public Instant getContractValidUntilAtCreation() {
+        return contractValidUntilAtCreation;
+    }
+
+    public void setContractValidUntilAtCreation(Instant contractValidUntilAtCreation) {
+        this.contractValidUntilAtCreation = contractValidUntilAtCreation;
+    }
+
     public HashMap<Long, String> getFiles() {
         return files;
     }
@@ -167,6 +194,9 @@ public class ServiceTicketDTO implements Identifyable {
         serviceTicketDTO.setDescription(serviceTicket.getDescription());
         serviceTicketDTO.setMinutesSpent(serviceTicket.getMinutesSpent());
         serviceTicketDTO.setCreationDate(serviceTicket.getCreationDate());
+        serviceTicketDTO.setHadValidContractAtCreation(serviceTicket.isHadValidContractAtCreation());
+        serviceTicketDTO.setContractValidFromAtCreation(serviceTicket.getContractValidFromAtCreation());
+        serviceTicketDTO.setContractValidUntilAtCreation(serviceTicket.getContractValidUntilAtCreation());
 
         if (serviceTicket.getResponses() != null && !serviceTicket.getResponses().isEmpty()) {
             serviceTicketDTO.setResponses(serviceTicket.getResponses()

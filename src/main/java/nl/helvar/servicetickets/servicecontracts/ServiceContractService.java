@@ -36,7 +36,7 @@ public class ServiceContractService {
 
             if (project.getServiceContract() != null) {
                 throw new InvalidRequestException(
-                        "Project with id " + serviceContractCreationDTO.getProjectId() + " already has a contract."
+                    "Project with id " + serviceContractCreationDTO.getProjectId() + " already has a contract."
                 );
             }
 

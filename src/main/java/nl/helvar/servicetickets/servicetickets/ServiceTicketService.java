@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,9 +61,17 @@ public class ServiceTicketService {
         // Build entity from DTO (project, fields, etc.)
         ServiceTicket serviceTicket = serviceTicketCreationDTO.fromDto(projectRepository);
 
+        // Ensure creationDate is set before we compute any snapshot fields
+        if (serviceTicket.getCreationDate() == null) {
+            serviceTicket.setCreationDate(Instant.now());
+        }
+
         // Resolve who the submitter is (self or another user if allowed)
         User submittedBy = resolveSubmitter(userDetails, serviceTicketCreationDTO);
         serviceTicket.setSubmittedBy(submittedBy);
+
+        // Snapshot whether this ticket was created while the project had a valid contract
+        applyContractSnapshotAtCreation(serviceTicket);
 
         serviceTicket.setTicketPriority(ticketPriorityEvaluator.evaluate(serviceTicket));
         // Persist
@@ -320,6 +329,75 @@ public class ServiceTicketService {
     }
 
     // METHODS:
+    private void applyContractSnapshotAtCreation(ServiceTicket ticket) {
+        if (ticket == null || ticket.getProject() == null || ticket.getCreationDate() == null) {
+            return;
+        }
+
+        // Convert ticket creation moment to a LocalDate in UTC (stable and predictable)
+        LocalDate ticketDate = ticket.getCreationDate().atZone(ZoneOffset.UTC).toLocalDate();
+
+        var contract = findContractCoveringDate(ticket.getProject(), ticketDate);
+
+        if (contract == null) {
+            ticket.setHadValidContractAtCreation(false);
+            ticket.setContractValidFromAtCreation(null);
+            ticket.setContractValidUntilAtCreation(null);
+            return;
+        }
+
+        ticket.setHadValidContractAtCreation(true);
+
+        // Persist the validity window as Instants (UTC start-of-day)
+        if (contract.getStartDate() != null) {
+            ticket.setContractValidFromAtCreation(contract.getStartDate().atStartOfDay(ZoneOffset.UTC).toInstant());
+        } else {
+            ticket.setContractValidFromAtCreation(null);
+        }
+
+        if (contract.getEndDate() != null) {
+            // Inclusive end date: store as end-of-day UTC
+            ticket.setContractValidUntilAtCreation(
+                    contract.getEndDate().plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant().minusMillis(1)
+            );
+        } else {
+            ticket.setContractValidUntilAtCreation(null);
+        }
+    }
+
+    private nl.helvar.servicetickets.servicecontracts.ServiceContract findContractCoveringDate(
+            nl.helvar.servicetickets.projects.Project project,
+            LocalDate ticketDate
+    ) {
+        if (project == null || ticketDate == null) {
+            return null;
+        }
+
+        // This assumes Project exposes the current contract as `getServiceContract()`.
+        // If your getter name differs, adjust this line accordingly.
+        nl.helvar.servicetickets.servicecontracts.ServiceContract current = project.getServiceContract();
+
+        while (current != null) {
+            LocalDate start = current.getStartDate();
+            LocalDate end = current.getEndDate();
+
+            boolean hasStart = start != null;
+            boolean hasEnd = end != null;
+
+            // Treat missing start/end defensively (should ideally be non-null in DB)
+            boolean startsOk = !hasStart || !ticketDate.isBefore(start);
+            boolean endsOk = !hasEnd || !ticketDate.isAfter(end);
+
+            if (startsOk && endsOk) {
+                return current;
+            }
+
+            current = current.getPreviousContract();
+        }
+
+        return null;
+    }
+
     private User resolveSubmitter(UserDetails userDetails, ServiceTicketCreationDTO dto) {
         // 1) Who is calling?
         User creator = userRepository.findOne(Specification.where(userEmailEquals(userDetails.getUsername())))

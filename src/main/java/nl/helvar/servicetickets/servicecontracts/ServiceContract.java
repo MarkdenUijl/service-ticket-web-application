@@ -95,6 +95,8 @@ public class ServiceContract {
 
     public boolean isValid() {
         LocalDate today = LocalDate.now();
-        return this.endDate.isAfter(today);
+
+        return !today.isBefore(startDate)
+                && !today.isAfter(endDate);
     }
 }

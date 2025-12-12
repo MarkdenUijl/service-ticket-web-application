@@ -34,6 +34,13 @@ public class ServiceTicket {
     @JoinColumn(name = "project_id")
     @JsonIgnore
     private Project project;
+
+    // Snapshot fields: determine contract validity at the moment the ticket was created.
+    // This prevents historic tickets from changing behavior when contracts are renewed/expired later.
+    private boolean hadValidContractAtCreation;
+    private Instant contractValidFromAtCreation;
+    private Instant contractValidUntilAtCreation;
+
     private int minutesSpent;
     @Column(nullable = false)
     private Instant creationDate;
@@ -44,6 +51,7 @@ public class ServiceTicket {
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User submittedBy;
+
 
     @PrePersist
     void onCreate() {
@@ -129,6 +137,31 @@ public class ServiceTicket {
     public int getMinutesSpent() {
         return minutesSpent;
     }
+
+    public boolean isHadValidContractAtCreation() {
+        return hadValidContractAtCreation;
+    }
+
+    public void setHadValidContractAtCreation(boolean hadValidContractAtCreation) {
+        this.hadValidContractAtCreation = hadValidContractAtCreation;
+    }
+
+    public Instant getContractValidFromAtCreation() {
+        return contractValidFromAtCreation;
+    }
+
+    public void setContractValidFromAtCreation(Instant contractValidFromAtCreation) {
+        this.contractValidFromAtCreation = contractValidFromAtCreation;
+    }
+
+    public Instant getContractValidUntilAtCreation() {
+        return contractValidUntilAtCreation;
+    }
+
+    public void setContractValidUntilAtCreation(Instant contractValidUntilAtCreation) {
+        this.contractValidUntilAtCreation = contractValidUntilAtCreation;
+    }
+
 
     public void setMinutesSpent(int minutesSpent) {
         this.minutesSpent = minutesSpent;

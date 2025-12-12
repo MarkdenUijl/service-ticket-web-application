@@ -82,7 +82,7 @@ public class ServiceContractCreationDTO {
         serviceContract.setContractTime(this.getContractTime());
         serviceContract.setUsedTime(this.getUsedTime());
         serviceContract.setStartDate(this.getStartDate());
-        serviceContract.setEndDate(this.getEndDate());
+        serviceContract.setEndDate(this.getStartDate().plusYears(1));
 
         return serviceContract;
     }
